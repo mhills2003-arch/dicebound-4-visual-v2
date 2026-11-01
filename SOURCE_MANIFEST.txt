@@ -1,0 +1,3 @@
+Base source ZIP: DICEBOUND4_FOUR_CLASS_BENEFITS_MULTIPLAYER_GITHUB_UPDATE.zip
+Base ZIP SHA256: a5647f2d15524d1d589ccd36b83f8c0c1432906d5e778ae157a8d5c7f8045999
+V2 modifications limited to route/auth namespace, branding, isolation config, safety documentation and original visual assets.

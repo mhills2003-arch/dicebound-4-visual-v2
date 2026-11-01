@@ -1,0 +1,19 @@
+# DISTINCT V2 WORKER ONLY. Never deploy this from your V1 repository.
+# No custom domain, routes, KV, D1 or existing beta storage binding.
+name = "sonny-dicebound-visual-v2"
+main = "src/worker.mjs"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+[[durable_objects.bindings]]
+name = "V2_GAME_ROOM"
+class_name = "GameRoom"
+
+[[migrations]]
+tag = "v2_initial_sqlite"
+new_sqlite_classes = ["GameRoom"]

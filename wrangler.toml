@@ -1,6 +1,6 @@
 # DISTINCT V2 WORKER ONLY. Never deploy this from your V1 repository.
 # No custom domain, routes, KV, D1 or existing beta storage binding.
-name = "sonny-dicebound-visual-v2"
+name = "dicebound-4-visual-v2"
 main = "src/worker.mjs"
 compatibility_date = "2026-11-01"
 workers_dev = true

@@ -228,3 +228,379 @@
 @media(max-width:430px){.portal-arrow{width:34px;height:40px;font-size:22px;border-radius:9px}}
 
 .chat-emoji-bar{display:flex;gap:4px;padding:6px 9px 0;flex-wrap:wrap;align-items:center}.chat-emoji{background:#203949;border:1px solid #4b6268;border-radius:7px;color:white;min-width:32px;min-height:32px;font-size:18px;cursor:pointer}.chat-emoji:focus-visible{outline:2px solid #efcf88}
+
+/* A small authored encounter briefing changes every room, without hiding controls. */
+.room-challenge {margin:5px 0 4px;color:#ead9ad;font-size:clamp(12px,1.2vw,14px);line-height:1.42;max-width:850px;}
+
+/* Personal consumable actions remain alongside enemy status, not over the dungeon. */
+#combatItemsList{display:grid;gap:7px}.supply-item{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border:1px solid #355765;border-radius:8px;background:#172b3b}
+.supply-text{display:flex;flex-direction:column;gap:3px;min-width:0}.supply-text strong{font-size:12px;color:#f2dcaa}.supply-text small{font-size:10px;color:#b7cbc7;line-height:1.35}.supply-item button{flex:none;min-width:47px;min-height:38px}
+
+/* Endgame Maze — isolated from the campaign canvas and persistent inventory. */
+.maze-control-panel{border-color:#9f8452}
+.maze-control-panel .bag-action,.maze-actions button,.maze-directions button,#mazeSlotChoices button,#mazeRewardChoices button{margin:3px;padding:8px 10px;min-height:38px;border-radius:8px;border:1px solid #a58b59;background:#23374a;color:#f4e5c8;cursor:pointer}
+.maze-control-panel button:disabled{opacity:.45;cursor:not-allowed}
+.maze-map{position:relative;overflow:auto;min-height:270px;max-height:460px;border:1px solid #546d7b;border-radius:10px;background:#071321;padding:8px}
+.maze-map-grid{position:relative;min-width:360px;min-height:270px}
+.maze-node{position:absolute;display:flex;align-items:center;justify-content:center;width:28px;height:28px;box-sizing:border-box;background:#384759;border:1px solid #9eaeae;border-radius:5px;color:#f6f1d7;font:12px system-ui;transform:translate(-50%,-50%)}
+.maze-node.current{background:#bd9848;color:#152332;border:2px solid #fff3c6}
+.maze-node.boss{background:#704e77}
+.maze-map-line{position:absolute;background:#7a8a80;height:2px;transform-origin:0 50%}
+.maze-foe{display:flex;gap:8px;align-items:center;margin:4px 0;padding:5px;border-radius:6px;background:#202739}
+.maze-foe button{min-height:32px}
+.maze-danger{color:#ffb98a;font-weight:bold}
+
+/* Four-class beta creation: visible before selecting once; usable on tablets */
+.class-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 4px}
+.class-choice{padding:13px 12px;border:1px solid #b89e6b;border-radius:10px;background:#253d51;color:#f2e6c9;text-align:left;cursor:pointer;line-height:1.5;font-weight:650}
+.class-choice:focus-visible{outline:3px solid #f3cf83;outline-offset:2px}
+.class-choice:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:690px){.class-choice-grid{grid-template-columns:1fr}}
+
+/* Endgame boss arena: one logical coordinate per 7×7 tile. */
+.maze-arena{display:grid;grid-template-columns:repeat(7,minmax(26px,1fr));gap:3px;max-width:440px;margin:8px auto 14px;padding:8px;background:#0a1624;border:1px solid #5f728a;border-radius:11px}
+.maze-arena-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;min-height:36px;min-width:0;font-size:21px;color:#b8b9bc;border:1px solid #4c6675;background:#1b3244;border-radius:5px;cursor:pointer}
+.maze-arena-cell.danger{background:#9b342e;color:#fff5ca;border-color:#ffa998;box-shadow:inset 0 0 0 1px #ffcf76}
+.maze-arena-cell.fixture{color:#ffe7ac;border-color:#9b8041}
+.maze-arena-cell.hero{color:#fff3cf;background:#31596b;border-color:#b5e8ff}
+.maze-arena-cell.monarch{background:#5e355d;color:#fff1e6}
+.maze-arena-cell:disabled{cursor:default;opacity:1}
+.maze-boss-intro{font-size:.95rem;line-height:1.5;color:#e9d3a5}
+.maze-weak{color:#b4f6c5;font-weight:700}
+@media(max-width:430px){.maze-arena{padding:4px;gap:2px}.maze-arena-cell{min-height:28px;font-size:18px}}
+
+/* V2 identity marker only; the dungeon renderer is intentionally still baseline. */
+.v2-ribbon { border-top: 1px solid #73dbdb !important; border-bottom: 1px solid #73dbdb !important; }
+.v2-ribbon strong { color: #a9ffff; letter-spacing: .06em; }
+
+/* V2 artwork is an independent Canvas layer. This comparison control never changes game state. */
+.v2-art-toggle{border-color:#d6ae68;background:linear-gradient(150deg,#564128,#1e3542);color:#fbe0a6;box-shadow:inset 0 1px 0 #fbd89342}
+.v2-art-toggle[aria-pressed="false"]{border-color:#59768c;background:#1d3041;color:#bfc9d1;box-shadow:none}
+.v2-art-toggle[hidden]{display:none!important}
+
+.v2-preview-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap;color:#f1d79c;border-color:#94764d;background:#1c2d39}
+@media(max-width:760px){.v2-preview-link{font-size:10px;padding:6px 8px}}
+
+/* V2 VISUAL PASS · Maze arena scenery. This changes paint, not game cells. */
+.maze-arena{background:
+ radial-gradient(ellipse at 45% 30%,#d4b07d24,transparent 62%),
+ repeating-linear-gradient(45deg,#ffffff08 0 2px,transparent 2px 24px),
+ linear-gradient(160deg,#2d3547,#0a1a25 68%,#161b2c);
+ border:2px solid #b99c70;box-shadow:inset 0 0 35px #070c19e0,0 10px 30px #0308109e;
+ padding:12px;gap:3px}
+.maze-arena-cell{background:
+ linear-gradient(155deg,#b2a08c10 0 15%,transparent 16% 52%,#00000038 75%),
+ repeating-linear-gradient(0deg,#d7bd8c13 0 1px,transparent 1px 14px),
+ linear-gradient(145deg,#46566a,#1d2e41);
+ border:1px solid #b9a47c70;border-radius:4px;text-shadow:0 2px 3px #000;
+ box-shadow:inset 1px 1px 0 #c8d5da24,inset -2px -3px 5px #050e1d72;
+ transition:filter .15s,border-color .15s}
+.maze-arena-cell:hover:not(:disabled){filter:brightness(1.20);border-color:#e3cfaa}
+.maze-arena-cell.danger{background:radial-gradient(circle at 52% 50%,#e97e47,#6f2330);border-color:#ffd19c;box-shadow:0 0 9px #e76b5b80}
+.maze-arena-cell.hero{background:radial-gradient(circle,#35697a,#174452);border-color:#87e3da}
+.maze-arena-cell.fixture{background:radial-gradient(circle at 42% 30%,#78634d,#313144);border-color:#edcf83}
+.maze-arena-cell.monarch{background:radial-gradient(circle at 50% 25%,#926384,#3a274d);border-color:#ddadeb}
+@media(max-width:430px){.maze-arena{padding:5px;gap:2px}}
+
+/* V2 HUD LAB: board-first presentation. These selectors only apply in
+   .hud-board-focus; the complete previous HUD remains one click away. */
+.hud-main-switch{border-color:#f1d48b;background:#273e45;color:#ffe0a0;font-weight:850}
+.hud-focus-tool{border-color:#586e7a;background:#142736;color:#d8e9e6}
+body:not(.hud-board-focus) .hud-focus-tool{display:none!important}
+body.hud-board-focus .masthead{height:53px;padding:4px 16px}
+body.hud-board-focus .brand strong{font-size:20px}
+body.hud-board-focus .brand small{letter-spacing:.07em;font-size:8px}
+body.hud-board-focus .brand-icon{font-size:23px}
+body.hud-board-focus .v2-ribbon{display:none}
+body.hud-board-focus .workspace{display:block;max-width:none;width:100%;padding:7px 11px;min-height:0}
+body.hud-board-focus .main-area{width:100%;max-width:none;min-width:0;gap:5px}
+body.hud-board-focus .side-left,body.hud-board-focus .side-right{display:none}
+body.hud-board-focus .room-heading{min-height:0;gap:9px;padding:6px 11px;align-items:center}
+body.hud-board-focus .room-heading h1{font-size:20px;margin:0}
+body.hud-board-focus .room-heading p{display:none}
+body.hud-board-focus .room-actions{max-width:none;justify-content:flex-end;gap:4px;align-items:center}
+body.hud-board-focus .room-actions .viewbtn{font-size:11px;padding:5px 8px;min-height:34px}
+body.hud-board-focus .v2-preview-link{display:none}
+/* Compact personal status; backpack remains accessible via Party/Map or classic HUD. */
+body.hud-board-focus .hero-hud{padding:5px 10px;grid-template-columns:minmax(140px,.8fr) minmax(145px,1fr) minmax(290px,1.6fr);gap:8px}
+body.hud-board-focus .hero-hud-title strong{font-size:14px}
+body.hud-board-focus .hero-hud .hud-eyebrow,body.hud-board-focus .hero-hud .hud-note,body.hud-board-focus .hero-hud .hero-bag{display:none}
+body.hud-board-focus .hero-hud .hud-bars{gap:3px}
+body.hud-board-focus .hero-hud .hud-meter-label{line-height:1.12}
+body.hud-board-focus .hero-hud .hud-cells{gap:4px}
+body.hud-board-focus .hero-hud .hud-cell{padding:4px 2px}
+body.hud-board-focus .hero-hud .hud-cell span{font-size:9px}
+body.hud-board-focus .hero-hud .hud-cell strong{font-size:11px}
+body.hud-board-focus .board-and-actions{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;height:auto;min-height:0;gap:5px}
+body.hud-board-focus .board-and-actions .canvas-wrap{width:100%;min-width:0;min-height:390px;height:clamp(370px,54dvh,790px);max-height:none;grid-area:auto;order:2;flex:none}
+body.hud-board-focus .turn-dock{order:1;width:100%;min-width:0;min-height:0;flex:initial;display:flex;flex-direction:row;align-items:center;gap:8px;padding:4px 9px;min-height:42px}
+body.hud-board-focus .turn-dock-head{flex-direction:row;gap:9px;white-space:nowrap}
+body.hud-board-focus .turn-clock{font-size:19px}
+body.hud-board-focus .turn-dock .turn-banner{max-width:270px;padding:5px 8px;font-size:11px!important;line-height:1.25;white-space:normal}
+body.hud-board-focus .turn-dock .turn-dock-help{display:none}
+body.hud-board-focus .turn-dock #globalTurnStrip{display:flex;flex:1 1 auto;flex-direction:row;gap:4px;align-items:center;flex-wrap:wrap;padding:3px 7px}
+body.hud-board-focus .turn-dock #globalTurnStrip .turn-heading{font-size:10px;white-space:nowrap}
+body.hud-board-focus .turn-dock #globalTurnStrip .turn-step{font-size:10px;padding:4px}
+body.hud-board-focus .turn-dock #globalTurnStrip .turn-enemies{display:none}
+body.hud-board-focus .action-dock{order:3;width:100%;max-width:none;min-width:0;height:auto;min-height:0;flex:none;display:flex;flex-direction:row;align-items:center;gap:7px;padding:7px 9px;overflow:visible}
+body.hud-board-focus .action-dock-title{display:none}
+body.hud-board-focus .action-dock #rollMoveBtn{flex:0 0 135px;width:135px;min-height:45px;font-size:12px}
+body.hud-board-focus .action-dock .dock-counter{flex:0 0 90px;font-size:10px}
+body.hud-board-focus .action-dock .combat-controls{display:grid;flex:1 1 auto;min-width:0;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:none;gap:5px;overflow:visible}
+body.hud-board-focus .action-dock .combat-btn{min-height:46px;height:auto;min-width:0;font-size:11px;line-height:1.15;padding:5px 3px}
+body.hud-board-focus .action-dock .combat-btn.special{font-size:10px}
+body.hud-board-focus .action-dock .end-turn-overlay{width:128px;flex:0 0 128px;min-width:0;min-height:45px;font-size:12px;margin:0}
+body.hud-board-focus .target-panel{padding:3px 9px;margin:0;font-size:11px;min-height:0}
+body.hud-board-focus .movement-roll{display:none}
+body.hud-board-focus .controls{min-height:0;padding:3px 9px;gap:10px;background:transparent;border:0}
+body.hud-board-focus .dpad{display:flex;align-items:center;gap:2px}
+body.hud-board-focus .dpad button{height:34px;min-width:38px}
+body.hud-board-focus .toolhint{font-size:10px}
+body.hud-board-focus .toolhint small{display:none}
+body.hud-board-focus .class-select-panel{position:relative}
+/* Open party or encounter panes as overlays only on demand. */
+.hud-drawer-shade{position:fixed;inset:0;z-index:75;background:rgba(1,8,14,.66);backdrop-filter:blur(2px)}
+.hud-drawer-shade[hidden],.hud-drawer-close[hidden]{display:none!important}
+.hud-drawer-close{position:fixed;right:calc(max(9px,env(safe-area-inset-right)) + 7px);top:calc(3dvh + 7px);z-index:83;border:1px solid #f4db9f;background:#243946;color:#ffe6ac;border-radius:8px;padding:8px 12px;font-weight:750}
+body.hud-board-focus .sidebar.hud-panel-open{display:flex!important;position:fixed;z-index:80;top:3dvh;right:max(9px,env(safe-area-inset-right));bottom:3dvh;width:min(465px,calc(100vw - 18px));max-height:94dvh;overflow-y:auto;overscroll-behavior:contain;background:#0d2031;border:2px solid #b59a69;border-radius:15px;padding:48px 11px 11px;gap:10px;box-shadow:0 18px 65px #000b;grid-column:auto;flex-direction:column}
+body.hud-board-focus .side-left.hud-panel-open{left:max(9px,env(safe-area-inset-left));right:auto}
+body.hud-board-focus .side-right.hud-panel-open.hud-log-only > section:not(.adventurelog){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-shop-only > section:not(#merchantPanel){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-rewards-only > section:not(#questRewardPanel){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-details-only > section:is(.adventurelog,#merchantPanel,#questRewardPanel){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-shop-only .shop-item{min-height:45px}
+body.hud-board-focus .side-right.hud-panel-open .adventurelog{min-height:65dvh}
+body.hud-board-focus .side-right.hud-panel-open .adventurelog #log{max-height:73dvh;min-height:50dvh}
+body.hud-board-focus .chat-launcher{z-index:69}
+@media(max-width:1100px){
+ body.hud-board-focus .room-heading{flex-wrap:wrap}
+ body.hud-board-focus .room-actions{justify-content:flex-start}
+ body.hud-board-focus .hero-hud{grid-template-columns:1fr 1fr}
+ body.hud-board-focus .hero-hud .hud-cells{grid-column:1/-1}
+ body.hud-board-focus .turn-dock{flex-wrap:wrap}
+ body.hud-board-focus .action-dock{flex-wrap:wrap}
+ body.hud-board-focus .action-dock .combat-controls{order:2;flex-basis:100%;grid-template-columns:repeat(6,minmax(0,1fr))}
+ body.hud-board-focus .action-dock .end-turn-overlay{margin-left:auto}
+}
+@media(max-width:700px){
+ body.hud-board-focus .masthead{height:50px;padding:4px 7px}
+ body.hud-board-focus .brand strong{font-size:15px}
+ body.hud-board-focus .brand small{display:none}
+ body.hud-board-focus .workspace{padding:4px}
+ body.hud-board-focus .room-heading{padding:5px}
+ body.hud-board-focus .room-heading h1{font-size:17px}
+ body.hud-board-focus .room-actions .viewbtn{min-height:38px;font-size:11px;padding:5px 7px}
+ body.hud-board-focus .hero-hud{grid-template-columns:1fr 1fr;padding:5px}
+ body.hud-board-focus .hero-hud .hud-cells{grid-column:1/-1}
+ body.hud-board-focus .hero-hud .hud-cell{padding:3px}
+ body.hud-board-focus .board-and-actions{display:flex;flex-direction:column;gap:5px}
+ body.hud-board-focus .board-and-actions .canvas-wrap{order:2;height:clamp(300px,50dvh,570px);min-height:300px;max-height:none;width:100%;flex:none}
+ body.hud-board-focus .turn-dock{order:1;width:100%;flex:0 0 auto;display:flex;padding:4px;gap:4px}
+ body.hud-board-focus .turn-dock .turn-banner{font-size:10px!important;padding:4px}
+ body.hud-board-focus .turn-dock #globalTurnStrip{display:flex;grid-column:auto;padding:3px;gap:2px}
+ body.hud-board-focus .action-dock{order:3;width:100%;min-width:0;height:auto;display:flex;padding:5px;gap:4px;flex-wrap:wrap}
+ body.hud-board-focus .action-dock #rollMoveBtn{flex:1 1 110px;min-width:100px}
+ body.hud-board-focus .action-dock .dock-counter{flex:0 1 90px}
+ body.hud-board-focus .action-dock .end-turn-overlay{flex:0 0 110px;width:110px}
+ body.hud-board-focus .action-dock .combat-controls{flex:1 1 100%;order:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:none;gap:4px}
+ body.hud-board-focus .action-dock .combat-btn{min-height:43px;font-size:11px}
+ body.hud-board-focus .dpad button{height:39px;min-width:42px}
+ body.hud-board-focus .toolhint{display:none}
+ body.hud-board-focus .canvas-help{font-size:10px}
+}
+@media(max-width:380px){body.hud-board-focus .room-actions .viewbtn{font-size:10px;padding:4px 6px}}
+
+/* Art-comparison tools are optional rather than a permanent wall of controls. */
+.hud-visual-settings{position:relative;flex:none}
+.hud-visual-settings summary{list-style:none;display:block;cursor:pointer;user-select:none}
+.hud-visual-settings summary::-webkit-details-marker{display:none}
+.hud-visual-settings[open] summary{border-color:#e4cb89;color:#ffe9bd}
+.hud-art-buttons{position:absolute;right:0;top:calc(100% + 6px);width:min(270px,calc(100vw - 20px));z-index:58;background:#0d2131;border:1px solid #ad976e;border-radius:12px;box-shadow:0 12px 38px #000b;padding:8px;display:flex;flex-direction:column;gap:5px}
+.hud-art-buttons button{white-space:normal!important;text-align:left;min-height:39px;width:100%}
+/* Backpack uses the same pop-up principle as the shop: no duplicate inventory state. */
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open{display:block!important;position:fixed;z-index:80;top:3dvh;right:max(9px,env(safe-area-inset-right));bottom:3dvh;width:min(480px,calc(100vw - 18px));max-height:94dvh;overflow-y:auto;background:#0c2030;border:2px solid #b59a69;border-radius:14px;box-shadow:0 18px 65px #000b;padding:58px 12px 14px;color:#f6dfab}
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open .hero-bag-content{grid-template-columns:1fr;gap:8px}
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open summary{font-size:16px}
+@media(min-width:701px) and (max-width:1100px){body.hud-board-focus .board-and-actions .canvas-wrap{height:clamp(340px,49dvh,620px)}}
+
+/* Put low-frequency HUD panels behind one small pop-out menu. */
+body:not(.hud-board-focus) .hud-hud-menu{display:none}
+.hud-hud-menu{position:relative;flex:none}
+.hud-hud-menu summary{list-style:none;display:block;cursor:pointer;user-select:none}
+.hud-hud-menu summary::-webkit-details-marker{display:none}
+.hud-hud-menu[open] summary{border-color:#e4cb89;color:#ffe9bd}
+.hud-menu-buttons{position:absolute;top:calc(100% + 6px);right:0;z-index:58;width:min(260px,calc(100vw - 20px));background:#0c2131;border:1px solid #b59a69;border-radius:12px;padding:9px;box-shadow:0 12px 38px #000b;display:flex;flex-direction:column;gap:6px}
+.hud-menu-buttons button{width:100%;min-height:43px;white-space:normal!important;text-align:left}
+
+/* Board Focus FIX B — class selection is an on-demand modal, not a full room panel. */
+body.hud-board-focus #classSelectPanel:not(.hud-class-open){display:none!important}
+body.hud-board-focus #classSelectPanel.hud-class-open:not([hidden]){display:block!important;position:fixed;z-index:81;top:3dvh;left:50%;transform:translateX(-50%);width:min(680px,calc(100vw - 20px));max-height:94dvh;overflow-y:auto;overscroll-behavior:contain;background:#0d2031;border:2px solid #b59a69;border-radius:15px;padding:56px 14px 18px;box-shadow:0 18px 65px #000b}
+body.hud-board-focus #classSelectPanel.hud-class-open[hidden]{display:none!important}
+body.hud-board-focus #classSelectPanel.hud-class-open .class-choice-grid{grid-template-columns:1fr 1fr}
+@media(max-width:700px){body.hud-board-focus #classSelectPanel.hud-class-open .class-choice-grid{grid-template-columns:1fr}}
+
+
+/* DICEBOUND V2 · CINEMATIC ROOM-FIRST HUD · all styles strictly within focus mode. */
+#cinematicTop{display:none}
+.cin-class-portrait,.cinematic-scene-badge{display:none}
+body.hud-board-focus{overflow:hidden;background:#081016}
+body.hud-board-focus .masthead{display:none!important}
+body.hud-board-focus #cinematicTop{display:flex!important;position:relative;z-index:55;width:100%;height:68px;min-height:68px;align-items:center;gap:13px;padding:4px 17px;background:linear-gradient(180deg,#020b10 0%,#0e1b23 85%,#13232a 100%);border-bottom:3px ridge #ca9750;box-shadow:0 4px 19px #000b;color:#f5d693;overflow:visible}
+body.hud-board-focus .cin-logo{display:flex;align-items:center;gap:7px;font:700 clamp(18px,1.8vw,28px) Georgia,'Palatino Linotype',serif;letter-spacing:.055em;text-shadow:0 2px 3px #000,0 0 12px #ae6a2755;white-space:nowrap}
+body.hud-board-focus .cin-logo .cin-die{font-size:31px;color:#d7a454;filter:drop-shadow(0 0 5px #bc803a)}
+body.hud-board-focus .cin-economy{display:flex;align-items:stretch;gap:5px;min-width:0}
+body.hud-board-focus .cin-chip{border:1px solid #7a8c90;box-shadow:inset 0 1px #e6bd7840,0 2px 2px #0009;display:flex;gap:5px;align-items:center;justify-content:center;min-height:42px;border-radius:5px;background:#091924;color:#f7e1b4;padding:2px 9px;white-space:nowrap;font:600 15px Georgia,serif}
+body.hud-board-focus .cin-coin{color:#ffc55c;text-shadow:0 0 8px #d37c16;font-size:23px}
+body.hud-board-focus .cin-xp>span{color:#82d8ff;font-size:20px;text-shadow:0 0 6px #158fe9}
+body.hud-board-focus .cin-chip small{color:#c3d7dc;font:700 11px system-ui}
+body.hud-board-focus .cin-level{color:#d9d7c9}
+body.hud-board-focus .cin-room{min-width:165px;flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.13;padding:4px 22px;border-top:2px solid #bb8d48;border-bottom:2px solid #bb8d48;position:relative;background:linear-gradient(90deg,transparent,#172432aa 11%,#101e27 85%,transparent);color:#f5dfae;overflow:hidden;white-space:nowrap}
+body.hud-board-focus .cin-room::before,body.hud-board-focus .cin-room::after{content:'❦';position:absolute;top:12px;color:#d3a35a;font-size:18px}
+body.hud-board-focus .cin-room::before{left:3px}body.hud-board-focus .cin-room::after{right:3px;transform:scaleX(-1)}
+body.hud-board-focus .cin-room span{font:700 clamp(13px,1.12vw,20px) Georgia,'Palatino Linotype',serif;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+body.hud-board-focus .cin-room strong{font:italic 600 clamp(12px,.92vw,16px) Georgia,serif;color:#e9d3a3;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+body.hud-board-focus .cin-nav{display:flex;align-items:center;gap:5px;flex:none}
+body.hud-board-focus .cin-nav button,body.hud-board-focus .cin-more summary{border:1px solid #8c9c9d;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:linear-gradient(160deg,#1a303c,#06131f);box-shadow:inset 0 1px 0 #e4f7fb35;color:#efdfc4;min-width:62px;min-height:43px;padding:3px 8px;font:700 11px Georgia,serif;cursor:pointer;white-space:nowrap}
+body.hud-board-focus .cin-nav button span:first-child,body.hud-board-focus .cin-more summary span{font-size:19px;color:#eac079;line-height:1}
+body.hud-board-focus .cin-nav button:hover,body.hud-board-focus .cin-more summary:hover{border-color:#f2c678;background:#223b48}
+body.hud-board-focus .cin-more{position:relative}
+body.hud-board-focus .cin-more summary{list-style:none;min-width:43px;font-size:21px}body.hud-board-focus .cin-more summary::-webkit-details-marker{display:none}
+body.hud-board-focus .cin-more-menu{position:absolute;right:0;top:calc(100% + 12px);width:215px;display:grid;gap:6px;padding:10px;background:#0b1c28;border:2px solid #bda06b;border-radius:9px;box-shadow:0 15px 36px #000c}
+body.hud-board-focus .cin-more-menu button{width:100%;display:block;text-align:left;font:600 13px system-ui;min-height:40px}
+body.hud-board-focus .workspace{display:block!important;max-width:none!important;width:100%;height:calc(100dvh - 68px);min-height:0!important;padding:0!important;margin:0!important;overflow:hidden}
+body.hud-board-focus .main-area{position:relative;display:block!important;width:100%;height:100%;max-width:none!important;overflow:hidden}
+body.hud-board-focus .room-heading{display:none!important}
+body.hud-board-focus .side-left,body.hud-board-focus .side-right{display:none!important}
+body.hud-board-focus .class-select-panel:not(.hud-class-open){display:none!important}
+body.hud-board-focus .board-and-actions{display:block!important;position:absolute;inset:0;width:100%;height:100%!important;min-height:0!important;max-height:none!important;overflow:hidden}
+body.hud-board-focus .board-and-actions .canvas-wrap{position:absolute!important;inset:0;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;border:0!important;border-radius:0!important;margin:0!important;overflow:hidden!important;background:#172719;z-index:1}
+body.hud-board-focus .canvas-help{position:absolute;left:30%;right:30%;bottom:137px;border-radius:5px;background:#06101ad9;color:#f0ddb0;font:12px Georgia,serif;padding:3px 9px;z-index:5}
+body.hud-board-focus .cinematic-scene-badge{display:none}
+body.hud-board-focus .hero-hud{position:absolute;left:0;bottom:0;z-index:15;display:grid!important;align-content:center;align-items:center;grid-template-columns:185px 225px 1fr!important;grid-template-rows:1fr;column-gap:10px;width:100%;height:130px;min-height:130px;padding:8px 720px 8px 14px!important;border:0!important;border-top:3px ridge #d7a75b!important;border-radius:0!important;background:linear-gradient(180deg,#07151fef,#0c202afe)!important;box-shadow:0 -6px 19px #0008;color:#f5e4c8}
+body.hud-board-focus .hero-hud .hud-eyebrow,body.hud-board-focus .hero-hud .hud-note,body.hud-board-focus .hero-hud .hero-bag{display:none!important}
+body.hud-board-focus .hero-hud-title{align-items:center;flex-wrap:nowrap;gap:9px;max-width:190px;overflow:hidden}
+body.hud-board-focus .hero-hud-title>div{display:flex;flex-direction:column;align-items:flex-start;gap:0}
+body.hud-board-focus .cin-class-portrait{display:block!important;width:74px;height:94px;object-fit:cover;object-position:50% 22%;border:2px ridge #cf9c56;border-radius:36% 36% 7px 7px;box-shadow:0 0 0 3px #141e26,0 0 10px #ad804d66;flex-shrink:0;background:#273845}
+body.hud-board-focus .hero-hud-title strong{font:700 20px Georgia,serif;color:#ffe5ae;max-width:98px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.hud-board-focus .hero-hud-title .hud-muted{font:13px Georgia,serif;color:#d2dccd;max-height:31px;overflow:hidden}
+body.hud-board-focus .hero-level{font:700 14px Georgia,serif;white-space:nowrap;border:0;padding:0;color:#f0c67e}
+body.hud-board-focus .hud-bars{gap:8px;min-width:0}
+body.hud-board-focus .hud-meter-label span{font-size:14px;font-weight:800;color:#f4d69f}
+body.hud-board-focus .hud-meter-label strong{font-size:13px;color:#f8eaca}
+body.hud-board-focus .hud-track{height:10px;background:#273140;border:1px solid #aa8a55}
+body.hud-board-focus .hud-fill.hp{background:linear-gradient(90deg,#9c2432,#f2494c)}
+body.hud-board-focus .hud-fill.xp{background:linear-gradient(90deg,#5d9bc8,#c8e8eb)}
+body.hud-board-focus .hud-cells{display:grid;align-items:center;grid-template-columns:repeat(4,minmax(70px,1fr));gap:5px;grid-column:3;overflow:hidden}
+body.hud-board-focus .hud-cell{background:linear-gradient(180deg,#152c36,#071720);border:1px solid #566b6c;border-radius:7px;min-height:74px;padding:7px 2px;gap:1px}
+body.hud-board-focus .hud-cell span{font-size:11px;color:#edca91}
+body.hud-board-focus .hud-cell strong{font:700 14px Georgia,serif;color:#f7e4c3}
+body.hud-board-focus .action-dock{position:absolute!important;bottom:0;right:0;z-index:16;display:flex!important;flex-direction:row;align-items:center;justify-content:flex-end;gap:7px;height:130px!important;min-height:130px;width:700px!important;max-width:48%;padding:10px 13px!important;border:0!important;border-top:3px ridge #d7a75b;background:linear-gradient(180deg,#08141d,#0e2430)!important;box-shadow:none}
+body.hud-board-focus .action-dock-title{display:none!important}
+body.hud-board-focus .action-dock #rollMoveBtn{flex:1 1 75px;width:auto!important;min-width:70px;height:94px;min-height:94px;font:700 14px Georgia,serif;background:linear-gradient(175deg,#845f23,#bc8e36 40%,#473512)!important;border:2px ridge #e4c476;border-radius:8px;color:#fff4d4;text-shadow:1px 1px #1a1112;white-space:normal}
+body.hud-board-focus .action-dock .dock-counter{display:none!important}
+body.hud-board-focus .action-dock .combat-controls{display:flex!important;gap:6px;flex:3 1 auto;min-width:0;align-items:center;justify-content:flex-end;overflow:visible}
+body.hud-board-focus .action-dock .combat-btn,body.hud-board-focus .action-dock .cin-extra>summary{flex:1 1 74px;min-width:65px;min-height:92px!important;height:92px!important;display:flex;align-items:center;justify-content:center;text-align:center;padding:5px 4px;border:2px ridge #8dabae;background:linear-gradient(155deg,#1c3545,#091b2a);border-radius:9px;box-shadow:inset 0 0 0 2px #0a1c26,0 3px 9px #0008;color:#f7e2af;font:700 15px Georgia,serif;white-space:normal}
+body.hud-board-focus .action-dock .combat-btn:disabled{opacity:.42}
+body.hud-board-focus .action-dock .combat-btn.special{font-size:14px}
+body.hud-board-focus .action-dock .end-turn-overlay{flex:1 0 92px;width:auto!important;min-width:92px;min-height:94px;height:94px;font:700 17px Georgia,serif;border:3px ridge #f4d078;border-radius:10px;color:#ffebbd;background:linear-gradient(160deg,#76501b,#161a1a 85%);box-shadow:0 0 10px #dcad4266}
+body.hud-board-focus .action-dock .cin-extra{position:relative;flex:1 1 72px;min-width:63px}
+body.hud-board-focus .action-dock .cin-extra>summary{list-style:none;cursor:pointer;min-width:100%;font-size:13px}
+body.hud-board-focus .action-dock .cin-extra>summary::-webkit-details-marker{display:none}
+body.hud-board-focus .action-dock .cin-extra-buttons{display:grid;gap:6px;position:absolute;bottom:calc(100% + 9px);right:0;width:220px;max-height:55dvh;overflow:auto;border:2px solid #cdaa69;background:#0a202c;padding:9px;border-radius:10px;box-shadow:0 10px 40px #000b}
+body.hud-board-focus .action-dock .cin-extra-buttons .combat-btn{height:45px!important;min-height:45px!important;font:600 14px Georgia,serif}
+body.hud-board-focus .turn-dock{display:flex!important;position:absolute!important;z-index:13;top:14px;left:14px;width:auto!important;max-width:45%;min-height:39px!important;height:auto!important;padding:5px 11px!important;gap:8px;border:1px solid #d2ab60;background:#091c27dc;border-radius:7px;box-shadow:0 2px 8px #0008}
+body.hud-board-focus .turn-dock-head{gap:6px;align-items:center}
+body.hud-board-focus .turn-dock .turn-dock-title{display:none}
+body.hud-board-focus .turn-dock .turn-clock{font:700 17px Georgia,serif;color:#ffd68c}
+body.hud-board-focus .turn-dock .turn-banner{position:static!important;transform:none!important;white-space:nowrap;border:0;background:transparent;box-shadow:none;padding:0 5px!important;font-size:12px!important;max-width:260px}
+body.hud-board-focus .turn-dock #globalTurnStrip{display:none!important}
+body.hud-board-focus .controls{position:absolute!important;bottom:129px;left:12px;z-index:11;background:#081825ca;border:1px solid #876f4b;border-radius:8px;padding:2px 7px;min-height:0!important;height:39px!important;gap:6px}
+body.hud-board-focus .controls .dpad{gap:1px}
+body.hud-board-focus .controls .dpad button{height:30px!important;min-width:34px!important;font-size:14px;margin:0 1px}
+body.hud-board-focus .controls .toolhint{display:none}
+body.hud-board-focus .target-panel{position:absolute!important;z-index:12;bottom:134px;right:12px;width:auto;max-width:45%;padding:5px 11px;background:#091b25d9;border:1px solid #816c4e;border-radius:7px;font-size:12px}
+body.hud-board-focus .movement-roll{display:none}
+body.hud-board-focus .chat-launcher{z-index:48}
+@media(max-width:1320px){
+ body.hud-board-focus #cinematicTop{gap:7px;padding:4px 9px}
+ body.hud-board-focus .cin-logo{font-size:20px}
+ body.hud-board-focus .cin-chip{padding:2px 5px;font-size:12px}
+ body.hud-board-focus .cin-nav button{min-width:42px;padding:3px 5px}
+ body.hud-board-focus .hero-hud{padding-right:52%!important;grid-template-columns:155px 1fr!important}
+ body.hud-board-focus .hero-hud .hud-cells{display:none}
+ body.hud-board-focus .action-dock{width:52%!important;max-width:52%;gap:4px;padding:7px!important}
+ body.hud-board-focus .action-dock .combat-btn{min-width:50px!important}
+}
+@media(max-width:800px){
+ body.hud-board-focus{overflow:auto}
+ body.hud-board-focus #cinematicTop{height:56px;min-height:56px;gap:5px;padding:2px 6px}
+ body.hud-board-focus .cin-logo{font-size:16px}.cin-die{display:none}
+ body.hud-board-focus .cin-economy .cin-xp,body.hud-board-focus .cin-economy .cin-level{display:none}
+ body.hud-board-focus .cin-room{min-width:0;padding:2px 6px}
+ body.hud-board-focus .cin-room::before,body.hud-board-focus .cin-room::after{display:none}
+ body.hud-board-focus .cin-room span{font-size:11px}body.hud-board-focus .cin-room strong{font-size:11px}
+ body.hud-board-focus .cin-nav button span:last-child{display:none}
+ body.hud-board-focus .cin-nav button{min-height:35px;min-width:32px;padding:2px}
+ body.hud-board-focus .cin-more summary{min-height:35px;min-width:35px}
+ body.hud-board-focus .workspace{height:calc(100dvh - 56px)}
+ body.hud-board-focus .hero-hud{height:106px;min-height:106px;grid-template-columns:100px 1fr!important;padding:4px calc(60% + 4px) 4px 5px!important;gap:3px}
+ body.hud-board-focus .cin-class-portrait{width:42px;height:65px}
+ body.hud-board-focus .hero-hud-title strong{font-size:12px}
+ body.hud-board-focus .hero-hud-title .hud-muted{font-size:10px}
+ body.hud-board-focus .hero-level{font-size:11px}
+ body.hud-board-focus .hero-hud .hud-meter-label span{font-size:10px}
+ body.hud-board-focus .hero-hud .hud-meter-label strong{font-size:10px}
+ body.hud-board-focus .action-dock{height:106px!important;min-height:106px;width:60%!important;max-width:60%;padding:3px!important;gap:3px}
+ body.hud-board-focus .action-dock #rollMoveBtn{height:76px!important;min-height:76px!important;min-width:40px;font-size:10px}
+ body.hud-board-focus .action-dock .combat-btn,body.hud-board-focus .action-dock .cin-extra>summary{height:76px!important;min-height:76px!important;min-width:35px!important;font-size:11px!important}
+ body.hud-board-focus .action-dock .end-turn-overlay{height:76px!important;min-height:76px!important;min-width:50px;font-size:11px}
+ body.hud-board-focus .controls{bottom:111px;left:5px}
+ body.hud-board-focus .target-panel{bottom:112px;right:5px}
+ body.hud-board-focus .canvas-help{bottom:112px;font-size:10px}
+}
+@media(max-width:480px){
+ body.hud-board-focus .cin-logo{font-size:13px}
+ body.hud-board-focus .cin-nav #cinematicParty,body.hud-board-focus .cin-nav #cinematicInventory{display:none}
+ body.hud-board-focus .cin-room strong{font-size:10px}
+ body.hud-board-focus .hero-hud{padding-right:64%!important;grid-template-columns:1fr!important}
+ body.hud-board-focus .hero-hud-title{gap:4px}
+ body.hud-board-focus .hero-hud .hud-bars{display:none}
+ body.hud-board-focus .action-dock{width:64%!important;max-width:64%}
+ body.hud-board-focus .action-dock #rollMoveBtn{min-width:32px;font-size:9px}
+ body.hud-board-focus .action-dock .combat-controls{gap:2px}
+ body.hud-board-focus .action-dock .combat-btn,body.hud-board-focus .action-dock .cin-extra>summary{min-width:28px!important;font-size:9px!important}
+ body.hud-board-focus .action-dock .end-turn-overlay{min-width:43px;font-size:10px}
+}
+
+/* Final specificity repair: previous vertical action dock rules are not suitable for this layout. */
+body.hud-board-focus .action-dock{flex-wrap:nowrap!important}
+body.hud-board-focus .action-dock .combat-controls{flex-direction:row!important;flex-wrap:nowrap!important;order:initial!important;overflow:visible!important;padding:0!important;grid-template-rows:none!important}
+body.hud-board-focus .action-dock .combat-controls>.combat-btn{width:auto!important;flex:1 1 65px!important;min-width:60px!important}
+body.hud-board-focus .action-dock .cin-extra-buttons>.combat-btn{width:100%!important}
+body.hud-board-focus .cin-visual-panel,body.hud-board-focus #cinVisualPanel{position:fixed;z-index:95;top:85px;right:18px;width:270px;max-height:70dvh;overflow:auto;display:grid;gap:6px;padding:12px;border:2px solid #bca06b;background:#0d222b;border-radius:10px;box-shadow:0 15px 40px #000c}
+body.hud-board-focus #cinVisualPanel button{background:#213c46;border:1px solid #8ca4a1;border-radius:5px;color:#f9e2b5;padding:8px;cursor:pointer}
+@media(max-width:800px){body.hud-board-focus .action-dock .combat-controls>.combat-btn{min-width:34px!important}}
+@media(max-width:480px){body.hud-board-focus .action-dock .combat-controls>.combat-btn{min-width:25px!important}}
+
+/* Illustrated SVG affordances, sourced as real separate UI icons. */
+body.hud-board-focus .cin-stat-label{display:flex;gap:3px;justify-content:center;align-items:center}
+body.hud-board-focus .cin-stat-label img{width:19px;height:19px;vertical-align:middle}
+body.hud-board-focus .hud-meter .cin-stat-label{justify-content:flex-start}
+body.hud-board-focus .hud-meter .cin-stat-label img{width:17px;height:17px}
+body.hud-board-focus .action-dock #rollMoveBtn{background-image:url('./assets/cinematic-icons/roll.svg')!important;background-repeat:no-repeat!important;background-position:center 9px!important;background-size:34px 34px!important;padding-top:41px!important}
+body.hud-board-focus .action-dock #attackBtn{background-image:url('./assets/cinematic-icons/attack.svg');background-repeat:no-repeat;background-position:center 9px;background-size:37px 37px;padding-top:41px}
+body.hud-board-focus .action-dock #defendBtn{background-image:url('./assets/cinematic-icons/defend.svg');background-repeat:no-repeat;background-position:center 9px;background-size:37px 37px;padding-top:41px}
+body.hud-board-focus .action-dock #specialBtn{background-image:url('./assets/cinematic-icons/special.svg');background-repeat:no-repeat;background-position:center 9px;background-size:37px 37px;padding-top:41px}
+body.hud-board-focus .action-dock .cin-extra>summary{background-image:url('./assets/cinematic-icons/items.svg');background-repeat:no-repeat;background-position:center 9px;background-size:32px 32px;padding-top:41px}
+body.hud-board-focus .action-dock .end-turn-overlay{background-image:url('./assets/cinematic-icons/roll.svg');background-repeat:no-repeat;background-position:center 10px;background-size:28px 28px;padding-top:31px}
+@media(max-width:800px){body.hud-board-focus .action-dock #rollMoveBtn,body.hud-board-focus .action-dock #attackBtn,body.hud-board-focus .action-dock #defendBtn,body.hud-board-focus .action-dock #specialBtn,body.hud-board-focus .action-dock .cin-extra>summary{background-size:21px 21px!important;background-position:center 6px!important;padding-top:29px!important}body.hud-board-focus .action-dock .end-turn-overlay{background-size:18px 18px;background-position:center 7px;padding-top:24px}}
+
+/* Inventory must lift the full bottom strip above the modal shade. */
+body.hud-board-focus .hero-hud:has(.hero-bag.hud-bag-open){z-index:86!important}
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open{position:fixed!important;z-index:87!important}
+body.hud-board-focus .cin-class-portrait{object-fit:contain;object-position:center;padding:6px 2px}
+
+/* Chat is a collapsible overlay; never cover the essential End Turn control. */
+body.hud-board-focus .chat-launcher{bottom:147px!important;right:15px!important;z-index:48}
+body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
+@media(max-width:800px){body.hud-board-focus .chat-launcher{bottom:121px!important;right:8px!important;padding:7px 11px;font-size:12px;min-height:34px}body.hud-board-focus .chat-drawer{bottom:164px!important}}

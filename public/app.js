@@ -1,25 +1,173 @@
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs';
+import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='MEDIUM MAZE ROOMS · 13×9 · 5–8 TOUGHER FOES · 1 NOV 2026';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT · CINEMATIC GAME HUD · GOLD ART PILOT';
 const $ = id => document.getElementById(id);
+initPremiumWoodland();
 const canvas = $('gameCanvas');
 const ctx=canvas.getContext('2d');
 // Visible verification: if the badge does not appear, the browser is still using old app.js.
 const betaTitle=document.querySelector('.brand small');
 if(betaTitle)betaTitle.append(document.createTextNode(' · '+CLIENT_BUILD));
 const RES={tx:42,ty:23,zh:43}; // original DICEBOUND 3.2.1 projection
-const paths={one:'./assets/gary.png',two:'./assets/outlaw.png',three:'./assets/gary.png',four:'./assets/outlaw.png',d8:'./assets/d8.png',wallface:'./assets/wallface.jpeg',wallcap:'./assets/wallcap.jpeg'};
+const paths={one:'./assets/gary.png',two:'./assets/outlaw.png',three:'./assets/gary.png',four:'./assets/outlaw.png',d8:'./assets/d8.png',d6:'./assets/premium-woodland/d6-training.png',wallface:'./assets/wallface.jpeg',wallcap:'./assets/wallcap.jpeg'};
 const images={};for(const [key,path] of Object.entries(paths)){const image=new Image();image.src=path;images[key]=image}
+const cinForestFrames={};for(const side of ['left','right']){const i=new Image();i.src='./assets/premium-woodland/cinematic-frame-'+side+'.jpg';cinForestFrames[side]=i}
+function paintCinematicWoodlandSurround(ctx,s,w,h){
+  // Only environmental borders: NO units, walls, target markers or gameplay.
+  const leftW=Math.max(0,s.originX),rightX=s.originX+9*s.cell,rightW=Math.max(0,w-rightX);
+  const inner=ctx.createLinearGradient(0,0,0,h);inner.addColorStop(0,'#172619');inner.addColorStop(1,'#182c20');ctx.fillStyle=inner;ctx.fillRect(0,0,w,h);
+  const bg=(side,x,width)=>{const img=cinForestFrames[side];if(!img?.complete||!img.naturalWidth||width<1)return;ctx.drawImage(img,x,0,width,h);};
+  bg('left',0,leftW+2);bg('right',rightX-2,rightW+2);
+  ctx.save();const shadow=ctx.createLinearGradient(s.originX-30,0,s.originX+50,0);shadow.addColorStop(0,'#08180d88');shadow.addColorStop(1,'#08180d00');ctx.fillStyle=shadow;ctx.fillRect(s.originX-30,0,80,h);
+  const right=ctx.createLinearGradient(rightX-50,0,rightX+30,0);right.addColorStop(0,'#08180d00');right.addColorStop(1,'#08180d88');ctx.fillStyle=right;ctx.fillRect(rightX-50,0,80,h);ctx.restore();
+}
 const ROOM_DATA={woodland:{name:'Woodland Path',left:null,right:'clearing'},clearing:{name:'Training Clearing',left:'woodland',right:'watchpost'},watchpost:{name:'Old Watchpost',left:'clearing',right:null}};
 const roomDef=id=>state?.roomDefinitions?.[id]||ROOM_DATA[id]||{name:'Unknown room',left:null,right:null,quest:1};
 // Must match server's authoritative roomSize/doorRow rules; older adventures
 // retain their original 9 × 7 geometry. Medium becomes 13 × 9.
-const roomSize=id=>roomDef(id).quest>=5?{width:13,height:9}:{width:9,height:7};
+const roomSize=id=>roomDef(id).quest>=10?{width:15,height:11}:roomDef(id).quest>=5?{width:13,height:9}:{width:9,height:7};
 const doorRow=id=>Math.floor(roomSize(id).height/2);
 let socket,state,me,view='tactical',connected=false,errorTimer,frameMetrics,authClosed=false,deadlineOffset=0;
+let v2ArtEnabled=localStorage.getItem('db4_v2_room_art')!=='off';
+const v2ArtToggle=document.getElementById('v2ArtToggle');
+if(v2ArtToggle)v2ArtToggle.addEventListener('click',()=>{v2ArtEnabled=!v2ArtEnabled;localStorage.setItem('db4_v2_room_art',v2ArtEnabled?'on':'off');render()});
+let woodlandLightingEnabled=localStorage.getItem('db4_v2_woodland_lighting')!=='off';
+const woodlandLightingToggle=document.createElement('button');
+woodlandLightingToggle.id='woodlandLightingToggle';
+woodlandLightingToggle.type='button';
+woodlandLightingToggle.className=v2ArtToggle?.className||'';
+woodlandLightingToggle.hidden=true;
+v2ArtToggle?.insertAdjacentElement('afterend',woodlandLightingToggle);
+woodlandLightingToggle.addEventListener('click',()=>{
+  woodlandLightingEnabled=!woodlandLightingEnabled;
+  localStorage.setItem('db4_v2_woodland_lighting',woodlandLightingEnabled?'on':'off');
+  render();
+});
+const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
+const premiumActive=()=>artActive()&&isPremiumWoodlandRoom(me?.room)&&view==='tactical'&&premiumWoodlandReady();
+let woodlandDepthEnabled=localStorage.getItem('db4_v2_woodland_depth')!=='off';
+const woodlandDepthToggle=document.createElement('button');
+woodlandDepthToggle.id='woodlandDepthToggle';
+woodlandDepthToggle.type='button';
+woodlandDepthToggle.className=v2ArtToggle?.className||'';
+woodlandDepthToggle.hidden=true;
+woodlandLightingToggle.insertAdjacentElement('afterend',woodlandDepthToggle);
+woodlandDepthToggle.addEventListener('click',()=>{
+  woodlandDepthEnabled=!woodlandDepthEnabled;
+  localStorage.setItem('db4_v2_woodland_depth',woodlandDepthEnabled?'on':'off');
+  render();
+});
+const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
+let woodlandCharactersEnabled=localStorage.getItem('db4_v2_woodland_characters')!=='off';
+const woodlandCharactersToggle=document.createElement('button');
+woodlandCharactersToggle.id='woodlandCharactersToggle';
+woodlandCharactersToggle.type='button';
+woodlandCharactersToggle.className=v2ArtToggle?.className||'';
+woodlandCharactersToggle.hidden=true;
+woodlandDepthToggle.insertAdjacentElement('afterend',woodlandCharactersToggle);
+woodlandCharactersToggle.addEventListener('click',()=>{
+  woodlandCharactersEnabled=!woodlandCharactersEnabled;
+  localStorage.setItem('db4_v2_woodland_characters',woodlandCharactersEnabled?'on':'off');
+  render();
+});
+const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
+
+
+// Cinematic controls reuse the EXISTING production handlers/commands.
+// No second combat state machine, fake movement, or duplicated statistics.
+const cinExtras=['potionBtn','potionAllyBtn','reviveBtn','nestBtn','lanternBtn'];
+const cinControls=document.querySelector('.action-dock .combat-controls');
+const cinDetail=document.createElement('details');cinDetail.className='cin-extra';
+cinDetail.innerHTML='<summary aria-label="More actions">✚<br>Items</summary><div class="cin-extra-buttons"></div>';
+const cinHomeOrder=[...cinControls.children];
+function setCinematicActionLayout(on){
+  if(on){
+    for(const id of ['attackBtn','defendBtn','specialBtn'])cinControls.appendChild($(id));
+    for(const id of cinExtras)cinDetail.querySelector('.cin-extra-buttons').appendChild($(id));
+    if(!cinDetail.isConnected)cinControls.appendChild(cinDetail);
+  }else{
+    for(const item of cinHomeOrder)cinControls.appendChild(item);
+    cinDetail.remove();
+  }
+}
+function cinClick(oldId){$(oldId)?.click();document.querySelector('.cin-more')?.removeAttribute('open')}
+for(const [id,oldId] of [['cinematicParty','hudPartyBtn'],['cinematicInventory','hudInventoryBtn'],['cinematicShop','returnCampBtn'],['cinematicClassBtn','hudClassBtn'],['cinematicQuestBtn','openQuests'],['cinematicLog','hudLogBtn'],['cinematicView','toggleView'],['cinematicClassic','hudLayoutBtn'],['cinematicExit','logoutBtn']]){
+  $(id).addEventListener('click',()=>cinClick(oldId));
+}
+$('cinematicVisuals').addEventListener('click',()=>{
+ document.querySelector('.cin-more')?.removeAttribute('open');
+ document.querySelector('.hud-visual-settings').open=true;
+ // Settings belong to the original toolbar, so expose a popover containing its real buttons.
+ openCinematicVisuals();
+});
+function openCinematicVisuals(){
+ let panel=$('cinVisualPanel');
+ if(panel){panel.remove();return;}
+ panel=document.createElement('div');panel.id='cinVisualPanel';panel.className='cin-visual-panel';
+ const label=document.createElement('strong');label.textContent='Visual settings';panel.append(label);
+ const original=document.querySelector('.hud-art-buttons');
+ for(const button of original?.querySelectorAll('button')||[]){if(button.hidden)continue;
+  const copy=document.createElement('button');copy.textContent=button.textContent;copy.addEventListener('click',()=>{button.click();copy.textContent=button.textContent});panel.append(copy);
+ }
+ const close=document.createElement('button');close.textContent='Close';close.onclick=()=>panel.remove();panel.append(close);
+ document.body.append(panel);
+}
+
+// Board-first HUD sandbox: UI state only. No WebSocket commands or game-state
+// mutations are issued by these controls. Classic layout is always available.
+let boardFocus=localStorage.getItem('db4_v2_board_focus')!=='off';
+let hudOpenPanel=null;
+const hudLeft=$('sideLeftPanel'),hudRight=$('sideRightPanel'),hudBag=$('heroBag'),hudClass=$('classSelectPanel');
+const hudShade=$('hudShade'),hudClose=$('hudDrawerClose');
+function closeHudPanel(){
+  hudOpenPanel=null;
+  for(const pane of [hudLeft,hudRight]){
+    pane.classList.remove('hud-panel-open','hud-log-only','hud-shop-only','hud-details-only','hud-rewards-only');
+    pane.removeAttribute('role');pane.removeAttribute('aria-modal');pane.removeAttribute('aria-label');
+  }
+  hudBag.classList.remove('hud-bag-open');hudBag.open=false;hudBag.removeAttribute('role');hudBag.removeAttribute('aria-modal');hudBag.removeAttribute('aria-label');
+  hudClass.classList.remove('hud-class-open');hudClass.removeAttribute('role');hudClass.removeAttribute('aria-modal');hudClass.removeAttribute('aria-label');
+  hudShade.hidden=true;hudClose.hidden=true;
+}
+function setBoardFocus(enabled){
+  boardFocus=!!enabled;
+  document.body.classList.toggle('hud-board-focus',boardFocus);
+  document.getElementById('cinematicTop').hidden=!boardFocus;
+  setCinematicActionLayout(boardFocus);
+  localStorage.setItem('db4_v2_board_focus',boardFocus?'on':'off');
+  $('hudLayoutBtn').textContent=boardFocus?'▣ Board Focus: ON':'▦ Board Focus: OFF';
+  $('hudLayoutBtn').setAttribute('aria-pressed',String(boardFocus));
+  closeHudPanel();
+  requestAnimationFrame(render);
+}
+function openHudPanel(panel){
+  if(!boardFocus)return;
+  if(hudOpenPanel===panel){closeHudPanel();return}
+  if(panel==='shop'&&me?.room!=='camp'){toast('Visit camp to open the merchant.');return}
+  if(panel==='rewards'&&$('questRewardPanel').hidden){toast('No reward chest is awaiting your choice.');return}
+  document.querySelector('.hud-hud-menu')?.removeAttribute('open');
+  closeHudPanel();hudOpenPanel=panel;
+  const pane=panel==='party'?hudLeft:panel==='inventory'?hudBag:panel==='class'?hudClass:hudRight;
+  if(panel==='inventory'){hudBag.open=true;hudBag.classList.add('hud-bag-open')}else if(panel==='class')hudClass.classList.add('hud-class-open');else pane.classList.add('hud-panel-open');
+  if(panel!=='party')pane.classList.add(({log:'hud-log-only',shop:'hud-shop-only',rewards:'hud-rewards-only',encounter:'hud-details-only'})[panel]);
+  const title=({party:'Party and map',inventory:'Equipment and backpack',log:'Adventure log',shop:'Camp merchant',rewards:'Victory rewards',encounter:'Encounter, supplies and treasure',class:'Choose your adventurer class'})[panel];
+  pane.setAttribute('role','dialog');pane.setAttribute('aria-modal','true');pane.setAttribute('aria-label',title);
+  hudShade.hidden=false;hudClose.hidden=false;hudClose.focus({preventScroll:true});
+}
+$('hudLayoutBtn').addEventListener('click',()=>setBoardFocus(!boardFocus));
+for(const [button,panel] of [['hudInventoryBtn','inventory'],['hudPartyBtn','party'],['hudEncounterBtn','encounter'],['hudLogBtn','log'],['hudShopBtn','shop'],['hudRewardsBtn','rewards'],['hudClassBtn','class']]){
+  $(button).addEventListener('click',()=>openHudPanel(panel));
+}
+hudClose.addEventListener('click',closeHudPanel);
+hudShade.addEventListener('click',closeHudPanel);
+setBoardFocus(boardFocus);
+
+
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
@@ -151,6 +299,8 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
+ if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=v2ArtEnabled?'✦ Scene art: ON':'◇ Scene art: OFF';v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
+
   // Prominent fixed-order turn strip visible even when no enemies are present.
   const turn=state.turn||{};turnStrip.replaceChildren();
   turnStrip.append(el('strong','turn-heading','GLOBAL ROUND '+(turn.round||1)+' · '));
@@ -165,18 +315,26 @@ function syncUI(){if(!state||!me)return;
   const room=roomDef(me.room),battle=state.rooms[me.room].battle;
   if(!battle.enemies.some(e=>e.id===selectedEnemyId&&e.hp>0))selectedEnemyId=null;
   $('roomName').textContent=room.name;
+  $('cinematicRoom').textContent=room.name;
+  let tactical=$('roomChallenge');
+  if(!tactical){tactical=document.createElement('p');tactical.id='roomChallenge';tactical.className='room-challenge';$('roomSub').after(tactical)}
+  tactical.hidden=!room.challenge;
+  const nextHazardPhase=((battle.enemyPhases||0)+1+(room.hazardPhaseOffset||0))%3;
+  const hazardWarning=room.hazard?(room.hazard==='chaos'||room.hazard==='storm'?nextHazardPhase===0:room.hazard==='darkness'?nextHazardPhase===0:nextHazardPhase!==0)?(room.hazard==='storm'?' · 🌪 WIND NEXT ENEMY PHASE':room.hazard==='darkness'?' · 🌑 SHADOW STRIKE NEXT PHASE':' · ⚠ DANGER ON NEXT ENEMY PHASE'):' · Hazard rests this phase':'';
+  tactical.textContent=room.challenge?'⚑ ROOM CHALLENGE · '+room.challenge+hazardWarning:'';
   $('currentQuestLabel').textContent=me.room==='camp'?'CAMP · BETWEEN QUESTS':`QUEST ${room.quest||1} · ${(campaign?.quests?.find(q=>q.number===(room.quest||1))?.name||'ADVENTURE').toUpperCase()}`;
+  $('cinematicQuest').textContent=$('currentQuestLabel').textContent.replace(' · ',' — ');
   $('roomSub').textContent=me.room==='camp'?'ADVENTURERS’ CAMP · Merchant, quests and resting place':
-    `QUEST ${room.quest||1} · ${room.subtitle||'Explore the adventure'}${room.quest>=5?' · 13×9 maze · '+battle.enemies.filter(e=>e.hp>0).length+' foes remaining':''}`;
+    `QUEST ${room.quest||1} · ${room.challenge||room.subtitle||'Explore the adventure'}${room.quest>=5?' · '+roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · '+battle.enemies.filter(e=>e.hp>0).length+' foes remaining':''}`;
   const help=document.querySelector('.canvas-help');
-  if(help)help.textContent=room.quest>=5?'13×9 maze · S Swift · R Ranged · A Armoured · Z Zombie · G Ghost · T Teleporter · C Cloner · H Healer · N Ninja · Tap a foe to target':'Arrows, WASD or touch pad to move · Tap a foe to target';
+  if(help)help.textContent=room.quest>=5?roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · S Swift · R Ranged · A Armoured · Z Zombie · G Ghost · T Teleporter · C Cloner · H Healer · N Ninja · Tap a foe to target':'Arrows, WASD or touch pad to move · Tap a foe to target';
   const list=$('people');list.replaceChildren();
   for(const p of Object.values(state.players)){
-    const wrap=el('div','player'+(p.id===state.me?' me':''));const pic=el('img','portrait');pic.src=paths[p.id];pic.alt=p.klass==='knight'?'Armoured knight':'Ranger with bow';wrap.append(pic);
+    const wrap=el('div','player'+(p.id===state.me?' me':''));const pic=el('img','portrait');pic.src=paths[p.id];pic.alt=({knight:'Armoured knight',outlaw:'Outlaw scout',warlock:'Warlock arcane caster',tinker:'Tinker field inventor'}[p.klass]||'Adventurer');wrap.append(pic);
     const d=el('div','player-details');const name=el('div','player-name',p.name+(p.id===state.me?' (you)':''));d.append(name);
     d.append(el('div','player-place',(p.connected?'● ':'○ ')+roomDef(p.room).name));
     const bar=el('div','hpbar'),fill=el('div','hpfill');fill.style.width=Math.max(0,100*p.hp/p.maxHp)+'%';bar.append(fill);d.append(bar);
-    d.append(el('div','player-stats',`${p.hp}/${p.maxHp} HP · ${p.klass==='knight'?'Knight':'Outlaw'}${p.hp===0?' · DOWNED':''}`));wrap.append(d);list.append(wrap);
+    d.append(el('div','player-stats',`${p.hp}/${p.maxHp} HP · ${({knight:'Knight',outlaw:'Outlaw',warlock:'Warlock',tinker:'Tinker'}[p.klass]||'Adventurer')}${p.hp===0?' · DOWNED':''}`));wrap.append(d);list.append(wrap);
   }
   const map=$('roomMap');map.replaceChildren();for(const id of Object.keys(state.rooms).filter(id=>roomDef(id).quest===(room.quest||1))){
     const row=el('div','roomlink'+(state.rooms[id].discovered?' seen':'')+(me.room===id?' active':''));
@@ -205,12 +363,23 @@ function syncUI(){if(!state||!me)return;
   $('endTurnQuickBtn').textContent=myTurn?'✓ END TURN':'⌛ WAITING';
   $('returnCampBtn').disabled=!connected||active||me.hp<=0||state.turn?.activePlayer!==me.id;
   $('returnCampBtn').textContent=me.room==='camp'?'🪙 View Merchant ↓':'🏕 Camp / Shop';
-  $('returnCampBtn').title=active?'Finish the encounter first':me.room==='camp'?'Scroll to the merchant below':'Visit the merchant independently, without moving teammates';
+  $('returnCampBtn').title=active?'Finish the encounter first':me.room==='camp'?'Open the camp merchant':'Visit the merchant independently, without moving teammates';
+  $('hudShopBtn').hidden=me.room!=='camp';
+  if(hudOpenPanel==='shop'&&me.room!=='camp')closeHudPanel();
   const lastQuest=me.lastCampQuest,bookmark=me.questBookmarks?.[lastQuest];
   $('resumeQuestBtn').hidden=!(me.room==='camp'&&bookmark);
   $('resumeQuestBtn').disabled=!connected||state.turn?.activePlayer!==me.id||me.hp<=0;
   if(bookmark)$('resumeQuestBtn').textContent='↩ Return to '+(roomDef(bookmark.room)?.name||'quest');
   for(const name of ['attackBtn','defendBtn','reviveBtn'])$(name).disabled=!connected||!active||submitted||!myTurn||!rolled||me.hp<=0;
+  const adjacentNest=(battle.nests||[]).find(n=>n.active&&Math.abs(n.x-me.x)+Math.abs(n.y-me.y)===1);
+  $('nestBtn').hidden=room.quest!==9||battle.status!=='active';
+  $('nestBtn').disabled=!adjacentNest||!connected||submitted||!myTurn||!rolled||me.hp<=0;
+  $('nestBtn').textContent=adjacentNest?'💠 Disable Nest · N':'💠 Stand Beside Nest';
+  const lanterns=state.roomLanterns?.[me.room]||[];
+  const availableLantern=lanterns.findIndex(([x,y],i)=>!(battle.litLanterns||[]).includes(i)&&Math.abs(x-me.x)+Math.abs(y-me.y)<=1);
+  $('lanternBtn').hidden=room.quest!==14||battle.status!=='active';
+  $('lanternBtn').disabled=availableLantern<0||!connected||submitted||!myTurn||!rolled||me.hp<=0;
+  $('lanternBtn').textContent=availableLantern>=0?'🏮 Light Lantern · L':'🏮 Approach an Unlit Lantern';
   const stat=me.combatStats||{};
   const main=me.inventory?.equipment?.find(item=>item.id===me.equipped?.weapon);
   const special=stat.special;
@@ -234,7 +403,8 @@ function syncUI(){if(!state||!me)return;
     'Move up to your D6 roll, search or explore if you wish, then END TURN. All players go before any enemies.';
   updateDoorControls();
   updateHeroHud();
-  updateLootPanel();updateShopPanel();updateMoveControls();
+  updateLootPanel();updateShopPanel();updateQuestRewards();updateCombatItemsPanel();updateMazeUI();updateMoveControls();
+  $('hudRewardsBtn').hidden=$('questRewardPanel').hidden;
   if(!$('questOverlay').hidden)renderCampaign();
   requestAnimationFrame(render);
 }
@@ -248,6 +418,19 @@ function updateMoveControls(){
  $('rollMoveBtn').disabled=!connected||me.hp<=0||!myTurn||rolled;
  $('rollMoveBtn').textContent=rolled?'🎲 D6 · '+remaining+' steps':'🎲 Roll movement D6';
 }
+function updateQuestRewards(){
+ const panel=$('questRewardPanel'),offers=Object.values(state?.questRewardOffers||{});
+ panel.hidden=!offers.length;if(panel.hidden)return;
+ const area=$('questRewardChoices');area.replaceChildren();
+ for(const offer of offers){
+   area.append(el('p','',`Quest ${offer.quest} · ${offer.rarity} equipment reward · choose one:`));
+   for(const category of ['Sword','Bow','Mace','Staff','Armour']){
+     const btn=el('button','bag-action',category);btn.type='button';
+     btn.disabled=!connected||state.turn?.activePlayer!==me.id;
+     btn.addEventListener('click',()=>send({type:'claim-quest-reward',quest:offer.quest,category}));area.append(btn);
+   }
+ }
+}
 function updateShopPanel(){
  const panel=$('merchantPanel');panel.hidden=me.room!=='camp';
  if(panel.hidden)return;
@@ -260,7 +443,7 @@ function updateShopPanel(){
  }
  const sell=$('merchantSell');sell.replaceChildren();
  let count=0;
- for(const kind of ['equipment','potions','enchantments'])for(const item of me.inventory?.[kind]||[]){
+ for(const kind of ['equipment','potions','enchantments','consumables'])for(const item of me.inventory?.[kind]||[]){
    const price=merchantResaleValue(item);
    if(price<=0)continue;
    count++;
@@ -276,12 +459,35 @@ function updateShopPanel(){
  }
  if(!count)sell.append(el('p','muted','No sellable items. Training-only equipment has no resale value.'));
 }
+const CONSUMABLE_LABELS={
+ 'blast-bomb':['💣 Blast Bomb','Ranged blast, within 3 tiles; walls block the blast.'],
+ 'meteor-scroll':['☄️ Meteor Scroll','Light damage to every living enemy in this room.'],
+ 'guardian-ward':['🔰 Guardian Tonic','Restore 35% max HP and block next enemy strike.'],
+ 'super-potion':['⚡ Superstrength','Double attack and armour dice until leaving this room.']
+};
+function updateCombatItemsPanel(){
+ const list=$('combatItemsList');if(!list||!state||!me)return;
+ const battle=state.rooms[me.room]?.battle;
+ const active=battle?.status==='active';const submitted=!!battle?.actions?.[me.id];
+ const allowed=connected&&active&&!submitted&&me.hp>0&&state.turn?.activePlayer===me.id&&me.lastRolledTurn===state.turn?.round;
+ list.replaceChildren();
+ for(const [sku,[label,description]] of Object.entries(CONSUMABLE_LABELS)){
+   const quantity=(me.inventory?.consumables||[]).filter(x=>x.sku===sku&&x.charges>0).length;
+   const row=el('div','supply-item');
+   const note=el('div','supply-text');note.append(el('strong','',`${label} · ${quantity}`),el('small','',description));
+   const btn=el('button','bag-action','Use');btn.type='button';btn.disabled=!allowed||quantity<1;
+   btn.title=!active?'Enter combat to use this item':quantity<1?'Purchase at camp':'Queues your single combat action for this turn';
+   btn.addEventListener('click',()=>send({type:'action',action:{type:'item',sku}}));
+   row.append(note,btn);list.append(row);
+ }
+}
 function merchantResaleValue(item){
  if(!item||item.training)return 0;
  const stock=(state.shopStock||[]).find(s=>s.kind==='equipment'&&s.category===item.category&&s.rarity===item.rarity);
  const fallback={Sword:{Legendary:400,Mythic:900,Exotic:3000},Mace:{Legendary:500,Mythic:1200,Exotic:4000},Bow:{Rare:170,Legendary:400,Mythic:900,Exotic:3000},Armour:{Rare:170,Legendary:400,Mythic:900,Exotic:3000}};
  if(item.kind==='equipment')return Math.floor((stock?.cost||fallback[item.category]?.[item.rarity]||0)*.5);
  if(item.kind==='potion')return Math.floor(Math.max(0,item.charges||0)*5);
+ if(item.kind==='consumable')return Math.floor(((state.shopStock||[]).find(x=>x.sku===item.sku)?.cost||({ 'blast-bomb':45,'meteor-scroll':120,'guardian-ward':35,'super-potion':150}[item.sku]||0))*.5);
  if(item.kind==='enchantment')return Math.floor((20+10*Math.max(1,Math.min(5,item.level||1)))*.5);
  return 0;
 }
@@ -299,10 +505,33 @@ function enchantmentDescription(enchant){
 const LEVEL_CAP=30;
 function xpTarget(level){return level>=LEVEL_CAP?0:Math.ceil(100*Math.pow(1.4,Math.max(0,level-1)))}
 function currentCombatStats(p){
-  const base=p.klass==='knight'?{attack:12,armour:8}:{attack:14,armour:6};
+  const base=({knight:{attack:12,armour:8},outlaw:{attack:14,armour:6},warlock:{attack:16,armour:4},tinker:{attack:10,armour:10}}[p.klass]||{attack:12,armour:8});
   const multiplier=Math.pow(1.2,Math.max(0,(p.level||1)-1));
   return {attack:Math.round(base.attack*multiplier),armour:Math.round(base.armour*multiplier)};
 }
+
+function updateClassSelection(){
+ const panel=$('classSelectPanel');if(!panel||!me)return;
+ panel.hidden=!!me.classChosen;
+ $('hudClassBtn').hidden=!!me.classChosen;
+ $('cinematicClassBtn').hidden=!!me.classChosen;
+ if(panel.hidden){if(hudOpenPanel==='class')closeHudPanel();return;}
+ const safe=!me.mazeSlot&&['camp','woodland'].includes(me.room)&&state.rooms?.[me.room]?.battle?.status!=='active';
+ $('classChoiceNote').textContent=safe
+   ?'Choose a permanent class. Existing XP, coins, equipment and progress are retained. You receive a simple starter weapon.'
+   :'Choose your class when you return to camp. Your existing character and gear are safe.';
+ const choices=$('classChoices');choices.replaceChildren();
+ for(const c of [
+  {id:'knight',name:'🛡 Knight',detail:'50 HP · D12 attack · D8 armour · +25% equipment finds · 25% off Maces/Plate · Mace +D2, Plate +D2 defence'},
+  {id:'outlaw',name:'🏹 Outlaw',detail:'44 HP · D14 attack · D6 armour · +25% gold · 25% off Swords/Shields · Sword +D2, Shield +D2 defence'},
+  {id:'warlock',name:'🔮 Warlock',detail:'40 HP · D16 attack · D4 armour · +25% potion finds · 25% off Staffs/Wards · Staff +D4'},
+  {id:'tinker',name:'⚙ Tinker',detail:'48 HP · D10 attack · D10 armour · +25% enchantment finds · 25% off combat supplies · Bomb/Meteor +D4'}
+ ]){
+  const b=el('button','class-choice',c.name+' · '+c.detail);b.type='button';b.disabled=!safe||!connected;
+  b.addEventListener('click',()=>{if(confirm(`Choose ${c.name.replace(/^.. /,'')} permanently? Your current gear and progress will be kept.`))send({type:'class-select',klass:c.id})});choices.append(b);
+ }
+}
+
 function updateHeroHud(){
   if(!me)return;
   const level=me.level||1,required=xpTarget(level),xp=Math.max(0,me.xp||0);
@@ -310,8 +539,9 @@ function updateHeroHud(){
   const stats=me.combatStats||currentCombatStats(me);
   const potions=(me.inventory?.potions||[]);
   const charges=potions.reduce((sum,item)=>sum+Math.max(0,item.charges||0),0);
+  updateClassSelection();
   $('heroName').textContent=me.name;
-  $('heroClass').textContent=me.klass==='knight'?' · Knight':' · Outlaw';
+  $('heroClass').textContent=' · '+({knight:'Knight',outlaw:'Outlaw',warlock:'Warlock',tinker:'Tinker'}[me.klass]||'Adventurer')+(me.klass==='knight'?' · Mace/Plate +D2':me.klass==='outlaw'?' · Sword/Shield +D2':me.klass==='warlock'?' · Staff +D4':me.klass==='tinker'?' · Bomb/Meteor +D4':'');
   $('heroLevel').textContent=`Level ${level} / ${LEVEL_CAP}`;
   $('heroHp').textContent=`${me.hp} / ${me.maxHp} HP`;
   $('heroHpFill').style.width=`${Math.max(0,Math.min(100,100*me.hp/Math.max(1,me.maxHp)))}%`;
@@ -321,6 +551,11 @@ function updateHeroHud(){
   $('heroArmour').textContent=`D${stats.armour}`;
   $('heroPotions').textContent=potions.length?`${charges} use${charges===1?'':'s'}`:'0';
   $('heroGold').textContent=String(me.gold||0);
+  $('cinematicGold').textContent=String(me.gold||0);
+  $('cinematicXp').textContent=required?`${xp} / ${required}`:'MAX';
+  $('cinematicLevel').textContent=String(level);
+  $('cinematicClassIcon').src='./assets/cinematic-icons/helm.svg';
+  $('cinematicClassIcon').alt=({knight:'Knight',outlaw:'Outlaw',warlock:'Warlock',tinker:'Tinker'}[me.klass]||'Adventurer')+' class emblem';
   const inv=me.inventory||{};
   const equipped=me.equipped||{};
   const gear=inv.equipment||[];
@@ -334,7 +569,7 @@ function updateHeroHud(){
   const itemsSection=el('section','hero-bag-section');
   itemsSection.append(el('strong','',`⚔ Weapons & armour (${gear.length})`));
   for(const item of gear){
-    const slots=item.category==='Armour'?['armour']:['weapon','offhand'];
+    const slots=item.category==='Armour'?['armour']:item.category==='Shield'?['offhand']:['weapon','offhand'];
     const currently=slots.find(slot=>equipped[slot]===item.id);
     const row=el('div','bag-item');
     const worn=currently=== 'weapon'?' · MAIN':currently==='offhand'?' · OFF':currently==='armour'?' · WORN':'';
@@ -361,6 +596,11 @@ function updateHeroHud(){
     potionSection.append(el('p','hud-muted','Use Heal Me or Heal Ally. Each use restores up to 30% max HP (lab value).'));
   }else potionSection.append(el('p','hud-muted','No healing potions collected.'));
   view.append(potionSection);
+  const supplySection=el('section','hero-bag-section');
+  supplySection.append(el('strong','','💣 Combat supplies ('+(inv.consumables||[]).length+' single-use)'));
+  for(const item of inv.consumables||[])supplySection.append(el('div','bag-item',item.name+' · 1 use'));
+  if(!(inv.consumables||[]).length)supplySection.append(el('p','hud-muted','No combat supplies. Visit the camp merchant.'));
+  view.append(supplySection);
   const enchantSection=el('section','hero-bag-section');
   enchantSection.append(el('strong','',`✦ Unused enchantments (${(inv.enchantments||[]).length})`));
   for(const ench of inv.enchantments||[]){
@@ -412,7 +652,7 @@ function updateLootPanel(){
 }
 function confirmLabReset(){
   if(state?.me!=='one')return;
-  if(!confirm('RESET ALL 42 TEST ROOMS AND EVERY TEST CHARACTER? This discards XP, equipment, coins, potion charges, enchantments, quest unlocks and defeated enemies. This is irreversible.'))return;
+  if(!confirm('RESET ALL 58 TEST ROOMS AND EVERY TEST CHARACTER? This discards XP, equipment, coins, potion charges, enchantments, quest unlocks and defeated enemies. This is irreversible.'))return;
   const typed=prompt('Type RESET to confirm this is the technical lab, not the real game:');
   if(typed!=='RESET')return toast('Reset cancelled.');
   send({type:'reset-lab'});
@@ -423,9 +663,11 @@ function rr(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(f
 function gridProjection(w,h){
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(view==='tactical'){
-    const cell=Math.max(8,Math.min((w-20)/cols,(h-24)/rows,86));
-    return {cell,originX:(w-cell*cols)/2,originY:(h-cell*rows)/2,
-      at:(x,y)=>({x:(w-cell*cols)/2+(x+.5)*cell,y:(h-cell*rows)/2+(y+.5)*cell})};
+    const visibleH=boardFocus?Math.max(150,h-(window.innerWidth<=800?128:152)):h;
+    const cell=Math.max(8,Math.min((w-20)/cols,(visibleH-24)/rows,boardFocus?140:86));
+    const x0=(w-cell*cols)/2,y0=(visibleH-cell*rows)/2+((boardFocus&&visibleH>450)?8:0);
+    return {cell,originX:x0,originY:y0,
+      at:(x,y)=>({x:x0+(x+.5)*cell,y:y0+(y+.5)*cell})};
   }
   const scale=Math.max(.12,Math.min((w-22)/((cols+rows)*RES.tx),(h-22)/((cols+rows)*RES.ty),1.65));
   const ox=w/2-(cols-rows)*RES.tx*scale/2,oy=h/2-(cols+rows)*RES.ty*scale/2;
@@ -436,12 +678,26 @@ function sceneFloor(s){
   const even=(x,y)=>(x+y)%2===0;
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
-    const cs=s.cell;
+    const cs=s.cell, premium=premiumActive();
+    if(premium){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
-      ctx.fillStyle=even(x,y)?'#314858':'#253847';ctx.fillRect(X,Y,cs,cs);
-      if(images.wallface?.complete&&images.wallface.naturalWidth){ctx.globalAlpha=.12;ctx.drawImage(images.wallface,X,Y,cs,cs);ctx.globalAlpha=1;}
-      ctx.strokeStyle='#b9a16a50';ctx.lineWidth=1;ctx.strokeRect(X+.5,Y+.5,cs-1,cs-1);
+      const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
+      if(premium) { /* image-backed room painted once across the entire board */ }
+      else if(artActive())paintStoneFloorTile(ctx,{x:X,y:Y,size:cs,tileX:x,tileY:y,texture:images.wallcap,theme:me.room});
+      else {ctx.fillStyle=even(x,y)?'#314858':'#253847';ctx.fillRect(X,Y,cs,cs);
+      if(images.wallface?.complete&&images.wallface.naturalWidth){ctx.globalAlpha=.12;ctx.drawImage(images.wallface,X,Y,cs,cs);ctx.globalAlpha=1;}}
+      if(!(state.roomWalls?.[me.room]||[]).some(([wx,wy])=>wx===x&&wy===y)){
+        const plan=roomDef(me.room).formation||'stagger';
+        const accents={island:'#a6bfa0',ghost:'#8ed8d5',rush:'#c7a476',boss:'#cfaa78',archers:'#d3b883',shield:'#b8b8b7',flanks:'#bdb7a0',stagger:'#8cabb5',gate:'#b7a48b',centre:'#b6c49b',guard:'#b6baa8'};
+        const step=plan==='rush'?3:plan==='ghost'?4:5;
+        if(!artActive()&&(x*5+y*7+roomDef(me.room).name.length)%step===0){
+          ctx.strokeStyle=(accents[plan]||'#aab8a9')+'45';ctx.lineWidth=Math.max(1,cs*.025);
+          ctx.beginPath();ctx.moveTo(X+cs*.27,Y+cs*.50);ctx.lineTo(X+cs*.73,Y+cs*.50);ctx.stroke();
+        }
+      }
+      if(hazard){ctx.fillStyle=roomDef(me.room).quest===10?'#be6ad070':roomDef(me.room).quest===13?'#e9dcb070':'#51b6dd70';ctx.fillRect(X+3,Y+3,cs-6,cs-6);ctx.fillStyle='#fff';ctx.font=`bold ${Math.max(10,cs*.34)}px system-ui`;ctx.fillText(roomDef(me.room).quest===10?'⚡':roomDef(me.room).quest===13?'🌪':'≈',X+cs*.5,Y+cs*.7);}
+      if(!premium){ctx.strokeStyle='#b9a16a50';ctx.lineWidth=1;ctx.strokeRect(X+.5,Y+.5,cs-1,cs-1);}
       if((x===0||x===cols-1)&&(y===centre)){ctx.fillStyle='#cfb46e40';ctx.fillRect(X+2,Y+2,cs-4,cs-4)}
     }
     const left=roomDef(me.room).left,right=roomDef(me.room).right||(roomDef(me.room).final&&state.rooms[me.room].battle.status==='cleared'?'camp':null);
@@ -456,7 +712,8 @@ function sceneFloor(s){
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const v=s.at(x,y),hw=RES.tx*s.scale,hh=RES.ty*s.scale;
       ctx.beginPath();ctx.moveTo(v.x,v.y-hh);ctx.lineTo(v.x+hw,v.y);ctx.lineTo(v.x,v.y+hh);ctx.lineTo(v.x-hw,v.y);ctx.closePath();
-      ctx.fillStyle=even(x,y)?'#495c65':'#374955';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#c4aa7380';ctx.stroke();
+      if(artActive()) {paintIsoFloorTile(ctx,{position:v,halfW:hw,halfH:hh,tileX:x,tileY:y,theme:me.room});}
+      else {ctx.fillStyle=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y)?(roomDef(me.room).quest===10?'#89528b':roomDef(me.room).quest===13?'#957d56':'#30748a'):(even(x,y)?'#495c65':'#374955');ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#c4aa7380';ctx.strokeStyle='#c4aa7380';ctx.stroke();}
       if(y===centre&&(x===0||x===cols-1)){ctx.fillStyle='#d5b97650';ctx.fill()}
     }
   }
@@ -497,6 +754,14 @@ function wallTerrain(room){
   if(q===5)return {veil:'rgba(191,143,70,.29)',edge:'#edcf8c',shadow:'#4a311f',moss:'rgba(204,148,64,.68)',label:'desert'};
   if(q===6)return {veil:'rgba(68,113,116,.35)',edge:'#9ac3c3',shadow:'#142a2e',moss:'rgba(98,151,127,.7)',label:'marsh'};
   if(q===7)return {veil:'rgba(116,113,143,.3)',edge:'#c7bdd3',shadow:'#292737',moss:'rgba(156,136,173,.55)',label:'monastery'};
+  if(q===8)return {veil:'rgba(94,122,141,.28)',edge:'#d1a889',shadow:'#292e3a',moss:'rgba(166,133,100,.55)',label:'diceworks'};
+  if(q===10)return {veil:'rgba(129,70,170,.32)',edge:'#df9af4',shadow:'#281b43',moss:'rgba(163,96,197,.6)',label:'chaos'};
+  if(q===11)return {veil:'rgba(45,121,164,.30)',edge:'#9fe4fa',shadow:'#153c58',moss:'rgba(97,157,190,.7)',label:'sunken'};
+  if(q===13)return {veil:'rgba(119,166,207,.20)',edge:'#e7d7b7',shadow:'#293e55',moss:'rgba(191,199,211,.58)',label:'sky'};
+  if(q===14)return {veil:'rgba(23,37,88,.43)',edge:'#9ca2e2',shadow:'#111327',moss:'rgba(94,102,173,.5)',label:'abyss'};
+  if(q===15)return {veil:'rgba(153,122,184,.23)',edge:'#ebd8fa',shadow:'#322743',moss:'rgba(218,178,157,.4)',label:'celestial'};
+  if(q===12)return {veil:'rgba(121,107,94,.30)',edge:'#d9c1a1',shadow:'#39312b',moss:'rgba(166,130,95,.6)',label:'city'};
+  if(q===9)return {veil:'rgba(107,86,148,.30)',edge:'#bbadd7',shadow:'#232033',moss:'rgba(118,95,172,.60)',label:'warrens'};
   if(q===4||/quarry|excavation|crystal pit/.test(name))return {veil:'rgba(176,128,74,.23)',edge:'#e7c082',shadow:'#423022',moss:'rgba(197,150,79,.7)',label:'quarry'};
   if(q===2||/mine|crystal|gallery/.test(name))return {veil:'rgba(75,109,132,.33)',edge:'#9dbed1',shadow:'#182b37',moss:'rgba(114,174,177,.55)',label:'mine'};
   if(q===3||/giant|forest/.test(name))return {veil:'rgba(59,112,71,.28)',edge:'#a3b98c',shadow:'#1d3023',moss:'rgba(87,155,91,.8)',label:'forest'};
@@ -561,19 +826,51 @@ function drawStoneIso(s,tx,ty,terrain){
   }
   ctx.restore();
 }
-function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+function render(){if(!state||!me)return;
+  woodlandLightingToggle.hidden=!(premiumActive());
+  if(!woodlandLightingToggle.hidden){
+    woodlandLightingToggle.textContent=woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF';
+    woodlandLightingToggle.setAttribute('aria-pressed',String(woodlandLightingEnabled));
+  }
+  woodlandDepthToggle.hidden=!premiumActive();
+  if(!woodlandDepthToggle.hidden){
+    woodlandDepthToggle.textContent=!woodlandDepthEnabled?'🍃 Foreground: OFF':'🍃 Foreground: ON';
+    woodlandDepthToggle.setAttribute('aria-pressed',String(woodlandDepthEnabled));
+    woodlandDepthToggle.title=reducedMotion?'Foreground scenery is visible; animation is disabled by your system preference.':'Compare this new foreground and soft drifting-leaf layer against the approved lighting baseline.';
+  }
+  woodlandCharactersToggle.hidden=!premiumActive();
+  if(!woodlandCharactersToggle.hidden){
+    woodlandCharactersToggle.textContent=woodlandCharactersEnabled?'♞ Characters: IN WORLD':'▣ Characters: TOKENS';
+    woodlandCharactersToggle.setAttribute('aria-pressed',String(woodlandCharactersEnabled));
+    woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
+  }
+  if(v2ArtToggle&&isPremiumWoodlandRoom(me.room)){
+    const label=v2ArtEnabled?(premiumWoodlandReady()?(me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
+    if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
+  }
+  const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
   if(canvas.width!==Math.round(box.width*dpr)||canvas.height!==Math.round(box.height*dpr)){canvas.width=Math.max(1,Math.round(box.width*dpr));canvas.height=Math.max(1,Math.round(box.height*dpr))}
   ctx.setTransform(dpr,0,0,dpr,0,0);const w=box.width,h=box.height;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#08111e';ctx.fillRect(0,0,w,h);
-  const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);
-  const s=gridProjection(w,h);frameMetrics=s;sceneFloor(s);positionPortalArrows(s,w,h);
+  if(artActive())paintArtBackdrop(ctx,w,h,{theme:me.room});else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
+  const s=gridProjection(w,h);frameMetrics=s;
+  if(boardFocus&&premiumActive())paintCinematicWoodlandSurround(ctx,s,w,h);
+  sceneFloor(s);positionPortalArrows(s,w,h);
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
   for(const [x,y] of state.roomWalls?.[me.room]||[]){
-    if(s.iso)drawStoneIso(s,x,y,terrain);
+    if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
+    else if(s.iso)drawStoneIso(s,x,y,terrain);
     else drawStoneTile(s,x,y,terrain);
   }
+  // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
+  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled,me.room);
+  else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
+  // Illustrated undergrowth tucks into existing obstacle footprints and is
+  // rendered below all actors/targets, leaving the full battle state untouched.
+  if(premiumActive()&&woodlandDepthEnabled)
+    paintPremiumWoodlandUnderbrush(ctx,s,state.roomWalls?.[me.room]||[],performance.now(),!reducedMotion);
   // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
   ctx.save();ctx.strokeStyle='#f1b475';ctx.fillStyle='#f1b47526';ctx.lineWidth=3;
@@ -582,11 +879,52 @@ function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect()
     else{const x=s.originX+(enemy.x+dx)*s.cell,y=s.originY+(enemy.y+dy)*s.cell;ctx.fillRect(x,y,s.cell,s.cell);ctx.strokeRect(x+2,y+2,s.cell-4,s.cell-4)}
   }ctx.restore();
   const battle=state.rooms[me.room].battle;
+  for(const nest of battle.nests||[]){
+    const pt=s.at(nest.x,nest.y);ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font=`${Math.max(17,s.cell*(s.iso?.88:.52))}px system-ui`;
+    ctx.shadowColor=nest.active?'#b881ff':'#495767';ctx.shadowBlur=nest.active?12:0;
+    ctx.fillText(nest.active?'💠':'✖',pt.x,pt.y-(s.iso?12*s.scale:0));ctx.restore();
+  }
+  if(roomDef(me.room).quest===14){
+    const lamps=state.roomLanterns?.[me.room]||[];
+    // Keep the map navigable even in darkness, while showing dangerous unlit areas.
+    if(!s.iso){
+      for(let y=0;y<roomSize(me.room).height;y++)for(let x=0;x<roomSize(me.room).width;x++){
+        const safe=(x<=2&&Math.abs(y-5)<=2)||lamps.some(([lx,ly],i)=>(battle.litLanterns||[]).includes(i)&&Math.abs(x-lx)+Math.abs(y-ly)<=3);
+        if(!safe){ctx.fillStyle='#0407158a';ctx.fillRect(s.originX+x*s.cell,s.originY+y*s.cell,s.cell,s.cell);}
+      }
+    }
+    for(const [i,[x,y]] of lamps.entries()){
+      const pt=s.at(x,y),lit=(battle.litLanterns||[]).includes(i);
+      ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`${Math.max(18,s.cell*.55)}px system-ui`;
+      ctx.shadowColor=lit?'#ffd684':'#536581';ctx.shadowBlur=lit?20:0;
+      ctx.fillText(lit?'🏮':'🕯️',pt.x,pt.y-(s.iso?12*s.scale:0));ctx.restore();
+    }
+  }
   const actors=[...battle.enemies.filter(e=>e.hp>0).map(e=>({p:e,kind:'enemy'})),...Object.values(state.players).filter(p=>p.room===me.room).map(p=>({p,kind:p.id}))];
   if(s.iso)actors.sort((a,b)=>(a.p.x+a.p.y)-(b.p.x+b.p.y));
   for(const a of actors){
+    const integrated=premiumActive()&&woodlandCharactersEnabled;
+    if(woodlandLightActive()&&!integrated)paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);
     const medium=roomSize(me.room).width>9;
-    iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
+    const abbreviations={normal:'',swift:'S',ranged:'R',armoured:'A',zombie:'Z',ghost:'G',teleporter:'T',cloner:'C',healer:'H',ninja:'N'};
+    const label=a.kind==='enemy'&&medium?`${abbreviations[a.p.role||'normal']||''}D${a.p.faces}`:a.kind==='enemy'?a.p.name:(a.p.name||'Player').slice(0,medium?4:8);
+    const drew=integrated&&paintPremiumWoodlandActor(ctx,s,a.p,a.kind,images[a.kind==='enemy'&&me.room==='clearing'&&a.p.faces===6?'d6':a.kind==='enemy'?'d8':a.kind],{
+      label,selected:a.kind==='enemy'&&selectedEnemyId===a.p.id,
+      active:a.kind!=='enemy'&&state.turn?.activePlayer===a.p.id,
+      motion:!reducedMotion,timeMs:performance.now(),light:woodlandLightingEnabled,roomId:me.room
+    });
+    if(!drew)iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
+  }
+  // Foreground passes run AFTER the units. Painted canopy silhouettes sit at
+  // the board rim; their opacity falls away near heroes/enemies and labels.
+  if(premiumActive()){
+    if(woodlandDepthEnabled){
+      const movement=!reducedMotion;
+      const timestamp=performance.now();
+      paintPremiumWoodlandForeground(ctx,s,actors,timestamp,movement);
+      paintPremiumWoodlandForestLife(ctx,s,actors,timestamp,movement);
+    }
   }
   const banner=$('turnBanner');
   const global=state.turn||{};
@@ -604,11 +942,13 @@ $('rollMoveBtn').onclick=()=>send({type:'roll-move'});
 $('endTurnBtn').onclick=()=>send({type:'end-turn'});
 $('endTurnQuickBtn').onclick=()=>send({type:'end-turn'});
 $('resumeQuestBtn').onclick=()=>send({type:'resume-quest'});
-$('returnCampBtn').onclick=()=>me?.room==='camp'?$('merchantPanel').scrollIntoView({behavior:'smooth',block:'start'}):send({type:'return-camp'});
+$('returnCampBtn').onclick=()=>me?.room==='camp'?(boardFocus?openHudPanel('shop'):$('merchantPanel').scrollIntoView({behavior:'smooth',block:'start'})):send({type:'return-camp'});
 $('attackBtn').onclick=()=>send({type:'action',action:{type:'attack',target:selectedEnemyId||null}});
 $('specialBtn').onclick=()=>send({type:'action',action:{type:'special',target:selectedEnemyId||null}});
 $('defendBtn').onclick=()=>send({type:'action',action:{type:'defend'}});
 $('reviveBtn').onclick=()=>send({type:'action',action:{type:'revive'}});
+$('nestBtn').onclick=()=>send({type:'action',action:{type:'nest'}});
+$('lanternBtn').onclick=()=>send({type:'action',action:{type:'light'}});
 $('potionBtn').onclick=()=>send({type:'potion',target:me?.id});
 $('potionAllyBtn').onclick=()=>{
   const ally=Object.values(state?.players||{}).find(p=>p.id!==me?.id&&p.connected&&p.room===me.room&&p.hp>0&&p.hp<p.maxHp&&Math.abs(p.x-me.x)+Math.abs(p.y-me.y)===1);
@@ -618,12 +958,15 @@ $('potionAllyBtn').onclick=()=>{
 $('toggleView').onclick=()=>{view=view==='tactical'?'illustrated':'tactical';$('toggleView').textContent=view==='tactical'?'▦ Tactical':'◇ Illustrated';render()};
 $('logoutBtn').onclick=()=>{const form=document.createElement('form');form.method='POST';form.action=ROOT+'/api/logout';document.body.append(form);form.submit()};
 window.addEventListener('keydown',ev=>{
-  if(ev.ctrlKey||ev.metaKey||!$('questOverlay').hidden||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+  if(ev.key==='Escape'&&hudOpenPanel){closeHudPanel();ev.preventDefault();return;}
+  if(ev.ctrlKey||ev.metaKey||hudOpenPanel||!$('questOverlay').hidden||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
   const dir={ArrowUp:'N',ArrowDown:'S',ArrowLeft:'W',ArrowRight:'E',w:'N',s:'S',a:'W',d:'E'}[ev.key];
   if(dir){requestMove(dir);ev.preventDefault()}
   else if(ev.key===' '){$('attackBtn').click();ev.preventDefault()}
   else if(ev.key.toLowerCase()==='f'){$('defendBtn').click();ev.preventDefault()}
   else if(ev.key.toLowerCase()==='r'){$('reviveBtn').click();ev.preventDefault()}
+  else if(ev.key.toLowerCase()==='n'&&!$('nestBtn').hidden){$('nestBtn').click();ev.preventDefault()}
+  else if(ev.key.toLowerCase()==='l'&&!$('lanternBtn').hidden){$('lanternBtn').click();ev.preventDefault()}
 });
 canvas.addEventListener('pointerup',ev=>{
   if(!state||!me||!frameMetrics||!$('questOverlay').hidden)return;const rect=canvas.getBoundingClientRect(),xx=ev.clientX-rect.left,yy=ev.clientY-rect.top;
@@ -669,16 +1012,16 @@ function renderCampaign(){
   for(const q of campaign.quests){
     const btn=document.createElement('button');btn.type='button';btn.className='quest-choice'+(selectedQuest===q.number?' picked':'');
     const heading=el('span','quest-choice-heading',`${q.emoji} ${String(q.number).padStart(2,'0')} · ${q.name}`);
-    const meta=el('span','quest-choice-meta',`${q.difficulty} · ${q.roomCount} rooms · ${q.number<=7?(q.number<= (state?.unlockedQuest||1)?'PLAYABLE':'LOCKED'):'PORT PENDING'}`);
+    const meta=el('span','quest-choice-meta',`${q.difficulty} · ${q.roomCount} rooms · ${q.number<= (state?.unlockedQuest||1)?'PLAYABLE':'LOCKED'}`);
     btn.append(heading,meta);btn.addEventListener('click',()=>{selectedQuest=q.number;renderCampaign()});list.append(btn);
   }
   const q=campaign.quests.find(x=>x.number===selectedQuest),detail=$('campaignDetail');detail.replaceChildren();
   const eyebrow=el('div','quest-detail-label',`QUEST ${q.number} · ${q.difficulty.toUpperCase()} · ${q.environment.toUpperCase()}`);
   const name=el('h3','',`${q.emoji} ${q.name}`);
   const unlocked=state?.unlockedQuest||1;
-  const playable=q.number<=7;const accessible=playable&&q.number<=unlocked;
-  const alert=el('div',accessible?'quest-live':'quest-pending',q.number<=7?(accessible?'✓ PLAYABLE · '+(state?.completedQuests?.includes(q.number)?'COMPLETED · Return to quest':'Unlocked and ready'):'🔒 COMPLETE THE PREVIOUS QUEST TO UNLOCK'):'🔒 MULTIPLAYER PORT PENDING — source catalogue only; not playable yet.');
-  detail.append(eyebrow,name,alert,el('p','muted',`${q.roomCount} original rooms. Quests 1–7 have playable beta encounters. Quests 8–15 remain catalogue-only.`));
+  const playable=q.number<=15;const accessible=playable&&q.number<=unlocked;
+  const alert=el('div',accessible?'quest-live':'quest-pending',accessible?'✓ PLAYABLE · '+(state?.completedQuests?.includes(q.number)?'COMPLETED · Return to quest':'Unlocked and ready'):'🔒 COMPLETE THE PREVIOUS QUEST TO UNLOCK');
+  detail.append(eyebrow,name,alert,el('p','muted',`${q.roomCount} original rooms. All 15 quests now have playable beta encounters.`));
   if(playable){const completed=state?.completedQuests?.includes(q.number);const savedRoom=me?.questBookmarks?.[q.number]?.room;const launch=el('button','quest-launch',completed?'↻ Replay Quest '+q.number:savedRoom?'↩ Resume Quest '+q.number+' · '+roomDef(savedRoom).name:'▶ Enter Quest '+q.number);launch.type='button';launch.disabled=!connected||!accessible||!me||state?.turn?.activePlayer!==me.id||state?.rooms[me.room]?.battle.status==='active';launch.addEventListener('click',()=>{
     if(completed&&!confirm('Replay Quest '+q.number+'? This resets defeated enemies and personal treasure in that quest for everyone, but preserves levels, gold, equipment and other quests. All players must first leave this quest.'))return;
     send({type:completed?'replay-quest':'enter-quest',quest:q.number});toggleQuestBoard(false)});detail.append(launch);}
@@ -686,7 +1029,7 @@ function renderCampaign(){
   q.rooms.forEach((r,i)=>{
     const li=el('li','quest-room');
     li.append(el('strong','',`${i+1}. ${r.name}`),el('span','',r.description));
-    if(q.number<=7&&state){const id=q.number===1?['woodland','clearing','watchpost'][i]:`q${q.number}r${i+1}`;if(state.rooms[id]?.discovered)li.classList.add('quest-discovered');}
+    if(q.number<=15&&state){const id=q.number===1?['woodland','clearing','watchpost'][i]:`q${q.number}r${i+1}`;if(state.rooms[id]?.discovered)li.classList.add('quest-discovered');}
     rooms.append(li);
   });detail.append(rooms);
 }
@@ -764,3 +1107,122 @@ $('chatAdminPlayer').addEventListener('change',renderChat);
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&chatOpen)setChatOpen(false)});
 
 connect();requestAnimationFrame(loop);
+
+// Separate Endgame Maze interface. The ordinary 15-quest canvas remains unchanged.
+function mazeButton(text,command,enabled=true){const b=el('button','bag-action',text);b.type='button';b.disabled=!connected||!enabled;b.addEventListener('click',()=>send(command));return b;}
+function updateMazeUI(){
+ const maze=state?.maze,panel=$('mazeControlPanel');if(!maze||!panel||!me)return;
+ const slots=$('mazeSlotChoices');slots.replaceChildren();
+ if(!maze.activeSlot){
+  const label=el('p','muted',(state?.completedQuests||[]).includes(15)?'Endgame unlocked. Return to camp to begin or resume.':'Finish Quest 15 to unlock the Endgame Maze.');slots.append(label);
+  for(const slot of maze.slots){
+   const r=el('div','shop-item'),desc=el('span','',`Save ${slot.slot} · ${slot.status}${slot.rooms?' · '+slot.rooms+' chambers':''}`);r.append(desc);
+   if(slot.status==='active')r.append(mazeButton('Join / Resume',{type:'maze-join',slot:slot.slot},me.room==='camp'));
+   else if(me.id==='one')r.append(mazeButton(slot.status==='empty'?'Create Maze':'New Expedition',{type:'maze-create',slot:slot.slot},me.room==='camp'&&(state.completedQuests||[]).includes(15)));
+   slots.append(r);
+  }
+ }else slots.append(el('p','',`Exploring saved Maze ${maze.activeSlot} · shared adventure`));
+ const rewards=$('mazeRewardChoices');rewards.replaceChildren();
+ for(const reward of maze.rewards||[]){rewards.append(el('p','',`🏆 Maze ${reward.slot} victory chest · ${reward.rarity}: choose one:`));
+  for(const category of ['Sword','Bow','Mace','Staff','Armour'])rewards.append(mazeButton(category,{type:'maze-reward',category}));
+ }
+ const run=maze.run,live=$('mazeLive');live.hidden=!run;if(!run)return;
+ $('mazeRoomHeading').textContent=`🧭 Maze ${run.slot}: ${run.room} · depth ${run.depth}`;
+ $('mazeRoomStatus').textContent=`Shared discoveries: ${run.seen.length} rooms · clues ${run.cluesFound} · checkpoint ${run.checkpoint}`;
+ const map=$('mazeMap');map.replaceChildren();
+ const nodes=run.seen||[];if(nodes.length){
+  const minX=Math.min(...nodes.map(n=>n.x)),minY=Math.min(...nodes.map(n=>n.y));
+  const maxX=Math.max(...nodes.map(n=>n.x)),maxY=Math.max(...nodes.map(n=>n.y));
+  const gap=38,pad=25,w=(maxX-minX)*gap+pad*2,h=(maxY-minY)*gap+pad*2;
+  const grid=el('div','maze-map-grid');grid.style.width=Math.max(330,w)+'px';grid.style.height=Math.max(260,h)+'px';
+  const byId=Object.fromEntries(nodes.map(n=>[n.id,n]));
+  for(const n of nodes){
+    for(const other of Object.values(n.connections||{})){
+      if(!byId[other]||other<n.id)continue;
+      const to=byId[other],x1=(n.x-minX)*gap+pad,y1=(n.y-minY)*gap+pad,x2=(to.x-minX)*gap+pad,y2=(to.y-minY)*gap+pad;
+      const line=el('div','maze-map-line');line.style.left=x1+'px';line.style.top=y1+'px';line.style.width=Math.hypot(x2-x1,y2-y1)+'px';line.style.transform=`rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;grid.append(line);
+    }
+  }
+  for(const n of nodes){
+   const spot=el('div','maze-node'+(n.id===run.roomId?' current':'')+(n.role==='boss'?' boss':''),n.id.slice(-2));
+   spot.style.left=((n.x-minX)*gap+pad)+'px';spot.style.top=((n.y-minY)*gap+pad)+'px';
+   spot.title=n.name+(n.id===run.roomId?' · YOU ARE HERE':'');grid.append(spot);
+  }
+  map.append(grid);
+ }
+ const directions=$('mazeDirections');directions.replaceChildren();
+ const battle=run.battle,isFighting=battle?.status==='active';
+ for(const dir of ['N','E','S','W'])if(run.connections[dir])directions.append(mazeButton(`${{N:'↑',E:'→',S:'↓',W:'←'}[dir]} ${run.connections[dir]}`,{type:'maze-travel',dir},!isFighting));
+ const enemies=$('mazeEnemies');enemies.replaceChildren();
+ if(battle){const fighting=battle.status==='active';enemies.append(el('h4','',fighting?`⚔ Combat · Round ${battle.round}`:'✓ This chamber is clear'));
+  if(fighting){
+   for(const enemy of battle.enemies.filter(e=>e.hp>0)){
+    const row=el('div','maze-foe');row.append(el('span','',`${enemy.name} · HP ${enemy.hp}/${enemy.maxHp}`));
+    row.append(mazeButton('⚔ Attack',{type:'maze-action',action:{type:'attack',target:enemy.id}},!battle.actions[me.id]&&me.hp>0));
+    if(me.combatStats?.special)row.append(mazeButton('★ Special',{type:'maze-action',action:{type:'special',target:enemy.id}},!battle.actions[me.id]&&me.hp>0));
+    enemies.append(row);
+   }
+   if(battle.warn?.tiles)enemies.append(el('p','maze-danger',`⚠ Next hazard: ${battle.warn.attack}. Avoid tiles ${battle.warn.tiles.map(t=>`(${t.x},${t.y})`).join(' ')}`));
+   if(run.boss)enemies.append(el('p','maze-danger',`👑 ${run.boss.name} · phase ${battle.phase+1} of 3 · ${run.boss.phases[battle.phase]}`));
+  }
+ }
+ // Boss room is an actual 7 × 7 tactical arena: all warned squares are visible.
+ const arena=$('mazeArena');arena.replaceChildren();arena.hidden=!(isFighting&&run.boss);
+ if(isFighting&&run.boss){
+  const bs=battle.bossState||{},myTile=me.mazeTile||{x:1,y:3};
+  const marked=new Set((battle.warn?.tiles||[]).map(t=>t.x+','+t.y));
+  const occupants=Object.values(state.players||{}).filter(p=>p.mazeSlot===run.slot&&run.positions[p.id]===run.roomId&&p.hp>0);
+  for(let y=0;y<7;y++)for(let x=0;x<7;x++){
+   const hero=occupants.find(p=>(p.mazeTile?.x??1)===x&&(p.mazeTile?.y??3)===y);
+   const fixture=(bs.points||[]).find(t=>t.x===x&&t.y===y);
+   const enemy=battle.enemies.find(e=>e.hp>0&&e.x===x&&e.y===y);
+   const tile=el('button','maze-arena-cell'+(marked.has(x+','+y)?' danger':'')+(fixture?' fixture':'')+(hero?' hero':'')+(enemy?.role==='boss'?' monarch':''),hero?'♟':enemy?.role==='boss'?'👑':enemy?'⚔':fixture?(fixture.used?'✓':'⚙'):'·');
+   tile.type='button';tile.title=`(${x},${y})${hero?' · '+hero.name:''}${fixture?' · '+fixture.name+(fixture.used?' · used':''):''}${marked.has(x+','+y)?' · DANGER NEXT ROUND':''}`;
+   const canStep=Math.abs(myTile.x-x)+Math.abs(myTile.y-y)===1&&!battle.actions[me.id]&&me.hp>0;
+   const canInteract=fixture&&!fixture.used&&Math.abs(myTile.x-x)+Math.abs(myTile.y-y)<=1&&!battle.actions[me.id]&&me.hp>0;
+   tile.disabled=!connected||(!canStep&&!canInteract);
+   if(canInteract)tile.addEventListener('click',()=>send({type:'maze-action',action:{type:'interact',point:fixture.id}}));
+   else if(canStep)tile.addEventListener('click',()=>send({type:'maze-action',action:{type:'move',tile:{x,y}}}));
+   arena.append(tile);
+  }
+  enemies.append(el('p','maze-boss-intro',`👑 ${run.boss.mechanic}. ${run.boss.weakness||"The arena objects may reveal a weakness. Search the Maze for more clues."}`));
+  if(bs.weakUntil>=battle.round)enemies.append(el('p','maze-weak',`✦ Weakness exposed through round ${bs.weakUntil}. Strike now!`));
+  if(bs.pendingEvent)enemies.append(el('p','maze-danger',`⚠ Next enemy phase: ${bs.pendingEvent.label}.`));
+ }
+ const actions=$('mazeTactics');actions.replaceChildren();
+ if(isFighting){
+  const ready=!battle.actions[me.id]&&me.hp>0;
+  if(run.boss){
+   const at=me.mazeTile||{x:1,y:3};
+   for(const point of battle.bossState?.points||[]){
+    const near=Math.abs(at.x-point.x)+Math.abs(at.y-point.y)<=1;
+    actions.append(mazeButton((point.used?'✓ ':near?'⚙ Use ':'↪ Approach ')+point.name,{type:'maze-action',action:{type:'interact',point:point.id}},ready&&near&&!point.used));
+   }
+   actions.append(mazeButton('↩ Retreat from boss arena',{type:'maze-retreat'},me.hp>0));
+  }
+  actions.append(mazeButton('🛡 Defend',{type:'maze-action',action:{type:'defend'}},ready));
+  actions.append(mazeButton('🧪 Healing Potion',{type:'maze-action',action:{type:'heal'}},ready&&!!me.inventory?.potions?.length));
+  for(const [sku,label] of [['blast-bomb','💣 Bomb'],['meteor-scroll','☄ Meteor'],['guardian-ward','🔰 Guardian Tonic'],['super-potion','⚡ Superstrength']]){
+   const available=(me.inventory?.consumables||[]).filter(i=>i.sku===sku&&i.charges>0).length;
+   if(available)actions.append(mazeButton(label+' ×'+available,{type:'maze-action',action:{type:'item',sku}},ready));
+  }
+  for(const ally of Object.values(state.players||{}).filter(p=>p.mazeSlot===run.slot&&p.hp===0&&run.positions[p.id]===run.roomId))actions.append(mazeButton('♥ Revive '+ally.name,{type:'maze-action',action:{type:'revive',target:ally.id}},ready));
+  for(const [dir,xy] of Object.entries({N:[0,-1],E:[1,0],S:[0,1],W:[-1,0]})){
+   const at=me.mazeTile||{x:1,y:3},next={x:at.x+xy[0],y:at.y+xy[1]};
+   if(next.x>=0&&next.x<=6&&next.y>=0&&next.y<=6)actions.append(mazeButton('Step '+dir,{type:'maze-action',action:{type:'move',tile:next}},ready));
+  }
+  if(battle.actions[me.id])actions.append(el('p','muted','Action submitted. Waiting for the other players in this chamber, or the 60-second round timer.'));
+ }
+ const searches=$('mazeSearchActions');searches.replaceChildren();
+ if(!isFighting){
+  searches.append(mazeButton('🔎 Search scenery and passages',{type:'maze-search'},!run.roomSearched));
+  for(const slot of ['coin','potion','equipment','enchantment'])searches.append(mazeButton('🎁 '+slot,{type:'maze-claim',slot},!run.claimed.includes(slot)));
+  if(run.bonus&&!run.bonus.attempted)searches.append(mazeButton('⚠ Attempt optional '+run.bonus.challenge,{type:'maze-bonus'}));
+ }
+ const journal=$('mazeJournal');journal.replaceChildren();
+ for(const entry of run.journal)journal.append(el('p','',entry));if(!run.journal.length)journal.append(el('p','muted','No clues discovered yet. Investigate new chambers.'));
+ $('mazeLeaveBtn').disabled=!connected; $('mazeAbandonBtn').disabled=!connected;
+}
+$('mazeLeaveBtn').addEventListener('click',()=>send({type:'maze-leave'}));
+$('mazeAbandonBtn').addEventListener('click',()=>{if(confirm('Request unanimous abandonment? This permanently ends the saved expedition and forfeits the final chest.'))send({type:'maze-abandon'})});
+

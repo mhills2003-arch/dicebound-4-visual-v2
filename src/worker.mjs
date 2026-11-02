@@ -58,6 +58,24 @@ export default {
     if(!u.pathname.startsWith(ROOT+'/'))return new Response('Not found',{status:404});
     // Public, non-sensitive probe: distinguishes a missing Worker route from an asset 404.
     if(req.method==='GET'&&u.pathname===ROOT+'/health')return new Response('DICEBOUND V2 router OK',{status:200,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'}});
+    // Unauthenticated, non-sensitive deployment fingerprint. Verifies that the
+    // Worker and its bound static files belong to the same cinematic V2 build.
+    if(req.method==='GET'&&u.pathname===ROOT+'/version'){
+      const checks=await Promise.all(
+        ['/index.html','/app.js','/styles.css','/assets/premium-woodland/training-clearing-ground.jpg'].map(async path=>{
+          try{const r=await env.ASSETS.fetch(new Request(u.origin+path));
+            return {status:r.status,body:path.endsWith('.jpg')?'':r.ok?await r.text():''};
+          }catch{return {status:0,body:''}}
+        })
+      );
+      const ready=checks[0].status===200&&checks[0].body.includes('id="cinematicRoom"')
+        &&checks[1].status===200&&checks[1].body.includes('cinematicRoom')
+        &&checks[2].status===200&&checks[2].body.includes('.cin-room')
+        &&checks[3].status===200;
+      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2',build:'v2-cinematic-restoration-20261102-r1',cinematicAssetsReady:ready,
+        checks:{html:checks[0].status,js:checks[1].status,css:checks[2].status,woodlandArt:checks[3].status}}),
+        {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
+    }
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
     const identity=await validSession(req,env);
     if(!identity)return reply(loginScreen(),401,{'x-frame-options':'DENY'});

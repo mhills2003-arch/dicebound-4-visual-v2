@@ -10,9 +10,7 @@ export const PREMIUM_FILES = Object.freeze({
   boulderA: './assets/premium-woodland/boulder-a.png',
   boulderB: './assets/premium-woodland/boulder-b.png',
   fernTreeA: './assets/premium-woodland/fern-tree-a.png',
-  fernTreeB: './assets/premium-woodland/fern-tree-b.png',
-  canopyA: './assets/premium-woodland/canopy-a.png',
-  canopyB: './assets/premium-woodland/canopy-b.png'
+  fernTreeB: './assets/premium-woodland/fern-tree-b.png'
 });
 const art = Object.create(null);
 let loaded = false;
@@ -177,102 +175,5 @@ export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true){
   edge.addColorStop(.74,'rgba(5,17,12,.01)');
   edge.addColorStop(1,'rgba(3,11,11,.29)');
   ctx.fillStyle=edge;ctx.fillRect(x,y,w,h);
-  ctx.restore();return true;
-}
-
-
-/**
- * Woodland Path only: a near-field layer composed from the same painted canopy
- * assets as the approved forest. Occupies the edge of the board, never creates
- * obstacles or changes room-wall semantics. Foreground opacity decreases near
- * combat units so portraits, HP bars and selection remain legible.
- */
-export const WOODLAND_FOREGROUND_POSITIONS = Object.freeze([
-  [.04,.025,2.15,'canopyA',.87], [.24,-.045,1.72,'canopyB',.63],
-  [.54,-.060,1.83,'canopyA',.70], [.89,.005,2.20,'canopyB',.92],
-  [-.038,.36,1.70,'canopyA',.73], [1.035,.55,1.92,'canopyB',.75],
-  [.015,.965,1.88,'canopyB',.91], [.33,1.02,1.78,'canopyA',.72],
-  [.70,1.025,1.87,'canopyB',.74], [.978,.967,2.00,'canopyA',.86]
-]);
-function rangeClamp(v,a=0,b=1){return Math.min(b,Math.max(a,v))}
-function alphaForNearbyActors(nx,ny,actors){
-  if(!Array.isArray(actors))return 1;
-  const closest=actors.reduce((min,actor)=>{
-    const p=actor?.p||actor;
-    if(!Number.isFinite(p?.x)||!Number.isFinite(p?.y))return min;
-    const dx=nx-(p.x+.5)/9,dy=ny-(p.y+.5)/7;
-    return Math.min(min,Math.hypot(dx*9,dy*7));
-  },Infinity);
-  // Keep the figure legible even as it approaches the edges of the map.
-  return closest<1.1?.13:closest<1.85?.36:closest<2.5?.68:1;
-}
-/** A modest undergrowth layer tucked around the server-provided walls.
- * It is scenery only: no collision footprints, no new walkable-square outlines.
- * This pass stays BELOW all characters and combat overlays.
- */
-export function paintPremiumWoodlandUnderbrush(ctx,s,walls=[],timeMs=0,motion=true){
-  if(!premiumWoodlandReady()||s.iso)return false;
-  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
-  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
-  for(let i=0;i<walls.length;i++){
-    if(i%2!==0)continue; // Avoid turning every blocked square into a hedge.
-    const [tx,ty]=walls[i];
-    if(!Number.isFinite(tx)||!Number.isFinite(ty))continue;
-    const img=art[i%4===0?'canopyA':'canopyB'];
-    if(!img?.complete||!img.naturalWidth)continue;
-    const px=x+(tx+.38)*c,py=y+(ty+.83)*c;
-    const sway=motion?Math.sin(timeMs*.0007+i*.85)*c*.015:0;
-    const width=c*(.79+(i%3)*.11),height=width*.52;
-    ctx.save();ctx.globalAlpha=.48;
-    ctx.drawImage(img,px-width*.5+sway,py-height*.58,width,height);
-    ctx.restore();
-  }
-  ctx.restore();return true;
-}
-
-export function paintPremiumWoodlandForeground(ctx,s,actors=[],timeMs=0,motion=true){
-  if(!premiumWoodlandReady()||s.iso)return false;
-  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
-  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
-  for(let i=0;i<WOODLAND_FOREGROUND_POSITIONS.length;i++){
-    const [nx,ny,scale,key,alpha]=WOODLAND_FOREGROUND_POSITIONS[i];
-    const img=art[key];if(!img?.complete||!img.naturalWidth)continue;
-    const sway=motion?Math.sin(timeMs*.00044+i*1.62)*c*.014:0;
-    const px=x+nx*w+sway,py=y+ny*h;
-    const width=c*scale,height=width*.66;
-    const visible=alpha*alphaForNearbyActors(nx,ny,actors);
-    ctx.save();ctx.globalAlpha=visible;
-    ctx.shadowColor='rgba(0,11,7,.32)';ctx.shadowBlur=c*.12;
-    ctx.drawImage(img,px-width*.5,py-height*.5,width,height);
-    ctx.restore();
-  }
-  ctx.restore();return true;
-}
-
-/**
- * Deterministic, unobtrusive floating leaves. All coordinates derive from
- * elapsed client animation time and constant seeds, never game RNG or state.
- * Motion is disabled automatically for reduced-motion users by the caller.
- */
-const FOREST_LEAVES=Object.freeze(Array.from({length:13},(_,i)=>({
-  px:((i*73+19)%97)/97,py:((i*43+37)%89)/89,
-  offset:i*.72,speed:.55+(i%4)*.20,
-  tint:i%3===0?'#efc780':i%3===1?'#d9ad63':'#9fbc75'
-})));
-export function paintPremiumWoodlandForestLife(ctx,s,actors=[],timeMs=0,motion=true){
-  if(!premiumWoodlandReady()||s.iso||!motion)return false;
-  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
-  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
-  const t=timeMs*.0001;
-  for(const [i,p] of FOREST_LEAVES.entries()){
-    const nx=(p.px+t*p.speed*.075+Math.sin(t*2+p.offset)*.019)%1;
-    const ny=(p.py+t*p.speed*.11)%1;
-    const opacity=(.12+Math.abs(Math.sin(t+p.offset))*.13)*alphaForNearbyActors(nx,ny,actors);
-    const px=x+nx*w,py=y+ny*h,r=c*(.035+(i%4)*.011);
-    ctx.save();ctx.globalAlpha=opacity;ctx.translate(px,py);
-    ctx.rotate(Math.sin(t*2.5+p.offset)*.5+i*.41);
-    ctx.fillStyle=p.tint;ctx.beginPath();ctx.ellipse(0,0,r,r*.42,0,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-  }
   ctx.restore();return true;
 }

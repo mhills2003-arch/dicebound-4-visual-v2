@@ -4,11 +4,11 @@ import {readFileSync,statSync} from 'node:fs';
 import {ROOM_WALLS} from '../src/engine.mjs';
 import {
  PREMIUM_ROOM,PREMIUM_FILES,initPremiumWoodland,premiumWoodlandReady,
- woodlandObstacleArt,paintPremiumWoodlandFloor,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere
+ woodlandObstacleArt,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow
 } from '../public/v2-premium-woodland.mjs';
 function mockCtx(){const operations=[];const ctx={
- save(){},restore(){},beginPath(){},rect(){},clip(){},moveTo(){},lineTo(){},stroke(){operations.push('stroke')},strokeRect(){operations.push('outline')},fillRect(){operations.push('fill')},
- drawImage(img,...args){operations.push(['asset',img.src,args])},createRadialGradient(){return{addColorStop(){}}}
+ save(){},restore(){},beginPath(){},closePath(){},rect(){},clip(){},moveTo(){},lineTo(){},arc(){},translate(){},scale(){},fill(){operations.push('light-shape')},stroke(){operations.push('stroke')},strokeRect(){operations.push('outline')},fillRect(){operations.push('fill')},
+ drawImage(img,...args){operations.push(['asset',img.src,args])},createRadialGradient(){return{addColorStop(){}}},createLinearGradient(){return{addColorStop(){}}}
 };return{ctx,operations}}
 const s={cell:60,originX:12,originY:14,iso:false,at(x,y){return{x:12+(x+.5)*60,y:14+(y+.5)*60}}};
 test('premium floor consists of independent image assets, not a baked image with UI and enemies',()=>{
@@ -27,8 +27,10 @@ test('premium room renderer derives props only from the canonical wall coordinat
  const walls=ROOM_WALLS.woodland.map(([x,y])=>[x,y]),snapshot=JSON.stringify(walls);
  const {ctx,operations}=mockCtx();
  assert(paintPremiumWoodlandFloor(ctx,s));
+ assert(paintPremiumWoodlandGroundLighting(ctx,s,walls));
  for(const [x,y] of walls)assert(paintPremiumWoodlandWall(ctx,s,x,y));
  assert(paintPremiumWoodlandAtmosphere(ctx,s));
+ assert(paintPremiumWoodlandContactShadow(ctx,s,{x:1,y:3},'one'));
  assert.equal(operations.filter(x=>Array.isArray(x)&&x[0]==='asset').length,1+walls.length);
  assert.equal(operations.filter(x=>x==='outline').length,walls.length);
  assert.equal(JSON.stringify(walls),snapshot);
@@ -37,9 +39,10 @@ test('premium room renderer derives props only from the canonical wall coordinat
 test('premium is restricted to Woodland Path and is render-only in the existing client',()=>{
  const js=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(js,/premiumActive=\(\)=>artActive\(\)&&me\?\.room==='woodland'&&view==='tactical'&&premiumWoodlandReady\(\)/);
- assert.match(js,/if\(premium\)paintPremiumWoodlandFloor\(ctx,s\)/);
+ assert.match(js,/if\(premium\)\{paintPremiumWoodlandFloor\(ctx,s\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandWall\(ctx,s,x,y\)/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
+ assert.match(js,/if\(woodlandLightActive\(\)\)paintPremiumWoodlandContactShadow/);
  assert.match(js,/if\(!premium\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);

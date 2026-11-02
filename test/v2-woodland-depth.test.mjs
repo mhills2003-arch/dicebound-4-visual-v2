@@ -53,7 +53,7 @@ test('animated forest life is optional and can be disabled for reduced motion',(
 });
 test('V2 integration draws underbrush below units and foreground above; not in other rooms',()=>{
   const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
-  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&me\?\.room==='woodland'&&view==='tactical'&&premiumWoodlandReady\(\)/);
+  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
   assert.match(app,/woodlandDepthEnabled=localStorage\.getItem\('db4_v2_woodland_depth'\)/);
   assert.match(app,/matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)/);
   assert.match(app,/woodlandDepthToggle\.addEventListener\('click'/);

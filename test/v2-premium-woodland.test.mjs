@@ -13,7 +13,7 @@ function mockCtx(){const operations=[];const ctx={
 const s={cell:60,originX:12,originY:14,iso:false,at(x,y){return{x:12+(x+.5)*60,y:14+(y+.5)*60}}};
 test('premium floor consists of independent image assets, not a baked image with UI and enemies',()=>{
  assert.equal(PREMIUM_ROOM,'woodland');
- assert.equal(Object.keys(PREMIUM_FILES).length,5);
+ assert.equal(Object.keys(PREMIUM_FILES).length,8);
  for(const path of Object.values(PREMIUM_FILES)){
   assert.match(path,/^\.\/assets\/premium-woodland\//);
   const file=new URL('../public/'+path.slice(2),import.meta.url);
@@ -36,13 +36,13 @@ test('premium room renderer derives props only from the canonical wall coordinat
  assert.equal(JSON.stringify(walls),snapshot);
  assert.deepEqual([...new Set(walls.map(([x,y])=>woodlandObstacleArt(x,y)))].sort(),[...new Set(walls.map(([x,y])=>woodlandObstacleArt(x,y)))].sort());
 });
-test('premium is restricted to Woodland Path and is render-only in the existing client',()=>{
+test('premium is restricted to Quest 1 woodland/clearing and is render-only in the existing client',()=>{
  const js=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
- assert.match(js,/premiumActive=\(\)=>artActive\(\)&&me\?\.room==='woodland'&&view==='tactical'&&premiumWoodlandReady\(\)/);
- assert.match(js,/if\(premium\)\{paintPremiumWoodlandFloor\(ctx,s\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
- assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandWall\(ctx,s,x,y\)/);
+ assert.match(js,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
+ assert.match(js,/if\(premium\)\{paintPremiumWoodlandFloor\(ctx,s,me.room\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
+ assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandWall\(ctx,s,x,y,me.room\)/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
- assert.match(js,/if\(woodlandLightActive\(\)\)paintPremiumWoodlandContactShadow/);
+ assert.match(js,/if\(woodlandLightActive\(\)&&!integrated\)paintPremiumWoodlandContactShadow/);
  assert.match(js,/if\(!premium\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);

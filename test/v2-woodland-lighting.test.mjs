@@ -39,9 +39,9 @@ test('contact shadows accept all four player IDs, do not edit player positions o
 });
 test('lighting stays confined to premium Woodland Path tactical renderer',()=>{
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
- assert.match(app,/premiumActive=\(\)=>artActive\(\)&&me\?\.room==='woodland'&&view==='tactical'&&premiumWoodlandReady\(\)/);
- assert.match(app,/paintPremiumWoodlandGroundLighting\(ctx,s,state\.roomWalls\?\.\[me\.room\]\|\|\[\]\)/);
- assert.match(app,/if\(woodlandLightActive\(\)\)paintPremiumWoodlandContactShadow/);
+ assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
+ assert.match(app,/paintPremiumWoodlandGroundLighting\(ctx,s,state\.roomWalls\?\.\[me\.room\]\|\|\[\],me\.room\)/);
+ assert.match(app,/if\(woodlandLightActive\(\)&&!integrated\)paintPremiumWoodlandContactShadow/);
  assert.match(app,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
  assert.match(app,/const woodlandLightActive=\(\)=>premiumActive\(\)\&\&woodlandLightingEnabled/);
  assert.match(app,/woodlandLightingToggle\.addEventListener\('click'/);

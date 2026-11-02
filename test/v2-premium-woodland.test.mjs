@@ -13,7 +13,7 @@ function mockCtx(){const operations=[];const ctx={
 const s={cell:60,originX:12,originY:14,iso:false,at(x,y){return{x:12+(x+.5)*60,y:14+(y+.5)*60}}};
 test('premium floor consists of independent image assets, not a baked image with UI and enemies',()=>{
  assert.equal(PREMIUM_ROOM,'woodland');
- assert.equal(Object.keys(PREMIUM_FILES).length,7);
+ assert.equal(Object.keys(PREMIUM_FILES).length,5);
  for(const path of Object.values(PREMIUM_FILES)){
   assert.match(path,/^\.\/assets\/premium-woodland\//);
   const file=new URL('../public/'+path.slice(2),import.meta.url);

@@ -12,7 +12,7 @@ test('visual V2 uses separate path, cookie and durable binding',()=>{
   assert.doesNotMatch(worker,/env\.GAME_ROOM\.get/);
 });
 test('V2 wrangler cannot take over existing custom domain and gates every asset',()=>{
-  assert.match(wrangler,/name = "sonny-dicebound-visual-v2"/);
+  assert.match(wrangler,/name = "dicebound-4-visual-v2"/);
   assert.match(wrangler,/run_worker_first = true/);
   assert.match(wrangler,/workers_dev = true/);
   assert.match(wrangler,/new_sqlite_classes = \["GameRoom"\]/);

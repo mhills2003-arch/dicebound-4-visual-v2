@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07101e"><meta name="dicebound-v2-build" content="v2-cinematic-restoration-20261102-r1"><title>DICEBOUND 4.0 V2 · Visual Lab</title><link rel="stylesheet" href="./styles.css?build=v2-cinematic-gold-20261102"><style id="boardFocusCritical" data-version="v2-boardfocus-20261102b">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07101e"><meta name="dicebound-v2-build" content="v2-cinematic-restoration-20261102-r1"><title>DICEBOUND 4.0 V2 · Visual Lab</title><link rel="stylesheet" href="./styles.css?build=v2-cinematic-search-keys-20261102-r1"><style id="boardFocusCritical" data-version="v2-boardfocus-20261102b">
 /* V2 HUD LAB: board-first presentation. These selectors only apply in
    .hud-board-focus; the complete previous HUD remains one click away. */
 .hud-main-switch{border-color:#f1d48b;background:#273e45;color:#ffe0a0;font-weight:850}
@@ -324,13 +324,17 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
     <button id="cinematicShop" title="Camp and shop" aria-label="Camp and shop"><span aria-hidden="true">⚒</span><span>Camp</span></button>
     <details class="cin-more"><summary title="More controls" aria-label="More controls"><span aria-hidden="true">⚙</span></summary>
       <div class="cin-more-menu">
-        <button id="cinematicClassBtn" hidden>⚔ Choose class</button><button id="cinematicQuestBtn">🗺 Quest map</button><button id="cinematicLog">📜 Adventure log</button>
+        <button id="cinematicClassBtn" hidden>⚔ Choose class</button><button id="cinematicQuestBtn">🗺 Quest map</button><button id="cinematicLog">📜 Adventure log</button><button id="cinematicKeys" type="button">⌨ Keyboard shortcuts</button>
         <button id="cinematicView">▦ Change view</button><button id="cinematicVisuals">✦ Artwork settings</button>
         <button id="cinematicClassic">▤ Classic HUD</button><button id="cinematicExit">Exit game</button>
       </div>
     </details>
   </nav>
 </header>
+<div id="cinHotkeyHelp" class="cin-hotkey-help" role="dialog" aria-label="Keyboard shortcuts" hidden><div class="cin-hotkey-title"><strong>⌨ KEYBOARD SHORTCUTS</strong><button type="button" id="cinHotkeyClose" aria-label="Close keyboard shortcuts">✕</button></div>
+<p><kbd>R</kbd> Roll dice <kbd>E</kbd> End turn <kbd>A</kbd> Attack <kbd>F</kbd> Fortify <kbd>S</kbd> Special</p>
+<p><kbd>I</kbd> Inventory <kbd>C</kbd> Camp <kbd>P</kbd> Items / potions <kbd>L</kbd> Adventure log <kbd>Q</kbd> Quests</p>
+<p class="cin-hotkey-note">Move with arrow keys or the touch pad. Shortcuts are disabled while typing or a text field is focused. Revive and lantern actions are still available under Items.</p></div>
 <div class="workspace">
     <aside class="sidebar side-left" id="sideLeftPanel">
       <section class="plate"><h2>YOUR ADVENTURERS</h2><div id="people" aria-live="polite">Connecting to the dungeon…</div></section>
@@ -365,7 +369,13 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
           <div id="turnBanner" class="turn-banner" hidden></div>
           <div class="turn-dock-help">Everyone takes one turn. Enemies go last.</div>
         </aside>
-        <div class="canvas-wrap" id="canvasWrap"><div class="cinematic-scene-badge" aria-hidden="true">✦ THE ADVENTURE ✦</div><canvas id="gameCanvas" role="img" aria-label="DICEBOUND tactical dungeon; use the directional buttons or arrow keys to move"></canvas><div class="canvas-help">Arrows, WASD or touch pad to move · Tap a foe to target</div></div>
+        <div class="canvas-wrap" id="canvasWrap"><div class="cinematic-scene-badge" aria-hidden="true">✦ THE ADVENTURE ✦</div>
+          <aside id="cinSearch" class="cin-search" aria-label="Room treasure search" hidden>
+            <button type="button" id="cinSearchToggle" class="cin-search-toggle" aria-expanded="false" aria-controls="cinSearchPanel" title="Search the cleared room for treasure"><span aria-hidden="true">🔎</span> SEARCH <span class="cin-search-arrow" aria-hidden="true">▾</span></button>
+            <div id="cinSearchPanel" class="cin-search-panel" hidden><div class="cin-search-title">✦ ROOM TREASURE <button type="button" id="cinSearchClose" aria-label="Close treasure search">✕</button></div>
+              <p id="cinSearchStatus">Clear the room to search.</p><div id="cinSearchSlots"></div><p class="cin-search-foot">One attempt per category in each room.</p>
+            </div>
+          </aside><canvas id="gameCanvas" role="img" aria-label="DICEBOUND tactical dungeon; use the directional buttons or arrow keys to move"></canvas><div class="canvas-help">Arrows, WASD or touch pad to move · Tap a foe to target</div></div>
         <aside class="action-dock" aria-label="Your turn action buttons">
           <strong class="action-dock-title">🎲 YOUR ACTIONS</strong>
           <button id="rollMoveBtn" type="button" class="dock-roll">🎲 Roll Dice</button>
@@ -375,7 +385,7 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
             <button id="potionBtn" class="combat-btn potion">🧪 Heal Me</button>
             <button id="potionAllyBtn" class="combat-btn potion">🧪 Heal Ally</button>
             <button id="specialBtn" class="combat-btn special">★ Special</button>
-            <button id="defendBtn" class="combat-btn">🛡 Defend</button>
+            <button id="defendBtn" class="combat-btn">🛡 Fortify</button>
             <button id="reviveBtn" class="combat-btn">♥ Revive</button>
             <button id="nestBtn" class="combat-btn" hidden>💠 Disable Nest · N</button><button id="lanternBtn" class="combat-btn" hidden>🏮 Light Lantern · L</button>
           </div>
@@ -414,7 +424,7 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
       </section>
       <section class="plate" id="questRewardPanel" hidden><h2>🏆 VICTORY CHEST</h2><p class="muted">Choose one equipment reward. The chest cannot be rerolled.</p><div id="questRewardChoices"></div></section><section class="plate" id="merchantPanel" hidden><h2>🪙 CAMP MERCHANT</h2><p class="muted">Buy potions, bombs, wards, meteors, superstrength and gear. Medium: Legendary offers are rare; Hard: occasional Mythic; Extreme: Legendary/Mythic stock plus a 5% chance of one Exotic offer after a qualifying boss.</p><div id="merchantStock"></div><h3 class="merchant-sell-heading">SELL ITEMS TO MERCHANT</h3><p class="muted">Buyback values are shown below. Selling permanently removes the item, including any bound enchantments.</p><div id="merchantSell"></div></section>
       <section class="plate adventurelog"><h2>ADVENTURE LOG</h2><div id="log" role="log" aria-live="polite">Your adventure will appear here…</div></section>
-      <section class="plate instructions"><h2>QUICK CONTROLS</h2><p><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or WASD: move</p><p><kbd>Space</kbd> Attack · <kbd>F</kbd> Defend · <kbd>R</kbd> Revive · <kbd>N</kbd> Disable adjacent Warrens nest · <kbd>L</kbd> Light an adjacent Abyss lantern</p><p class="muted">Separate browser sessions with individual adult-test invitation codes simulate co-operative tablets.</p></section>
+      <section class="plate instructions"><h2>QUICK CONTROLS</h2><p>Arrow keys or touch pad: move (W/D also move north/east)</p><p><kbd>R</kbd> Roll · <kbd>E</kbd> End turn · <kbd>A</kbd> Attack · <kbd>F</kbd> Fortify · <kbd>S</kbd> Special · <kbd>I</kbd> Inventory · <kbd>C</kbd> Camp · <kbd>P</kbd> Items · <kbd>L</kbd> Log · <kbd>Q</kbd> Quests</p><p>Revive and lantern actions remain available in Items.</p><p class="muted">Separate browser sessions with individual adult-test invitation codes simulate co-operative tablets.</p></section>
     </aside>
   </div>
   <div id="hudShade" class="hud-drawer-shade" hidden></div>
@@ -437,5 +447,5 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
   <section id="milestoneNotice" class="milestone-notice" role="alertdialog" aria-live="assertive" aria-label="Adventure achievement" hidden><button type="button" id="noticeClose" aria-label="Dismiss announcement">✕</button><div class="notice-icon">🎲</div><h2 id="noticeTitle"></h2><p id="noticeBody"></p></section>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </div>
-<script type="module" src="./app.js?build=v2-cinematic-gold-20261102"></script>
+<script type="module" src="./app.js?build=v2-cinematic-search-keys-20261102-r1"></script>
 </body></html>

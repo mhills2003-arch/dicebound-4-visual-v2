@@ -134,11 +134,44 @@ function closeHudPanel(){
   hudClass.classList.remove('hud-class-open');hudClass.removeAttribute('role');hudClass.removeAttribute('aria-modal');hudClass.removeAttribute('aria-label');
   hudShade.hidden=true;hudClose.hidden=true;
 }
+// The existing four server-validated treasure buttons are MOVED (not cloned)
+// into a compact left-hand overlay. Switching to Classic restores their DOM home.
+const cinSearchHome=$('lootPanel').parentElement;
+const cinSearchNext=$('lootPanel').nextSibling;
+let cinSearchOpen=false;
+let cinSearchLastRoom=null;
+function setCinematicSearchOpen(open){
+ cinSearchOpen=!!open&&boardFocus&&!$('cinSearch').hidden;
+ $('cinSearchPanel').hidden=!cinSearchOpen;
+ $('cinSearchToggle').setAttribute('aria-expanded',String(cinSearchOpen));
+ $('cinSearch').classList.toggle('is-open',cinSearchOpen);
+}
+function setCinematicSearchPlacement(on){
+ if(on){$('cinSearchSlots').append($('lootPanel'));}
+ else{cinSearchHome.insertBefore($('lootPanel'),cinSearchNext);setCinematicSearchOpen(false)}
+}
+function updateCinematicSearch(){
+ if(!state||!me)return;
+ const room=state.rooms?.[me.room];
+ const eligible=boardFocus&&me.room!=='camp'&&!!room&&!me.room.startsWith('maze');
+ $('cinSearch').hidden=!eligible;
+ if(me.room!==cinSearchLastRoom){cinSearchLastRoom=me.room;setCinematicSearchOpen(false)}
+ if(!eligible){setCinematicSearchOpen(false);return}
+ const b=room.battle;
+ $('cinSearchStatus').textContent=b.status==='active'?'Clear the enemies before searching.':
+ b.status==='dormant'?'Explore this room before searching.':
+ state.turn?.activePlayer!==me.id?'Your search attempts are available on your turn.':
+ 'Select each treasure category once per room.';
+}
+$('cinSearchToggle').addEventListener('click',()=>setCinematicSearchOpen(!cinSearchOpen));
+$('cinSearchClose').addEventListener('click',()=>setCinematicSearchOpen(false));
+
 function setBoardFocus(enabled){
   boardFocus=!!enabled;
   document.body.classList.toggle('hud-board-focus',boardFocus);
   document.getElementById('cinematicTop').hidden=!boardFocus;
   setCinematicActionLayout(boardFocus);
+  setCinematicSearchPlacement(boardFocus);
   localStorage.setItem('db4_v2_board_focus',boardFocus?'on':'off');
   $('hudLayoutBtn').textContent=boardFocus?'▣ Board Focus: ON':'▦ Board Focus: OFF';
   $('hudLayoutBtn').setAttribute('aria-pressed',String(boardFocus));
@@ -327,7 +360,7 @@ function syncUI(){if(!state||!me)return;
   $('roomSub').textContent=me.room==='camp'?'ADVENTURERS’ CAMP · Merchant, quests and resting place':
     `QUEST ${room.quest||1} · ${room.challenge||room.subtitle||'Explore the adventure'}${room.quest>=5?' · '+roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · '+battle.enemies.filter(e=>e.hp>0).length+' foes remaining':''}`;
   const help=document.querySelector('.canvas-help');
-  if(help)help.textContent=room.quest>=5?roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · S Swift · R Ranged · A Armoured · Z Zombie · G Ghost · T Teleporter · C Cloner · H Healer · N Ninja · Tap a foe to target':'Arrows, WASD or touch pad to move · Tap a foe to target';
+  if(help)help.textContent=room.quest>=5?roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · S Swift · R Ranged · A Armoured · Z Zombie · G Ghost · T Teleporter · C Cloner · H Healer · N Ninja · Tap a foe to target':'Arrow keys or touch pad to move · A Attack · S Special · Tap a foe to target';
   const list=$('people');list.replaceChildren();
   for(const p of Object.values(state.players)){
     const wrap=el('div','player'+(p.id===state.me?' me':''));const pic=el('img','portrait');pic.src=paths[p.id];pic.alt=({knight:'Armoured knight',outlaw:'Outlaw scout',warlock:'Warlock arcane caster',tinker:'Tinker field inventor'}[p.klass]||'Adventurer');wrap.append(pic);
@@ -379,7 +412,7 @@ function syncUI(){if(!state||!me)return;
   const availableLantern=lanterns.findIndex(([x,y],i)=>!(battle.litLanterns||[]).includes(i)&&Math.abs(x-me.x)+Math.abs(y-me.y)<=1);
   $('lanternBtn').hidden=room.quest!==14||battle.status!=='active';
   $('lanternBtn').disabled=availableLantern<0||!connected||submitted||!myTurn||!rolled||me.hp<=0;
-  $('lanternBtn').textContent=availableLantern>=0?'🏮 Light Lantern · L':'🏮 Approach an Unlit Lantern';
+  $('lanternBtn').textContent=availableLantern>=0?'🏮 Light Lantern':'🏮 Approach an Unlit Lantern';
   const stat=me.combatStats||{};
   const main=me.inventory?.equipment?.find(item=>item.id===me.equipped?.weapon);
   const special=stat.special;
@@ -403,7 +436,7 @@ function syncUI(){if(!state||!me)return;
     'Move up to your D6 roll, search or explore if you wish, then END TURN. All players go before any enemies.';
   updateDoorControls();
   updateHeroHud();
-  updateLootPanel();updateShopPanel();updateQuestRewards();updateCombatItemsPanel();updateMazeUI();updateMoveControls();
+  updateLootPanel();updateCinematicSearch();updateShopPanel();updateQuestRewards();updateCombatItemsPanel();updateMazeUI();updateMoveControls();
   $('hudRewardsBtn').hidden=$('questRewardPanel').hidden;
   if(!$('questOverlay').hidden)renderCampaign();
   requestAnimationFrame(render);
@@ -957,17 +990,64 @@ $('potionAllyBtn').onclick=()=>{
 };
 $('toggleView').onclick=()=>{view=view==='tactical'?'illustrated':'tactical';$('toggleView').textContent=view==='tactical'?'▦ Tactical':'◇ Illustrated';render()};
 $('logoutBtn').onclick=()=>{const form=document.createElement('form');form.method='POST';form.action=ROOT+'/api/logout';document.body.append(form);form.submit()};
+// Game-level shortcuts: activate the REAL buttons, never bypass their disabled
+// state or duplicate their authoritative WebSocket commands.
+const cinHotkeys=$('cinHotkeyHelp');
+function setHotkeyHelp(open){
+ cinHotkeys.hidden=!open;
+ if(open)document.querySelector('.cin-more')?.removeAttribute('open');
+}
+$('cinematicKeys').addEventListener('click',()=>setHotkeyHelp(cinHotkeys.hidden));
+$('cinHotkeyClose').addEventListener('click',()=>setHotkeyHelp(false));
+const keyActions={r:'rollMoveBtn',e:'endTurnQuickBtn',a:'attackBtn',f:'defendBtn',s:'specialBtn',i:'cinematicInventory',c:'cinematicShop',l:'cinematicLog'};
+function activateGameButton(id){
+ const btn=$(id);
+ if(!btn||btn.disabled||btn.hidden||!btn.isConnected)return false;
+ btn.click();return true;
+}
+function textEntryFocused(event){
+ const focused=document.activeElement;
+ return ['INPUT','TEXTAREA','SELECT'].includes(focused?.tagName)||
+ focused?.isContentEditable||event.target?.isContentEditable||
+ !!event.target?.closest?.('[contenteditable="true"],[role="textbox"]');
+}
 window.addEventListener('keydown',ev=>{
-  if(ev.key==='Escape'&&hudOpenPanel){closeHudPanel();ev.preventDefault();return;}
-  if(ev.ctrlKey||ev.metaKey||hudOpenPanel||!$('questOverlay').hidden||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
-  const dir={ArrowUp:'N',ArrowDown:'S',ArrowLeft:'W',ArrowRight:'E',w:'N',s:'S',a:'W',d:'E'}[ev.key];
-  if(dir){requestMove(dir);ev.preventDefault()}
-  else if(ev.key===' '){$('attackBtn').click();ev.preventDefault()}
-  else if(ev.key.toLowerCase()==='f'){$('defendBtn').click();ev.preventDefault()}
-  else if(ev.key.toLowerCase()==='r'){$('reviveBtn').click();ev.preventDefault()}
-  else if(ev.key.toLowerCase()==='n'&&!$('nestBtn').hidden){$('nestBtn').click();ev.preventDefault()}
-  else if(ev.key.toLowerCase()==='l'&&!$('lanternBtn').hidden){$('lanternBtn').click();ev.preventDefault()}
+ const key=ev.key?.toLowerCase();
+ if(ev.key==='Escape'){
+  if(!cinHotkeys.hidden){setHotkeyHelp(false);ev.preventDefault();return}
+  if(cinSearchOpen){setCinematicSearchOpen(false);ev.preventDefault();return}
+  if(hudOpenPanel){closeHudPanel();ev.preventDefault();return}
+ }
+ if(ev.repeat||ev.ctrlKey||ev.metaKey||ev.altKey||textEntryFocused(ev)||!connected||
+    !state||!me||!cinHotkeys.hidden||!chatDrawer.hidden||
+    !$('milestoneNotice').hidden||hudOpenPanel)return;
+ // Q may close its own overlay. All other commands are blocked while it is open.
+ if(key==='q'){
+  toggleQuestBoard($('questOverlay').hidden);ev.preventDefault();return;
+ }
+ if(!$('questOverlay').hidden)return;
+ // In overlay mode, P opens Items; in Classic it opens the inventory panel.
+ if(key==='p'){
+  if(boardFocus&&cinDetail.isConnected){cinDetail.open=!cinDetail.open;
+   if(cinDetail.open)document.querySelector('.cin-more')?.removeAttribute('open')}
+  else activateGameButton('hudInventoryBtn');
+  ev.preventDefault();return;
+ }
+ const dir={arrowup:'N',arrowdown:'S',arrowleft:'W',arrowright:'E',w:'N',d:'E'}[key];
+ if(dir){requestMove(dir);ev.preventDefault();return}
+ if(key===' '){
+  if(!['BUTTON','SUMMARY'].includes(document.activeElement?.tagName)){
+   activateGameButton('attackBtn');ev.preventDefault()
+  }return;
+ }
+ if(key==='n'&&!$('nestBtn').hidden){activateGameButton('nestBtn');ev.preventDefault();return}
+ const id=keyActions[key];
+ if(id){
+  activateGameButton(id);ev.preventDefault();
+  return;
+ }
 });
+
 canvas.addEventListener('pointerup',ev=>{
   if(!state||!me||!frameMetrics||!$('questOverlay').hidden)return;const rect=canvas.getBoundingClientRect(),xx=ev.clientX-rect.left,yy=ev.clientY-rect.top;
   let match=null,d=Infinity;
@@ -1042,9 +1122,7 @@ $('closeQuests').addEventListener('click',()=>toggleQuestBoard(false));
 $('questOverlay').addEventListener('click',e=>{if(e.target===$('questOverlay'))toggleQuestBoard(false)});
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!$('questOverlay').hidden){toggleQuestBoard(false);return}
-  if(e.key?.toLowerCase()==='q'&&!e.repeat&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){
-    toggleQuestBoard($('questOverlay').hidden);e.preventDefault();
-  }
+
 });
 loadCampaign();
 window.addEventListener('resize',render);

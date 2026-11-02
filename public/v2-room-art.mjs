@@ -1,3 +1,4 @@
+import {roomTheme,paintThemeFloor,paintThemeIso,paintThemeBackdrop,paintThemeDressing,paintThemeLight} from './v2-theme-kit.mjs';
 /**
  * DICEBOUND V2 · Smuggler's Station visual vertical slice.
  * Pure Canvas artwork: NO input handlers, collision rules, item definitions,
@@ -6,7 +7,7 @@
  */
 export const V2_ART_ROOM = 'q5r7';
 export const V2_WOODLAND_ROOM = 'woodland';
-export const isV2ArtRoom = id => id === V2_ART_ROOM || id === V2_WOODLAND_ROOM;
+export const isV2ArtRoom = id => id === V2_ART_ROOM || id === V2_WOODLAND_ROOM || Boolean(roomTheme(id));
 const TAU = Math.PI * 2;
 const hash = (x,y,s=0) => {let n=Math.imul((x+31)*1103515245,(y+71)*12345) ^ Math.imul(s+37,2654435761);n^=n>>>16;n=Math.imul(n,2246822519);return ((n^(n>>>13))>>>0)/4294967295};
 const point = (ctx,x,y,r,color) => {ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fillStyle=color;ctx.fill()};
@@ -18,6 +19,7 @@ function diamond(ctx,p,hw,hh){ctx.beginPath();ctx.moveTo(p.x,p.y-hh);ctx.lineTo(
 // not pretend to be a wall, obstacle, pickup or interactable.
 export function paintStoneFloorTile(ctx,{x,y,size,tileX,tileY,texture,theme}){
  if(theme==='woodland')return paintWoodlandFloorTile(ctx,{x,y,size,tileX,tileY});
+ if(paintThemeFloor(ctx,{x,y,size,tileX,tileY,roomId:theme}))return;
  const k=hash(tileX,tileY),c=size;
  ctx.save();ctx.fillStyle=grad(ctx,x,y,x+c,y+c,k<.33?'#4c514e':k<.68?'#56564d':'#465053', '#252d33');ctx.fillRect(x,y,c,c);
  if(texture?.complete&&texture.naturalWidth){ctx.save();ctx.globalAlpha=.105;ctx.drawImage(texture,x,y,c,c);ctx.restore()}
@@ -37,6 +39,7 @@ export function paintStoneFloorTile(ctx,{x,y,size,tileX,tileY,texture,theme}){
 }
 export function paintIsoFloorTile(ctx,{position,halfW,halfH,tileX,tileY,theme}){
  if(theme==='woodland')return paintWoodlandIsoTile(ctx,{position,halfW,halfH,tileX,tileY});
+ if(paintThemeIso(ctx,{position,halfW,halfH,tileX,tileY,roomId:theme}))return;
  const k=hash(tileX,tileY);ctx.save();diamond(ctx,position,halfW,halfH);ctx.clip();
  ctx.fillStyle=grad(ctx,position.x-halfW,position.y-halfH,position.x+halfW,position.y+halfH,k<.45?'#666153':'#525b59','#283742');
  ctx.fillRect(position.x-halfW,position.y-halfH,halfW*2,halfH*2);
@@ -46,6 +49,7 @@ export function paintIsoFloorTile(ctx,{position,halfW,halfH,tileX,tileY,theme}){
 }
 export function paintArtBackdrop(ctx,width,height,{theme}={}){
  if(theme==='woodland')return paintWoodlandBackdrop(ctx,width,height);
+ if(paintThemeBackdrop(ctx,width,height,theme))return;
  ctx.save();ctx.fillStyle=grad(ctx,0,0,0,height,'#19262b','#070f1b');ctx.fillRect(0,0,width,height);
  const pool=ctx.createRadialGradient(width*.55,height*.43,5,width*.54,height*.5,Math.max(width,height)*.68);
  pool.addColorStop(0,'#93714a3b');pool.addColorStop(.46,'#253a3b29');pool.addColorStop(1,'#050c1688');ctx.fillStyle=pool;ctx.fillRect(0,0,width,height);
@@ -127,6 +131,7 @@ function drawWallRelief(ctx,s,x,y,kind){
 /** Visual-only tile-attached decorations, never new collision objects. */
 export function paintV2Dressing(ctx,projection,wallCoords,{roomId}={}){
  if(roomId==='woodland')return paintWoodlandDressing(ctx,projection,wallCoords);
+ if(roomId!==V2_ART_ROOM && paintThemeDressing(ctx,projection,wallCoords,roomId))return;
  if(!isV2ArtRoom(roomId))return;
  const s=projection,walls=new Set(wallCoords.map(([x,y])=>`${x},${y}`));
  const floor=[ [6,4,'seal'],[2,2,'rope'],[9,7,'scuff'],[2,6,'scuff'],[10,2,'mosaic'] ];
@@ -142,6 +147,7 @@ export function paintV2Dressing(ctx,projection,wallCoords,{roomId}={}){
 /** Light and shadow run before units/markers, so enemies remain readable. */
 export function paintV2Light(ctx,s,wallCoords,{roomId}={}){
  if(roomId==='woodland')return paintWoodlandLight(ctx,s,wallCoords);
+ if(roomId!==V2_ART_ROOM && paintThemeLight(ctx,s,wallCoords,roomId))return;
  if(!isV2ArtRoom(roomId))return;
  const cols=13,rows=9;
  let x,y,w,h;

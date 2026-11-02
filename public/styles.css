@@ -280,3 +280,24 @@
 
 .v2-preview-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap;color:#f1d79c;border-color:#94764d;background:#1c2d39}
 @media(max-width:760px){.v2-preview-link{font-size:10px;padding:6px 8px}}
+
+/* V2 VISUAL PASS · Maze arena scenery. This changes paint, not game cells. */
+.maze-arena{background:
+ radial-gradient(ellipse at 45% 30%,#d4b07d24,transparent 62%),
+ repeating-linear-gradient(45deg,#ffffff08 0 2px,transparent 2px 24px),
+ linear-gradient(160deg,#2d3547,#0a1a25 68%,#161b2c);
+ border:2px solid #b99c70;box-shadow:inset 0 0 35px #070c19e0,0 10px 30px #0308109e;
+ padding:12px;gap:3px}
+.maze-arena-cell{background:
+ linear-gradient(155deg,#b2a08c10 0 15%,transparent 16% 52%,#00000038 75%),
+ repeating-linear-gradient(0deg,#d7bd8c13 0 1px,transparent 1px 14px),
+ linear-gradient(145deg,#46566a,#1d2e41);
+ border:1px solid #b9a47c70;border-radius:4px;text-shadow:0 2px 3px #000;
+ box-shadow:inset 1px 1px 0 #c8d5da24,inset -2px -3px 5px #050e1d72;
+ transition:filter .15s,border-color .15s}
+.maze-arena-cell:hover:not(:disabled){filter:brightness(1.20);border-color:#e3cfaa}
+.maze-arena-cell.danger{background:radial-gradient(circle at 52% 50%,#e97e47,#6f2330);border-color:#ffd19c;box-shadow:0 0 9px #e76b5b80}
+.maze-arena-cell.hero{background:radial-gradient(circle,#35697a,#174452);border-color:#87e3da}
+.maze-arena-cell.fixture{background:radial-gradient(circle at 42% 30%,#78634d,#313144);border-color:#edcf83}
+.maze-arena-cell.monarch{background:radial-gradient(circle at 50% 25%,#926384,#3a274d);border-color:#ddadeb}
+@media(max-width:430px){.maze-arena{padding:5px;gap:2px}}

@@ -4,7 +4,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · WOODLAND PATH ART PILOT';
+const CLIENT_BUILD='VISUAL V2 · COMPLETE CAMPAIGN ART PASS';
 const $ = id => document.getElementById(id);
 const canvas = $('gameCanvas');
 const ctx=canvas.getContext('2d');
@@ -157,7 +157,7 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
- if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=me.room==='woodland'?(v2ArtEnabled?'🌿 Forest art: ON':'◇ Forest art: OFF'):(v2ArtEnabled?'✦ V2 art: ON':'◇ V2 art: OFF');v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
+ if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=v2ArtEnabled?'✦ Scene art: ON':'◇ Scene art: OFF';v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
 
   // Prominent fixed-order turn strip visible even when no enemies are present.
   const turn=state.turn||{};turnStrip.replaceChildren();
@@ -672,7 +672,7 @@ function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect()
   if(canvas.width!==Math.round(box.width*dpr)||canvas.height!==Math.round(box.height*dpr)){canvas.width=Math.max(1,Math.round(box.width*dpr));canvas.height=Math.max(1,Math.round(box.height*dpr))}
   ctx.setTransform(dpr,0,0,dpr,0,0);const w=box.width,h=box.height;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#08111e';ctx.fillRect(0,0,w,h);
-  if(artActive())paintArtBackdrop(ctx,w,h,{theme:me.room==='woodland'?'woodland':undefined});else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
+  if(artActive())paintArtBackdrop(ctx,w,h,{theme:me.room});else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
   const s=gridProjection(w,h);frameMetrics=s;sceneFloor(s);positionPortalArrows(s,w,h);
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.

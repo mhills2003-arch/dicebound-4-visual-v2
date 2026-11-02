@@ -25,7 +25,7 @@ test('Log, shop, party, reward and inventory popups contain existing real widget
  assert.match(js,/pane\.classList\.add\('hud-panel-open'\)/);
  assert.match(js,/hudBag\.open=true;hudBag\.classList\.add\('hud-bag-open'\)/);
  assert.match(js,/\$\('returnCampBtn'\)\.onclick=\(\)=>me\?\.room==='camp'\?\(boardFocus\?openHudPanel\('shop'\)/);
- assert.match(js,/if\(ev\.key==='Escape'&&hudOpenPanel\)/);
+ assert.match(js,/if\(hudOpenPanel\)\{closeHudPanel\(\);ev\.preventDefault\(\);return\}/);
  assert.match(css,/hud-panel-open\.hud-shop-only > section:not\(#merchantPanel\)/);
  assert.match(css,/hud-panel-open\.hud-log-only > section:not\(\.adventurelog\)/);
 });
@@ -41,8 +41,8 @@ test('Board Focus affects UI only and preserves the current Quest 1 renderer and
 });
 
 test('Focus deployment does not mix old styles with new controls',()=>{
- assert.match(html,/styles\.css\?build=v2-cinematic-gold-20261102/);
- assert.match(html,/app\.js\?build=v2-cinematic-gold-20261102/);
+ assert.match(html,/styles\.css\?build=v2-cinematic-search-keys-20261102-r1/);
+ assert.match(html,/app\.js\?build=v2-cinematic-search-keys-20261102-r1/);
  assert.match(html,/<style id="boardFocusCritical"/);
  assert.match(html,/body\.hud-board-focus \.side-left,body\.hud-board-focus \.side-right\{display:none\}/);
  assert.match(html,/body\.hud-board-focus \.sidebar\.hud-panel-open/);

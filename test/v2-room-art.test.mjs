@@ -3,22 +3,24 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {ROOM_WALLS,ROOM_DATA} from '../src/engine.mjs';
 import {
- V2_ART_ROOM,isV2ArtRoom,paintStoneFloorTile,paintIsoFloorTile,paintArtBackdrop,paintV2Dressing,paintV2Light
+ V2_ART_ROOM,V2_WOODLAND_ROOM,isV2ArtRoom,paintStoneFloorTile,paintIsoFloorTile,paintArtBackdrop,paintV2Dressing,paintV2Light
 } from '../public/v2-room-art.mjs';
 function drawingContext(){
  const draws=[];
  const ctx={canvas:{width:920,height:640},beginPath(){},save(){},restore(){},fillRect(){draws.push('fillRect')},
   strokeRect(){draws.push('strokeRect')},drawImage(){draws.push('image')},fill(){draws.push('fill')},stroke(){draws.push('stroke')},
-  clip(){},closePath(){},rect(){},moveTo(){},lineTo(){},arc(){},ellipse(){},translate(){},scale(){},roundRect(){},bezierCurveTo(){},
+  clip(){},closePath(){},rect(){},moveTo(){},lineTo(){},arc(){},ellipse(){},translate(){},scale(){},rotate(){},roundRect(){},bezierCurveTo(){},quadraticCurveTo(){},
   createLinearGradient(){return {addColorStop(){}}},createRadialGradient(){return {addColorStop(){}}}};
  return {ctx,draws};
 }
 const projection={iso:false,cell:36,originX:11,originY:14,at(x,y){return {x:11+(x+.5)*36,y:14+(y+.5)*36}}};
 const isoProjection={iso:true,cell:27,scale:.78,at(x,y){return {x:410+(x-y)*25,y:60+(x+y)*14}}};
-test('only q5r7 receives experimental V2 scenery; all other 132 campaign rooms retain original renderer',()=>{
- assert.equal(V2_ART_ROOM,'q5r7');assert.equal(isV2ArtRoom('q5r7'),true);
+test('Woodland Path and Smuggler’s Station have separate visual pilots; all other campaign rooms unchanged',()=>{
+ assert.equal(V2_ART_ROOM,'q5r7');assert.equal(V2_WOODLAND_ROOM,'woodland');
+ assert.equal(isV2ArtRoom('q5r7'),true);assert.equal(isV2ArtRoom('woodland'),true);
  assert.equal(ROOM_DATA[V2_ART_ROOM].name,'Smuggler’s Station');
- for(const id of Object.keys(ROOM_DATA))if(id!==V2_ART_ROOM)assert.equal(isV2ArtRoom(id),false,id);
+ assert.equal(ROOM_DATA[V2_WOODLAND_ROOM].name,'Woodland Path');
+ for(const id of Object.keys(ROOM_DATA))if(![V2_ART_ROOM,V2_WOODLAND_ROOM].includes(id))assert.equal(isV2ArtRoom(id),false,id);
 });
 test('art renderer draws real grid-aligned tactical and illustrated floor surfaces',()=>{
  const {ctx,draws}=drawingContext();
@@ -63,4 +65,21 @@ test('a read-only art gallery is available before unlocking Quest 5',()=>{
  assert.match(gallery,/not a playable dungeon/);
  assert.match(script,/paintV2Dressing\(/);
  assert.doesNotMatch(script,/fetch\(|WebSocket|localStorage|send\(/);
+});
+
+test('Woodland Path preview draws a distinguishable forest surface and real-wall scenery, without changing the 9x7 topology',()=>{
+ const walls=ROOM_WALLS.woodland.map(pair=>[...pair]);const before=JSON.stringify(walls);
+ const {ctx,draws}=drawingContext();
+ paintArtBackdrop(ctx,920,640,{theme:'woodland'});
+ paintStoneFloorTile(ctx,{x:20,y:20,size:64,tileX:1,tileY:3,theme:'woodland'});
+ paintIsoFloorTile(ctx,{position:{x:180,y:140},halfW:36,halfH:20,tileX:1,tileY:3,theme:'woodland'});
+ const forest=s=>({iso:false,cell:64,originX:30,originY:40,at(x,y){return {x:30+(x+.5)*64,y:40+(y+.5)*64}}});
+ paintV2Dressing(ctx,forest(),walls,{roomId:'woodland'});
+ paintV2Light(ctx,forest(),walls,{roomId:'woodland'});
+ assert(draws.length>200,'vegetation/stone/foliage drawn from wall and floor topology');
+ assert.equal(JSON.stringify(walls),before);
+ const original=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
+ assert.match(original,/theme:me.room/);
+ assert.match(original,/WOODLAND PATH ART PILOT/);
+ assert.doesNotMatch(original,/send\(\{type:'v2-art/);
 });

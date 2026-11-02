@@ -1,13 +1,15 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
+import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-20261102-r1';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · CINEMATIC HUD';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 MINE ART · CINEMATIC HUD';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
+initPremiumMine();
 const canvas = $('gameCanvas');
 const ctx=canvas.getContext('2d');
 // Visible verification: if the badge does not appear, the browser is still using old app.js.
@@ -25,6 +27,18 @@ function paintCinematicWoodlandSurround(ctx,s,w,h){
   bg('left',0,leftW+2);bg('right',rightX-2,rightW+2);
   ctx.save();const shadow=ctx.createLinearGradient(s.originX-30,0,s.originX+50,0);shadow.addColorStop(0,'#08180d88');shadow.addColorStop(1,'#08180d00');ctx.fillStyle=shadow;ctx.fillRect(s.originX-30,0,80,h);
   const right=ctx.createLinearGradient(rightX-50,0,rightX+30,0);right.addColorStop(0,'#08180d00');right.addColorStop(1,'#08180d88');ctx.fillStyle=right;ctx.fillRect(rightX-50,0,80,h);ctx.restore();
+}
+function paintCinematicMineSurround(ctx,s,w,h){
+ const leftW=Math.max(0,s.originX),rightX=s.originX+9*s.cell,rightW=Math.max(0,w-rightX);
+ const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#111b24');bg.addColorStop(1,'#231a32');
+ ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+ for(const [side,x,width] of [['left',0,leftW+2],['right',rightX-2,rightW+2]]){
+  const img=mineFrameImage(side);if(img?.complete&&img.naturalWidth&&width>1)ctx.drawImage(img,x,0,width,h);
+ }
+ ctx.save();const edge=ctx.createLinearGradient(s.originX-24,0,s.originX+15,0);
+ edge.addColorStop(0,'#020712d8');edge.addColorStop(1,'#02071200');ctx.fillStyle=edge;ctx.fillRect(s.originX-24,0,39,h);
+ const r=ctx.createLinearGradient(rightX-15,0,rightX+24,0);
+ r.addColorStop(0,'#02071200');r.addColorStop(1,'#020712d8');ctx.fillStyle=r;ctx.fillRect(rightX-15,0,39,h);ctx.restore();
 }
 const ROOM_DATA={woodland:{name:'Woodland Path',left:null,right:'clearing'},clearing:{name:'Training Clearing',left:'woodland',right:'watchpost'},watchpost:{name:'Old Watchpost',left:'clearing',right:null}};
 const roomDef=id=>state?.roomDefinitions?.[id]||ROOM_DATA[id]||{name:'Unknown room',left:null,right:null,quest:1};
@@ -50,6 +64,8 @@ woodlandLightingToggle.addEventListener('click',()=>{
 });
 const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
 const premiumActive=()=>artActive()&&isPremiumWoodlandRoom(me?.room)&&view==='tactical'&&premiumWoodlandReady();
+const premiumMineActive=()=>artActive()&&isPremiumMineRoom(me?.room)&&view==='tactical'&&premiumMineReady(me?.room);
+const anyPremiumActive=()=>premiumActive()||premiumMineActive();
 let woodlandDepthEnabled=localStorage.getItem('db4_v2_woodland_depth')!=='off';
 const woodlandDepthToggle=document.createElement('button');
 woodlandDepthToggle.id='woodlandDepthToggle';
@@ -75,7 +91,7 @@ woodlandCharactersToggle.addEventListener('click',()=>{
   localStorage.setItem('db4_v2_woodland_characters',woodlandCharactersEnabled?'on':'off');
   render();
 });
-const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
+const woodlandLightActive=()=>anyPremiumActive()&&woodlandLightingEnabled;
 
 
 // Cinematic controls reuse the EXISTING production handlers/commands.
@@ -711,8 +727,9 @@ function sceneFloor(s){
   const even=(x,y)=>(x+y)%2===0;
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
-    const cs=s.cell, premium=premiumActive();
-    if(premium){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
+    const cs=s.cell, premium=anyPremiumActive();
+    if(premiumActive()){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
+    else if(premiumMineActive()){paintPremiumMineFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumMineLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
       const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
@@ -860,25 +877,25 @@ function drawStoneIso(s,tx,ty,terrain){
   ctx.restore();
 }
 function render(){if(!state||!me)return;
-  woodlandLightingToggle.hidden=!(premiumActive());
+  woodlandLightingToggle.hidden=!anyPremiumActive();
   if(!woodlandLightingToggle.hidden){
-    woodlandLightingToggle.textContent=woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF';
+    woodlandLightingToggle.textContent=premiumMineActive()?(woodlandLightingEnabled?'💎 Cave glow: ON':'💎 Cave glow: OFF'):(woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF');
     woodlandLightingToggle.setAttribute('aria-pressed',String(woodlandLightingEnabled));
   }
-  woodlandDepthToggle.hidden=!premiumActive();
+  woodlandDepthToggle.hidden=!anyPremiumActive();
   if(!woodlandDepthToggle.hidden){
-    woodlandDepthToggle.textContent=!woodlandDepthEnabled?'🍃 Foreground: OFF':'🍃 Foreground: ON';
+    woodlandDepthToggle.textContent=premiumMineActive()?(woodlandDepthEnabled?'✨ Cave dust: ON':'✨ Cave dust: OFF'):(woodlandDepthEnabled?'🍃 Foreground: ON':'🍃 Foreground: OFF');
     woodlandDepthToggle.setAttribute('aria-pressed',String(woodlandDepthEnabled));
-    woodlandDepthToggle.title=reducedMotion?'Foreground scenery is visible; animation is disabled by your system preference.':'Compare this new foreground and soft drifting-leaf layer against the approved lighting baseline.';
+    woodlandDepthToggle.title=premiumMineActive()?'Ambient dust drawn around the combat units, without altering any walls or effects.':reducedMotion?'Foreground scenery is visible; animation is disabled by your system preference.':'Compare this new foreground and soft drifting-leaf layer against the approved lighting baseline.';
   }
-  woodlandCharactersToggle.hidden=!premiumActive();
+  woodlandCharactersToggle.hidden=!anyPremiumActive();
   if(!woodlandCharactersToggle.hidden){
     woodlandCharactersToggle.textContent=woodlandCharactersEnabled?'♞ Characters: IN WORLD':'▣ Characters: TOKENS';
     woodlandCharactersToggle.setAttribute('aria-pressed',String(woodlandCharactersEnabled));
     woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
   }
-  if(v2ArtToggle&&isPremiumWoodlandRoom(me.room)){
-    const label=v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
+  if(v2ArtToggle&&(isPremiumWoodlandRoom(me.room)||isPremiumMineRoom(me.room))){
+    const label=isPremiumMineRoom(me.room)?(v2ArtEnabled?(premiumMineReady(me.room)?'💎 Quest 2 mine premium: ON':'💎 Loading mine artwork…'):'◇ Quest 2 mine premium: OFF'):(v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF');
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }
   const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
@@ -888,17 +905,20 @@ function render(){if(!state||!me)return;
   if(artActive())paintArtBackdrop(ctx,w,h,{theme:me.room});else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
   const s=gridProjection(w,h);frameMetrics=s;
   if(boardFocus&&premiumActive())paintCinematicWoodlandSurround(ctx,s,w,h);
+  else if(boardFocus&&premiumMineActive())paintCinematicMineSurround(ctx,s,w,h);
   sceneFloor(s);positionPortalArrows(s,w,h);
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
   for(const [x,y] of state.roomWalls?.[me.room]||[]){
     if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
+    else if(premiumMineActive())paintPremiumMineWall(ctx,s,x,y,me.room);
     else if(s.iso)drawStoneIso(s,x,y,terrain);
     else drawStoneTile(s,x,y,terrain);
   }
   // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
   if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled,me.room);
+  else if(premiumMineActive())paintPremiumMineAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
   else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
   // Illustrated undergrowth tucks into existing obstacle footprints and is
   // rendered below all actors/targets, leaving the full battle state untouched.
@@ -937,26 +957,29 @@ function render(){if(!state||!me)return;
   const actors=[...battle.enemies.filter(e=>e.hp>0).map(e=>({p:e,kind:'enemy'})),...Object.values(state.players).filter(p=>p.room===me.room).map(p=>({p,kind:p.id}))];
   if(s.iso)actors.sort((a,b)=>(a.p.x+a.p.y)-(b.p.x+b.p.y));
   for(const a of actors){
-    const integrated=premiumActive()&&woodlandCharactersEnabled;
-    if(woodlandLightActive()&&!integrated)paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);
+    const integrated=anyPremiumActive()&&woodlandCharactersEnabled;
+    if(woodlandLightActive()&&!integrated){if(premiumMineActive())paintPremiumMineContactShadow(ctx,s,a.p);else paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);}
     const medium=roomSize(me.room).width>9;
     const abbreviations={normal:'',swift:'S',ranged:'R',armoured:'A',zombie:'Z',ghost:'G',teleporter:'T',cloner:'C',healer:'H',ninja:'N'};
     const label=a.kind==='enemy'&&medium?`${abbreviations[a.p.role||'normal']||''}D${a.p.faces}`:a.kind==='enemy'?a.p.name:(a.p.name||'Player').slice(0,medium?4:8);
-    const drew=integrated&&paintPremiumWoodlandActor(ctx,s,a.p,a.kind,images[a.kind==='enemy'&&me.room==='clearing'&&a.p.faces===6?'d6':a.kind==='enemy'?'d8':a.kind],{
+    const baseSprite=images[a.kind==='enemy'&&me.room==='clearing'&&a.p.faces===6?'d6':a.kind==='enemy'?'d8':a.kind];
+    const visualOptions={
       label,selected:a.kind==='enemy'&&selectedEnemyId===a.p.id,
       active:a.kind!=='enemy'&&state.turn?.activePlayer===a.p.id,
       motion:!reducedMotion,timeMs:performance.now(),light:woodlandLightingEnabled,roomId:me.room
-    });
+    };
+    const drew=integrated&&(premiumMineActive()?paintPremiumMineActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):paintPremiumWoodlandActor(ctx,s,a.p,a.kind,baseSprite,visualOptions));
     if(!drew)iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
   }
   // Foreground passes run AFTER the units. Painted canopy silhouettes sit at
   // the board rim; their opacity falls away near heroes/enemies and labels.
-  if(premiumActive()){
+  if(anyPremiumActive()){
     if(woodlandDepthEnabled){
       const movement=!reducedMotion;
       const timestamp=performance.now();
-      paintPremiumWoodlandForeground(ctx,s,actors,timestamp,movement);
-      paintPremiumWoodlandForestLife(ctx,s,actors,timestamp,movement);
+      if(premiumMineActive())paintPremiumMineForeground(ctx,s,actors,timestamp,movement,me.room);
+      else{paintPremiumWoodlandForeground(ctx,s,actors,timestamp,movement);
+      paintPremiumWoodlandForestLife(ctx,s,actors,timestamp,movement);}
     }
   }
   const banner=$('turnBanner');

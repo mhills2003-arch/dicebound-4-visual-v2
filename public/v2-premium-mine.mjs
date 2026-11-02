@@ -1,0 +1,188 @@
+/**
+ * DICEBOUND 4.0 V2 — Quest 2 All That Glitters, five illustrated mine rooms.
+ * Purely visual: no room definitions, collision, item/loot, combat, quests,
+ * network, player positions, RNG or server authority are changed here.
+ */
+export const MINE_ROOMS = Object.freeze(['q2r1','q2r2','q2r3','q2r4','q2r5']);
+export const isPremiumMineRoom = id => MINE_ROOMS.includes(id);
+export const MINE_FILES = Object.freeze({
+  q2r1:'./assets/premium-mine/abandoned-mine-ground.jpg',
+  q2r2:'./assets/premium-mine/crystal-hollow-ground.jpg',
+  q2r3:'./assets/premium-mine/glittering-gallery-ground.jpg',
+  q2r4:'./assets/premium-mine/miners-vault-ground.jpg',
+  q2r5:'./assets/premium-mine/crystal-heart-ground.jpg',
+  rubble:'./assets/premium-mine/mine-rubble.png',
+  timber:'./assets/premium-mine/mine-timber.png',
+  cyan:'./assets/premium-mine/mine-crystal-cyan.png',
+  amber:'./assets/premium-mine/mine-crystal-amber.png',
+  amethyst:'./assets/premium-mine/mine-crystal-amethyst.png',
+  normalD4:'./assets/premium-mine/normal-d4.png',
+  normalD6:'./assets/premium-mine/normal-d6.png',
+  shinyD4:'./assets/premium-mine/shiny-d4.png',
+  shinyD6:'./assets/premium-mine/shiny-d6.png',
+  bossD12:'./assets/premium-mine/boss-d12.png',
+  left:'./assets/premium-mine/mine-frame-left.jpg',
+  right:'./assets/premium-mine/mine-frame-right.jpg'
+});
+const art=Object.create(null);let initiated=false;
+export function initPremiumMine(ImageCtor=typeof Image!=='undefined'?Image:null){
+ if(!ImageCtor||initiated)return;initiated=true;
+ for(const [name,path] of Object.entries(MINE_FILES)){
+  const image=new ImageCtor();image.decoding='async';image.src=path;art[name]=image;
+ }
+}
+const ready=key=>!!art[key]?.complete&&art[key].naturalWidth>0;
+export function premiumMineReady(roomId='q2r1'){
+ return isPremiumMineRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst');
+}
+const roomIndex=id=>MINE_ROOMS.indexOf(id);
+const floorPalette=[
+ {ambient:'22,30,40',light:'244,177,87'},
+ {ambient:'11,32,49',light:'92,208,234'},
+ {ambient:'38,30,35',light:'250,196,93'},
+ {ambient:'30,27,32',light:'245,159,79'},
+ {ambient:'27,19,48',light:'183,112,249'}
+];
+function oval(ctx,x,y,rx,ry,rgb,strength){
+ ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
+ const g=ctx.createRadialGradient(0,0,0,0,0,1);
+ g.addColorStop(0,`rgba(${rgb},${strength})`);
+ g.addColorStop(.33,`rgba(${rgb},${strength*.45})`);
+ g.addColorStop(1,`rgba(${rgb},0)`);
+ ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,1,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+export function paintPremiumMineFloor(ctx,s,roomId='q2r1'){
+ if(!premiumMineReady(roomId)||s.iso)return false;
+ const {originX:x,originY:y,cell:c}=s;
+ ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ ctx.drawImage(art[roomId],x,y,9*c,7*c);
+ ctx.lineWidth=Math.max(.75,c*.011);
+ ctx.strokeStyle=roomId==='q2r5'?'rgba(191,151,226,.25)':'rgba(196,202,205,.17)';
+ for(let i=1;i<9;i++){ctx.beginPath();ctx.moveTo(x+i*c,y);ctx.lineTo(x+i*c,y+7*c);ctx.stroke()}
+ for(let i=1;i<7;i++){ctx.beginPath();ctx.moveTo(x,y+i*c);ctx.lineTo(x+9*c,y+i*c);ctx.stroke()}
+ ctx.restore();return true;
+}
+export function mineWallArt(roomId,x,y){
+ const code=(x*11+y*7+x*y*3+roomIndex(roomId)*5)%7;
+ if(roomId==='q2r1')return code<4?'timber':'rubble';
+ if(roomId==='q2r2')return code<4?'cyan':code<6?'rubble':'timber';
+ if(roomId==='q2r3')return code<4?'amber':code<6?'timber':'rubble';
+ if(roomId==='q2r4')return code<4?'timber':code<6?'rubble':'amber';
+ return code<5?'amethyst':code===5?'cyan':'rubble';
+}
+export function paintPremiumMineWall(ctx,s,x,y,roomId='q2r1'){
+ if(!premiumMineReady(roomId)||s.iso)return false;
+ const pt=s.at(x,y),c=s.cell,key=mineWallArt(roomId,x,y),img=ready(key)?art[key]:art.rubble;
+ const sz=c*(key==='timber'?1.42:key==='rubble'?1.49:1.63);
+ ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ ctx.shadowColor='rgba(2,4,12,.84)';ctx.shadowBlur=c*.18;ctx.shadowOffsetY=c*.10;
+ ctx.drawImage(img,pt.x-sz*.5,pt.y-sz*.53,sz,sz);
+ ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+ ctx.strokeStyle=roomId==='q2r5'?'rgba(207,160,255,.70)':'rgba(197,207,216,.56)';
+ ctx.lineWidth=Math.max(1,c*.021);
+ ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
+ ctx.restore();return true;
+}
+export function paintPremiumMineLighting(ctx,s,walls=[],roomId='q2r1'){
+ if(!premiumMineReady(roomId)||s.iso)return false;
+ const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,index=roomIndex(roomId),palette=floorPalette[index];
+ ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+ const ambient=ctx.createLinearGradient(x,y,x+w,y+h);
+ ambient.addColorStop(0,`rgba(${palette.ambient},.22)`);
+ ambient.addColorStop(.52,'rgba(4,7,14,.05)');ambient.addColorStop(1,'rgba(1,3,10,.29)');
+ ctx.fillStyle=ambient;ctx.fillRect(x,y,w,h);
+ const lamps=index===0?[[.10,.18],[.55,.67],[.89,.28]]:index===3?[[.12,.27],[.84,.19],[.46,.76]]:
+               index===4?[[.50,.40],[.28,.24],[.78,.72]]:[[.18,.25],[.72,.30],[.51,.75]];
+ for(const [xx,yy] of lamps){
+  const rx=w*(index===4?.31:.18),ry=h*(index===4?.38:.28);
+  oval(ctx,x+w*xx,y+h*yy,rx,ry,palette.light,index===4?.33:.23);
+ }
+ for(const [tx,ty] of walls){
+  oval(ctx,x+(tx+.85)*c,y+(ty+.80)*c,c*.80,c*.35,'2,4,10',.54);
+ }
+ ctx.restore();return true;
+}
+export function paintPremiumMineAtmosphere(ctx,s,roomId='q2r1',timeMs=0,motion=true,lit=true){
+ if(!premiumMineReady(roomId)||s.iso)return false;
+ const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,index=roomIndex(roomId),pal=floorPalette[index];
+ ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+ const dark=ctx.createRadialGradient(x+w*.50,y+h*.48,w*.12,x+w*.50,y+h*.48,w*.73);
+ dark.addColorStop(0,'rgba(0,2,9,0)');dark.addColorStop(.65,'rgba(0,2,9,.05)');dark.addColorStop(1,'rgba(0,1,6,.46)');
+ ctx.fillStyle=dark;ctx.fillRect(x,y,w,h);
+ // Pinprick mineral reflections; stable frame positions and low opacity.
+ const t=motion?timeMs*.0007:0;
+ for(let i=0;i<(lit?(index===4?27:14):0);i++){
+  const nx=((i*67+11)%103)/103,ny=((i*43+5)%97)/97;
+  const glint=(.22+Math.sin(t*2+i*1.7)*.10)*(index===4?.75:.48);
+  oval(ctx,x+nx*w,y+ny*h,c*.045,c*.065,pal.light,glint);
+ }
+ ctx.restore();return true;
+}
+export function paintPremiumMineForeground(ctx,s,actors=[],timeMs=0,motion=true,roomId='q2r1'){
+ if(!premiumMineReady(roomId)||s.iso)return false;
+ const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,t=motion?timeMs*.000025:0;
+ ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+ for(let i=0;i<13;i++){
+  const nx=((i*37+11)%97)/97,ny=(((i*59+29)%89)/89+t*(.5+(i%3)*.21))%1;
+  let min=Infinity;
+  for(const a of actors){const p=a.p||a;if(!Number.isFinite(p?.x))continue;min=Math.min(min,Math.hypot(nx*9-p.x-.5,ny*7-p.y-.5))}
+  const fade=min<1.25?.1:min<2?.34:1;
+  ctx.globalAlpha=fade*(.12+(.035*Math.sin(t*85+i)));
+  ctx.fillStyle=roomId==='q2r5'?'#d0b1ff':'#bbcfd1';
+  ctx.beginPath();ctx.ellipse(x+w*nx,y+h*ny,c*.025,c*.040,i*.9,0,Math.PI*2);ctx.fill();
+ }
+ ctx.restore();return true;
+}
+export function paintPremiumMineContactShadow(ctx,s,p){
+ if(!p||!Number.isFinite(p.x)||s.iso)return false;
+ const giant=p.variant==='large'||p.variant==='large-shiny';
+ const pt=s.at(p.x+(giant?.5:0),p.y+(giant?.5:0)),c=s.cell;
+ oval(ctx,pt.x,pt.y+c*.28,c*(giant?.68:.42),c*.16,'1,3,10',.64);return true;
+}
+export function paintPremiumMineActor(ctx,s,p,kind,sprite,{label='',selected=false,active=false,motion=true,timeMs=0,roomId='q2r1'}={}){
+ if(!premiumMineReady(roomId)||s.iso||!p||!Number.isFinite(p.x)||!Number.isFinite(p.y))return false;
+ const giant=kind==='enemy'&&(p.variant==='large'||p.variant==='large-shiny');
+ const c=s.cell,pt=s.at(p.x+(giant?.5:0),p.y+(giant?.5:0));
+ const shiny=kind==='enemy'&&(p.variant==='shiny'||p.variant==='large-shiny');
+ const boss=kind==='enemy'&&p.variant==='boss';
+ if(boss&&p.faces===12&&ready('bossD12'))sprite=art.bossD12;
+ else if(shiny&&p.faces===4&&ready('shinyD4'))sprite=art.shinyD4;
+ else if(shiny&&p.faces===6&&ready('shinyD6'))sprite=art.shinyD6;
+ else if(kind==='enemy'&&p.faces===4&&ready('normalD4'))sprite=art.normalD4;
+ else if(kind==='enemy'&&p.faces===6&&ready('normalD6'))sprite=art.normalD6;
+ if(!sprite?.complete||!sprite.naturalWidth)return false;
+ ctx.save();
+ if(shiny||boss){
+  oval(ctx,pt.x,pt.y+c*.17,c*(boss?.87:.62),c*.44,boss?'181,100,237':'90,216,236',boss?.40:.34);
+ }
+ if(selected||active){
+  ctx.strokeStyle=selected?'#ffbb70':'#d9f4df';ctx.lineWidth=Math.max(2,c*.032);
+  ctx.beginPath();ctx.ellipse(pt.x,pt.y+c*.24,c*(giant?.72:.44),c*.19,0,0,Math.PI*2);ctx.stroke();
+ }
+ paintPremiumMineContactShadow(ctx,s,p);
+ const bob=motion&&p.hp>0?Math.sin(timeMs*.0022+p.x*7+p.y*11)*c*.014:0;
+ const imageSize=c*(boss?1.76:shiny?1.53:kind==='enemy'?1.29:1.40)*(giant?1.6:1);
+ ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ ctx.shadowColor=boss?'rgba(146,83,213,.67)':shiny?'rgba(51,155,188,.62)':'rgba(1,3,10,.80)';
+ ctx.shadowBlur=c*(shiny||boss?.25:.11);ctx.shadowOffsetY=c*.055;
+ if(kind==='enemy'&&!shiny&&!boss&&sprite.naturalHeight){
+  const sh=sprite.naturalHeight,sw=sprite.naturalWidth;
+  ctx.drawImage(sprite,0,sh*.115,sw,sh*.76,pt.x-imageSize*.50,pt.y-imageSize*.60+bob,imageSize,imageSize);
+ }else ctx.drawImage(sprite,pt.x-imageSize*.50,pt.y-imageSize*.58+bob,imageSize,imageSize);
+ ctx.restore();
+ const y=pt.y+c*(giant?.78:.48),text=label|| (kind==='enemy'?`D${p.faces||8}`:p.name||'Player');
+ const fs=Math.max(9,c*(giant?.235:.215));ctx.textAlign='center';ctx.textBaseline='alphabetic';
+ ctx.font=`700 ${fs}px system-ui,sans-serif`;
+ const width=Math.min(c*1.5,Math.max(c*.62,text.length*fs*.60+c*.15));
+ ctx.fillStyle='rgba(5,10,22,.79)';ctx.beginPath();ctx.roundRect(pt.x-width/2,y-fs*.98,width,fs*1.4,fs*.32);ctx.fill();
+ ctx.lineJoin='round';ctx.lineWidth=Math.max(2.4,fs*.29);ctx.strokeStyle='#07121b';ctx.fillStyle='#fff4e9';
+ ctx.strokeText(text,pt.x,y);ctx.fillText(text,pt.x,y);
+ if(kind==='enemy'){
+  const ratio=Number.isFinite(p.maxHp)&&p.maxHp>0?Math.max(0,Math.min(1,p.hp/p.maxHp)):1;
+  const bar=c*(giant?.94:.73),by=y+c*.10;ctx.fillStyle='#091322';
+  ctx.fillRect(pt.x-bar/2-1,by-1,bar+2,Math.max(4,c*.076)+2);
+  ctx.fillStyle=shiny?'#70e9ed':boss?'#dc89fc':'#e38386';ctx.fillRect(pt.x-bar/2,by,bar*ratio,Math.max(4,c*.076));
+ }else if(p.hp===0){ctx.fillStyle='#f6a4a7';ctx.fillText('DOWN',pt.x,pt.y-c*.55)}
+ ctx.restore();return true;
+}
+export function mineFrameImage(side){return art[side]}

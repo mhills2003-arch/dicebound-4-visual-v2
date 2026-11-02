@@ -5,7 +5,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT · BOARD FOCUS HUD';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT · BOARD FOCUS HUD FIX B';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 const canvas = $('gameCanvas');
@@ -71,7 +71,7 @@ const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
 // mutations are issued by these controls. Classic layout is always available.
 let boardFocus=localStorage.getItem('db4_v2_board_focus')!=='off';
 let hudOpenPanel=null;
-const hudLeft=$('sideLeftPanel'),hudRight=$('sideRightPanel'),hudBag=$('heroBag');
+const hudLeft=$('sideLeftPanel'),hudRight=$('sideRightPanel'),hudBag=$('heroBag'),hudClass=$('classSelectPanel');
 const hudShade=$('hudShade'),hudClose=$('hudDrawerClose');
 function closeHudPanel(){
   hudOpenPanel=null;
@@ -80,6 +80,7 @@ function closeHudPanel(){
     pane.removeAttribute('role');pane.removeAttribute('aria-modal');pane.removeAttribute('aria-label');
   }
   hudBag.classList.remove('hud-bag-open');hudBag.open=false;hudBag.removeAttribute('role');hudBag.removeAttribute('aria-modal');hudBag.removeAttribute('aria-label');
+  hudClass.classList.remove('hud-class-open');hudClass.removeAttribute('role');hudClass.removeAttribute('aria-modal');hudClass.removeAttribute('aria-label');
   hudShade.hidden=true;hudClose.hidden=true;
 }
 function setBoardFocus(enabled){
@@ -98,15 +99,15 @@ function openHudPanel(panel){
   if(panel==='rewards'&&$('questRewardPanel').hidden){toast('No reward chest is awaiting your choice.');return}
   document.querySelector('.hud-hud-menu')?.removeAttribute('open');
   closeHudPanel();hudOpenPanel=panel;
-  const pane=panel==='party'?hudLeft:panel==='inventory'?hudBag:hudRight;
-  if(panel==='inventory'){hudBag.open=true;hudBag.classList.add('hud-bag-open')}else pane.classList.add('hud-panel-open');
+  const pane=panel==='party'?hudLeft:panel==='inventory'?hudBag:panel==='class'?hudClass:hudRight;
+  if(panel==='inventory'){hudBag.open=true;hudBag.classList.add('hud-bag-open')}else if(panel==='class')hudClass.classList.add('hud-class-open');else pane.classList.add('hud-panel-open');
   if(panel!=='party')pane.classList.add(({log:'hud-log-only',shop:'hud-shop-only',rewards:'hud-rewards-only',encounter:'hud-details-only'})[panel]);
-  const title=({party:'Party and map',inventory:'Equipment and backpack',log:'Adventure log',shop:'Camp merchant',rewards:'Victory rewards',encounter:'Encounter, supplies and treasure'})[panel];
+  const title=({party:'Party and map',inventory:'Equipment and backpack',log:'Adventure log',shop:'Camp merchant',rewards:'Victory rewards',encounter:'Encounter, supplies and treasure',class:'Choose your adventurer class'})[panel];
   pane.setAttribute('role','dialog');pane.setAttribute('aria-modal','true');pane.setAttribute('aria-label',title);
   hudShade.hidden=false;hudClose.hidden=false;hudClose.focus({preventScroll:true});
 }
 $('hudLayoutBtn').addEventListener('click',()=>setBoardFocus(!boardFocus));
-for(const [button,panel] of [['hudInventoryBtn','inventory'],['hudPartyBtn','party'],['hudEncounterBtn','encounter'],['hudLogBtn','log'],['hudShopBtn','shop'],['hudRewardsBtn','rewards']]){
+for(const [button,panel] of [['hudInventoryBtn','inventory'],['hudPartyBtn','party'],['hudEncounterBtn','encounter'],['hudLogBtn','log'],['hudShopBtn','shop'],['hudRewardsBtn','rewards'],['hudClassBtn','class']]){
   $(button).addEventListener('click',()=>openHudPanel(panel));
 }
 hudClose.addEventListener('click',closeHudPanel);
@@ -457,7 +458,8 @@ function currentCombatStats(p){
 function updateClassSelection(){
  const panel=$('classSelectPanel');if(!panel||!me)return;
  panel.hidden=!!me.classChosen;
- if(panel.hidden)return;
+ $('hudClassBtn').hidden=!!me.classChosen;
+ if(panel.hidden){if(hudOpenPanel==='class')closeHudPanel();return;}
  const safe=!me.mazeSlot&&['camp','woodland'].includes(me.room)&&state.rooms?.[me.room]?.battle?.status!=='active';
  $('classChoiceNote').textContent=safe
    ?'Choose a permanent class. Existing XP, coins, equipment and progress are retained. You receive a simple starter weapon.'

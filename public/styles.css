@@ -431,3 +431,10 @@ body:not(.hud-board-focus) .hud-hud-menu{display:none}
 .hud-hud-menu[open] summary{border-color:#e4cb89;color:#ffe9bd}
 .hud-menu-buttons{position:absolute;top:calc(100% + 6px);right:0;z-index:58;width:min(260px,calc(100vw - 20px));background:#0c2131;border:1px solid #b59a69;border-radius:12px;padding:9px;box-shadow:0 12px 38px #000b;display:flex;flex-direction:column;gap:6px}
 .hud-menu-buttons button{width:100%;min-height:43px;white-space:normal!important;text-align:left}
+
+/* Board Focus FIX B — class selection is an on-demand modal, not a full room panel. */
+body.hud-board-focus #classSelectPanel:not(.hud-class-open){display:none!important}
+body.hud-board-focus #classSelectPanel.hud-class-open:not([hidden]){display:block!important;position:fixed;z-index:81;top:3dvh;left:50%;transform:translateX(-50%);width:min(680px,calc(100vw - 20px));max-height:94dvh;overflow-y:auto;overscroll-behavior:contain;background:#0d2031;border:2px solid #b59a69;border-radius:15px;padding:56px 14px 18px;box-shadow:0 18px 65px #000b}
+body.hud-board-focus #classSelectPanel.hud-class-open[hidden]{display:none!important}
+body.hud-board-focus #classSelectPanel.hud-class-open .class-choice-grid{grid-template-columns:1fr 1fr}
+@media(max-width:700px){body.hud-board-focus #classSelectPanel.hud-class-open .class-choice-grid{grid-template-columns:1fr}}

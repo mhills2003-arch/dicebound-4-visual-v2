@@ -56,6 +56,8 @@ export default {
   async fetch(req,env){
     const u=new URL(req.url);if(u.pathname===ROOT)return Response.redirect(u.origin+ROOT+'/',308);
     if(!u.pathname.startsWith(ROOT+'/'))return new Response('Not found',{status:404});
+    // Public, non-sensitive probe: distinguishes a missing Worker route from an asset 404.
+    if(req.method==='GET'&&u.pathname===ROOT+'/health')return new Response('DICEBOUND V2 router OK',{status:200,headers:{'content-type':'text/plain; charset=utf-8','cache-control':'no-store'}});
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
     const identity=await validSession(req,env);
     if(!identity)return reply(loginScreen(),401,{'x-frame-options':'DENY'});
@@ -79,7 +81,7 @@ export default {
     // PRIVATE ASSET GATE. Worker authenticates before serving each file.
     // Cloudflare's default root assets path works on accounts without base_path.
     const assetUrl=new URL(req.url);
-    assetUrl.pathname=(u.pathname===ROOT+'/')?'/':u.pathname.slice(ROOT.length);
+    assetUrl.pathname=(u.pathname===ROOT+'/')?'/index.html':u.pathname.slice(ROOT.length);
     const result=await env.ASSETS.fetch(new Request(assetUrl.toString(),req));
     const headers=new Headers(result.headers);headers.set('cache-control','private, no-store');headers.set('x-content-type-options','nosniff');headers.set('x-frame-options','DENY');headers.set('referrer-policy','no-referrer');
     return new Response(result.body,{status:result.status,statusText:result.statusText,headers});

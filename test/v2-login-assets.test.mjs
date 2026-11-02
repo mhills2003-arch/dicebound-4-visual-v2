@@ -26,17 +26,17 @@ function envWithAssets(){
   return { ...vars, ASSETS: {fetch: async request => {
     const pathname=new URL(request.url).pathname;
     hits.push(pathname);
-    if(pathname==='/index.html')return new Response('<html>DICEBOUND-V2-APP</html>', {headers:{'content-type':'text/html'}});
+    if(pathname==='/')return new Response('<html>DICEBOUND-V2-APP</html>', {headers:{'content-type':'text/html'}});
     if(pathname==='/v2-art-preview.html')return new Response('<html>V2-ART-LAB</html>', {headers:{'content-type':'text/html'}});
     if(pathname==='/app.js')return new Response('/* app */', {headers:{'content-type':'text/javascript'}});
     return new Response('Not found',{status:404});
   }}, hits};
 }
 
-test('V2 uses literal index.html asset with html_handling none (no index alias)',()=>{
+test('V2 disables Cloudflare HTML canonical redirects that leave authenticated prefix',()=>{
   assert.match(config,/^html_handling = "none"$/m);
   assert.match(config,/run_worker_first = true/);
-  assert.match(workerSource,/assetUrl\.pathname=\(u\.pathname===ROOT\+'\/'\)\?'\/index\.html'/);
+  assert.match(workerSource,/assetUrl\.pathname=\(u\.pathname===ROOT\+'\/'\)\?'\/'/);
 });
 
 test('successful V2 login redirects into prefix and protected game + Art Lab paths resolve',async()=>{
@@ -58,14 +58,22 @@ test('successful V2 login redirects into prefix and protected game + Art Lab pat
     assert.match(await result.text(),new RegExp(marker));
     assert.equal(result.headers.get('location'),null,'no unwanted canonical redirect');
   }
-  assert.deepEqual(e.hits,['/index.html','/v2-art-preview.html','/app.js']);
+  assert.deepEqual(e.hits,['/','/v2-art-preview.html','/app.js']);
   const forbidden=await worker.fetch(new Request(`${ROOT}/v2-art-preview.html`),e);
   assert.equal(forbidden.status,401,'Art Lab must remain gated behind V2 login');
 });
 
-
-test('Cloudflare html_handling none does not alias root slash to index.html',async()=>{
-  const assets=envWithAssets();
-  assert.equal((await assets.ASSETS.fetch(new Request('https://test.example/'))).status,404);
-  assert.equal((await assets.ASSETS.fetch(new Request('https://test.example/index.html'))).status,200);
+// Regression for the user's failure: the *first navigation* to the V2 URL
+// must show the login form unless a valid cookie already exists.
+test('unauthenticated V2 URL shows login before any sign-in, including ChatGPT tracking query',async()=>{
+  const worker=workerForRoutingTest();
+  const e=envWithAssets();
+  for(const suffix of ['/', '/?utm_source=chatgpt.com']){
+    const res=await worker.fetch(new Request(ROOT+suffix),e);
+    assert.equal(res.status,401);
+    assert.match(await res.text(),/Parent-issued invitation code/);
+  }
+  assert.deepEqual(e.hits,[], 'unauthenticated requests must never access static assets');
+  const outside=await worker.fetch(new Request('https://test.example/different-route'),e);
+  assert.equal(outside.status,404);
 });

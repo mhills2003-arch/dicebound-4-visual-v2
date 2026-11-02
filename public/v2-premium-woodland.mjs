@@ -1,16 +1,21 @@
 /**
- * DICEBOUND V2 · Premium Woodland vertical slice · Quest 1 / Woodland Path ONLY.
+ * DICEBOUND V2 · Premium Woodland vertical slice · Quest 1 rooms 1-1 and 1-2 only.
  * Visual assets are genuine environment textures and transparent scenery pieces.
  * The game's server controls every wall, position, target, HP and turn.
  * No state mutations, input handlers, fetch calls, random gameplay or WebSockets.
  */
 export const PREMIUM_ROOM = 'woodland';
+export const PREMIUM_ROOMS = Object.freeze(['woodland','clearing']);
+export const isPremiumWoodlandRoom = roomId => PREMIUM_ROOMS.includes(roomId);
 export const PREMIUM_FILES = Object.freeze({
   ground: './assets/premium-woodland/forest-ground.jpg',
+  clearing: './assets/premium-woodland/training-clearing-ground.jpg',
   boulderA: './assets/premium-woodland/boulder-a.png',
   boulderB: './assets/premium-woodland/boulder-b.png',
   fernTreeA: './assets/premium-woodland/fern-tree-a.png',
-  fernTreeB: './assets/premium-woodland/fern-tree-b.png'
+  fernTreeB: './assets/premium-woodland/fern-tree-b.png',
+  canopyA: './assets/premium-woodland/canopy-a.png',
+  canopyB: './assets/premium-woodland/canopy-b.png'
 });
 const art = Object.create(null);
 let loaded = false;
@@ -33,11 +38,13 @@ export function woodlandObstacleArt(x,y) {
   const index = ((x*13+y*7+x*y*11+x*x*3+y*y*5)>>>0)%4;
   return ['boulderA','fernTreeA','boulderB','fernTreeB'][index];
 }
-export function paintPremiumWoodlandFloor(ctx,s) {
+export function paintPremiumWoodlandFloor(ctx,s,roomId='woodland') {
   if (!premiumWoodlandReady() || s.iso) return false;
   const {originX:x, originY:y, cell:c} = s;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  ctx.drawImage(art.ground,x,y,9*c,7*c);
+  ctx.drawImage(roomId==='clearing'&&art.clearing?.complete&&art.clearing.naturalWidth ? art.clearing : art.ground,x,y,9*c,7*c);
+  // Training Clearing is open woodland, with distinct painted ground but no invented walls.
+  // All actors, barriers and interaction remain separate authoritative layers.
   // The tactical grid is accessible, but deliberately subordinate to the scene.
   ctx.lineWidth=Math.max(.6,c*.012);
   ctx.strokeStyle='rgba(228,213,164,.20)';
@@ -45,10 +52,10 @@ export function paintPremiumWoodlandFloor(ctx,s) {
   for(let i=1;i<7;i++){ctx.beginPath();ctx.moveTo(x,y+i*c);ctx.lineTo(x+9*c,y+i*c);ctx.stroke()}
   ctx.restore();return true;
 }
-export function paintPremiumWoodlandWall(ctx,s,x,y) {
+export function paintPremiumWoodlandWall(ctx,s,x,y,roomId='woodland') {
   if (!premiumWoodlandReady() || s.iso) return false;
   const {cell:c} = s,pt=s.at(x,y);
-  const name=woodlandObstacleArt(x,y),img=art[name];
+  const name=woodlandObstacleArt(x+(roomId==='clearing'?11:0),y+(roomId==='clearing'?7:0)),img=art[name];
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   // The visual silhouette may exceed a cell; its authoritative footprint never does.
   const r=c*(name.startsWith('boulder')?1.36:1.65);
@@ -88,7 +95,7 @@ const CANOPY_SHADOWS=Object.freeze([
   [.88,.51,.23,.18],[.14,.99,.20,.17],[.57,.98,.27,.17],
   [.98,.95,.25,.23]
 ]);
-export function paintPremiumWoodlandGroundLighting(ctx,s,walls=[]){
+export function paintPremiumWoodlandGroundLighting(ctx,s,walls=[],roomId='woodland'){
   if(!premiumWoodlandReady() || s.iso) return false;
   const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
@@ -137,7 +144,7 @@ export function paintPremiumWoodlandContactShadow(ctx,s,p,kind='one'){
  * Allows comparison with the approved 7/10 asset-based baseline.
  * The OFF state reproduces the existing, subtle pre-lighting overlay.
  */
-export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true){
+export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true,roomId='woodland'){
   if(!premiumWoodlandReady() || s.iso) return false;
   const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
@@ -154,7 +161,7 @@ export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true){
   // than hard-edged triangles. This avoids synthetic polygon beam boundaries.
   ctx.globalCompositeOperation='screen';
   const beams=[
-    {sx:.22,sy:-.12,dx:.30,dy:1.05,power:.047},
+    {sx:roomId==='clearing'?.16:.22,sy:-.12,dx:.30,dy:1.05,power:.047},
     {sx:.52,sy:-.12,dx:.25,dy:.94,power:.065},
     {sx:.72,sy:-.12,dx:.12,dy:.81,power:.036}
   ];
@@ -176,4 +183,177 @@ export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true){
   edge.addColorStop(1,'rgba(3,11,11,.29)');
   ctx.fillStyle=edge;ctx.fillRect(x,y,w,h);
   ctx.restore();return true;
+}
+
+
+/**
+ * Woodland Path only: a near-field layer composed from the same painted canopy
+ * assets as the approved forest. Occupies the edge of the board, never creates
+ * obstacles or changes room-wall semantics. Foreground opacity decreases near
+ * combat units so portraits, HP bars and selection remain legible.
+ */
+export const WOODLAND_FOREGROUND_POSITIONS = Object.freeze([
+  [.04,.025,2.15,'canopyA',.87], [.24,-.045,1.72,'canopyB',.63],
+  [.54,-.060,1.83,'canopyA',.70], [.89,.005,2.20,'canopyB',.92],
+  [-.038,.36,1.70,'canopyA',.73], [1.035,.55,1.92,'canopyB',.75],
+  [.015,.965,1.88,'canopyB',.91], [.33,1.02,1.78,'canopyA',.72],
+  [.70,1.025,1.87,'canopyB',.74], [.978,.967,2.00,'canopyA',.86]
+]);
+function rangeClamp(v,a=0,b=1){return Math.min(b,Math.max(a,v))}
+function alphaForNearbyActors(nx,ny,actors){
+  if(!Array.isArray(actors))return 1;
+  const closest=actors.reduce((min,actor)=>{
+    const p=actor?.p||actor;
+    if(!Number.isFinite(p?.x)||!Number.isFinite(p?.y))return min;
+    const dx=nx-(p.x+.5)/9,dy=ny-(p.y+.5)/7;
+    return Math.min(min,Math.hypot(dx*9,dy*7));
+  },Infinity);
+  // Keep the figure legible even as it approaches the edges of the map.
+  return closest<1.1?.13:closest<1.85?.36:closest<2.5?.68:1;
+}
+/** A modest undergrowth layer tucked around the server-provided walls.
+ * It is scenery only: no collision footprints, no new walkable-square outlines.
+ * This pass stays BELOW all characters and combat overlays.
+ */
+export function paintPremiumWoodlandUnderbrush(ctx,s,walls=[],timeMs=0,motion=true){
+  if(!premiumWoodlandReady()||s.iso)return false;
+  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  for(let i=0;i<walls.length;i++){
+    if(i%2!==0)continue; // Avoid turning every blocked square into a hedge.
+    const [tx,ty]=walls[i];
+    if(!Number.isFinite(tx)||!Number.isFinite(ty))continue;
+    const img=art[i%4===0?'canopyA':'canopyB'];
+    if(!img?.complete||!img.naturalWidth)continue;
+    const px=x+(tx+.38)*c,py=y+(ty+.83)*c;
+    const sway=motion?Math.sin(timeMs*.0007+i*.85)*c*.015:0;
+    const width=c*(.79+(i%3)*.11),height=width*.52;
+    ctx.save();ctx.globalAlpha=.48;
+    ctx.drawImage(img,px-width*.5+sway,py-height*.58,width,height);
+    ctx.restore();
+  }
+  ctx.restore();return true;
+}
+
+export function paintPremiumWoodlandForeground(ctx,s,actors=[],timeMs=0,motion=true){
+  if(!premiumWoodlandReady()||s.iso)return false;
+  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  for(let i=0;i<WOODLAND_FOREGROUND_POSITIONS.length;i++){
+    const [nx,ny,scale,key,alpha]=WOODLAND_FOREGROUND_POSITIONS[i];
+    const img=art[key];if(!img?.complete||!img.naturalWidth)continue;
+    const sway=motion?Math.sin(timeMs*.00044+i*1.62)*c*.014:0;
+    const px=x+nx*w+sway,py=y+ny*h;
+    const width=c*scale,height=width*.66;
+    const visible=alpha*alphaForNearbyActors(nx,ny,actors);
+    ctx.save();ctx.globalAlpha=visible;
+    ctx.shadowColor='rgba(0,11,7,.32)';ctx.shadowBlur=c*.12;
+    ctx.drawImage(img,px-width*.5,py-height*.5,width,height);
+    ctx.restore();
+  }
+  ctx.restore();return true;
+}
+
+/**
+ * Deterministic, unobtrusive floating leaves. All coordinates derive from
+ * elapsed client animation time and constant seeds, never game RNG or state.
+ * Motion is disabled automatically for reduced-motion users by the caller.
+ */
+const FOREST_LEAVES=Object.freeze(Array.from({length:13},(_,i)=>({
+  px:((i*73+19)%97)/97,py:((i*43+37)%89)/89,
+  offset:i*.72,speed:.55+(i%4)*.20,
+  tint:i%3===0?'#efc780':i%3===1?'#d9ad63':'#9fbc75'
+})));
+export function paintPremiumWoodlandForestLife(ctx,s,actors=[],timeMs=0,motion=true){
+  if(!premiumWoodlandReady()||s.iso||!motion)return false;
+  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  const t=timeMs*.0001;
+  for(const [i,p] of FOREST_LEAVES.entries()){
+    const nx=(p.px+t*p.speed*.075+Math.sin(t*2+p.offset)*.019)%1;
+    const ny=(p.py+t*p.speed*.11)%1;
+    const opacity=(.12+Math.abs(Math.sin(t+p.offset))*.13)*alphaForNearbyActors(nx,ny,actors);
+    const px=x+nx*w,py=y+ny*h,r=c*(.035+(i%4)*.011);
+    ctx.save();ctx.globalAlpha=opacity;ctx.translate(px,py);
+    ctx.rotate(Math.sin(t*2.5+p.offset)*.5+i*.41);
+    ctx.fillStyle=p.tint;ctx.beginPath();ctx.ellipse(0,0,r,r*.42,0,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();return true;
+}
+
+
+/**
+ * Quest 1 / Woodland Path: in-world portrait compositing.
+ * Uses the ORIGINAL transparent 3.2.1 hero/enemy PNGs, rather than generating
+ * fixed characters into a background image. Actor coordinates, HP, target IDs,
+ * wall geometry, hit-testing, and turn order remain server-authoritative.
+ * The unit silhouette is the only thing being replaced; the same name and HP
+ * information stays in a clean readable overlay above the floor/foreground.
+ */
+export function paintPremiumWoodlandActor(ctx,s,p,kind,sprite,{label='',selected=false,
+    active=false,motion=true,timeMs=0,light=true,roomId='woodland'}={}){
+  if(!premiumWoodlandReady()||s.iso||!p||!sprite?.complete||!sprite.naturalWidth||
+     !Number.isFinite(p.x)||!Number.isFinite(p.y))return false;
+  const c=s.cell;
+  const giant=kind==='enemy'&&(p.variant==='large'||p.variant==='large-shiny');
+  const pt=s.at(p.x+(giant?.5:0),p.y+(giant?.5:0));
+  const scale=giant?1.65:1;
+  const blink=motion&&p.hp>0?Math.sin(timeMs*.0022+(p.x*17+p.y*11))*.012*c:0;
+  const glow=kind==='enemy'?'rgba(244,119,102,.68)':kind==='one'?'rgba(248,216,146,.67)':kind==='two'?'rgba(119,225,202,.60)':kind==='three'?'rgba(201,171,242,.65)':'rgba(242,177,124,.62)';
+  ctx.save();
+  // Selection/readiness stays BELOW the sprite, never over its face or HP.
+  if(selected||active){
+    ctx.strokeStyle=selected?'rgba(255,170,113,.97)':glow;
+    ctx.lineWidth=Math.max(1.6,c*.038);
+    ctx.beginPath();ctx.ellipse(pt.x,pt.y+c*.27*scale,c*.43*scale,c*.17*scale,0,0,Math.PI*2);ctx.stroke();
+  }
+  // A low shadow catches the real silhouette's feet, not an arbitrary square.
+  softOval(ctx,pt.x+c*.08*scale,pt.y+c*.31*scale,c*.49*scale,c*.15*scale,
+    '5,13,9',light?.75:.53);
+  // Larger hero silhouettes bring the original illustrated art up to the same
+  // readable visual scale as the full-size D6 creatures at tablet resolution.
+  const clearing=roomId==='clearing';
+  const imageSize=c*(clearing?(kind==='enemy'?1.26:1.42):1.14)*scale;
+  const left=pt.x-imageSize*(clearing&&kind!=='enemy'?.50:.59),top=pt.y-imageSize*(clearing?.59:.56)+blink;
+  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  // Two subtle effects: environmental cast shadow and warm/cool edge scattering.
+  ctx.shadowColor='rgba(6,16,10,.82)';ctx.shadowBlur=c*.13;
+  ctx.shadowOffsetX=c*.065;ctx.shadowOffsetY=c*.09;
+  if(clearing&&kind==='enemy'&&sprite.naturalHeight>0){
+    // Original dice PNG contains old red/green HUD slivers at its top/bottom.
+    // Crop those from the *drawn image* and let this renderer supply the live HP.
+    const sh=sprite.naturalHeight,sw=sprite.naturalWidth;
+    const trimTop=sh*.115,trimBottom=sh*.125;
+    ctx.drawImage(sprite,0,trimTop,sw,sh-trimTop-trimBottom,left,top,imageSize,imageSize);
+  }else ctx.drawImage(sprite,left,top,imageSize,imageSize);
+  ctx.restore();
+  // Keep the full original identification and HP feedback. These are HUD
+  // overlays rather than tiles: there is no filled box around the character.
+  ctx.save();ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  const fontSize=Math.max(9,c*(giant?.235:.215));
+  ctx.font=`700 ${fontSize}px system-ui,sans-serif`;
+  ctx.lineJoin='round';ctx.lineWidth=Math.max(2.4,fontSize*.32);
+  ctx.strokeStyle='rgba(7,17,18,.94)';ctx.fillStyle='#fff2d9';
+  const text=label|| (kind==='enemy'?`D${p.faces||8}`:(p.name||'Player'));
+  const y=pt.y+c*(giant?.78:.49);
+  // A narrow translucent nameplate floats under each figure, never a sprite frame.
+  if(clearing){
+    const plateWidth=Math.min(c*1.35,Math.max(c*.52,text.length*fontSize*.59+c*.10));
+    const plateHeight=fontSize*1.36;
+    ctx.fillStyle='rgba(6,20,18,.70)';
+    ctx.beginPath();ctx.roundRect(pt.x-plateWidth/2,y-fontSize*.99,plateWidth,plateHeight,plateHeight*.34);ctx.fill();
+  }
+  ctx.fillStyle='#fff2d9';ctx.strokeText(text,pt.x,y);ctx.fillText(text,pt.x,y);
+  if(kind==='enemy'){
+    const ratio=Number.isFinite(p.maxHp)&&p.maxHp>0?Math.max(0,Math.min(1,p.hp/p.maxHp)):1;
+    const width=c*(giant?.94:.70),height=Math.max(4,c*.075),left=pt.x-width*.5;
+    const top=y+c*.085;
+    ctx.fillStyle='rgba(13,19,19,.96)';ctx.fillRect(left-1,top-1,width+2,height+2);
+    ctx.fillStyle='#e78482';ctx.fillRect(left,top,width*ratio,height);
+  }else if(p.hp===0){
+    ctx.font=`700 ${fontSize}px system-ui`;ctx.strokeText('DOWN',pt.x,pt.y-c*.53);
+    ctx.fillStyle='#ffaaa1';ctx.fillText('DOWN',pt.x,pt.y-c*.53);
+  }
+  ctx.restore();ctx.restore();return true;
 }

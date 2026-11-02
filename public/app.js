@@ -1,11 +1,11 @@
-import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow} from './v2-premium-woodland.mjs';
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 PREMIUM LIGHTING PILOT';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 const canvas = $('gameCanvas');
@@ -14,7 +14,7 @@ const ctx=canvas.getContext('2d');
 const betaTitle=document.querySelector('.brand small');
 if(betaTitle)betaTitle.append(document.createTextNode(' · '+CLIENT_BUILD));
 const RES={tx:42,ty:23,zh:43}; // original DICEBOUND 3.2.1 projection
-const paths={one:'./assets/gary.png',two:'./assets/outlaw.png',three:'./assets/gary.png',four:'./assets/outlaw.png',d8:'./assets/d8.png',wallface:'./assets/wallface.jpeg',wallcap:'./assets/wallcap.jpeg'};
+const paths={one:'./assets/gary.png',two:'./assets/outlaw.png',three:'./assets/gary.png',four:'./assets/outlaw.png',d8:'./assets/d8.png',d6:'./assets/premium-woodland/d6-training.png',wallface:'./assets/wallface.jpeg',wallcap:'./assets/wallcap.jpeg'};
 const images={};for(const [key,path] of Object.entries(paths)){const image=new Image();image.src=path;images[key]=image}
 const ROOM_DATA={woodland:{name:'Woodland Path',left:null,right:'clearing'},clearing:{name:'Training Clearing',left:'woodland',right:'watchpost'},watchpost:{name:'Old Watchpost',left:'clearing',right:null}};
 const roomDef=id=>state?.roomDefinitions?.[id]||ROOM_DATA[id]||{name:'Unknown room',left:null,right:null,quest:1};
@@ -39,7 +39,32 @@ woodlandLightingToggle.addEventListener('click',()=>{
   render();
 });
 const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
-const premiumActive=()=>artActive()&&me?.room==='woodland'&&view==='tactical'&&premiumWoodlandReady();
+const premiumActive=()=>artActive()&&isPremiumWoodlandRoom(me?.room)&&view==='tactical'&&premiumWoodlandReady();
+let woodlandDepthEnabled=localStorage.getItem('db4_v2_woodland_depth')!=='off';
+const woodlandDepthToggle=document.createElement('button');
+woodlandDepthToggle.id='woodlandDepthToggle';
+woodlandDepthToggle.type='button';
+woodlandDepthToggle.className=v2ArtToggle?.className||'';
+woodlandDepthToggle.hidden=true;
+woodlandLightingToggle.insertAdjacentElement('afterend',woodlandDepthToggle);
+woodlandDepthToggle.addEventListener('click',()=>{
+  woodlandDepthEnabled=!woodlandDepthEnabled;
+  localStorage.setItem('db4_v2_woodland_depth',woodlandDepthEnabled?'on':'off');
+  render();
+});
+const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
+let woodlandCharactersEnabled=localStorage.getItem('db4_v2_woodland_characters')!=='off';
+const woodlandCharactersToggle=document.createElement('button');
+woodlandCharactersToggle.id='woodlandCharactersToggle';
+woodlandCharactersToggle.type='button';
+woodlandCharactersToggle.className=v2ArtToggle?.className||'';
+woodlandCharactersToggle.hidden=true;
+woodlandDepthToggle.insertAdjacentElement('afterend',woodlandCharactersToggle);
+woodlandCharactersToggle.addEventListener('click',()=>{
+  woodlandCharactersEnabled=!woodlandCharactersEnabled;
+  localStorage.setItem('db4_v2_woodland_characters',woodlandCharactersEnabled?'on':'off');
+  render();
+});
 const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
 
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
@@ -539,7 +564,7 @@ function sceneFloor(s){
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
     const cs=s.cell, premium=premiumActive();
-    if(premium){paintPremiumWoodlandFloor(ctx,s);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[]);}
+    if(premium){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
       const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
@@ -692,8 +717,20 @@ function render(){if(!state||!me)return;
     woodlandLightingToggle.textContent=woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF';
     woodlandLightingToggle.setAttribute('aria-pressed',String(woodlandLightingEnabled));
   }
-  if(v2ArtToggle&&me.room==='woodland'){
-    const label=v2ArtEnabled?(premiumWoodlandReady()?'🌲 Premium woodland art: ON':'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
+  woodlandDepthToggle.hidden=!premiumActive();
+  if(!woodlandDepthToggle.hidden){
+    woodlandDepthToggle.textContent=!woodlandDepthEnabled?'🍃 Foreground: OFF':'🍃 Foreground: ON';
+    woodlandDepthToggle.setAttribute('aria-pressed',String(woodlandDepthEnabled));
+    woodlandDepthToggle.title=reducedMotion?'Foreground scenery is visible; animation is disabled by your system preference.':'Compare this new foreground and soft drifting-leaf layer against the approved lighting baseline.';
+  }
+  woodlandCharactersToggle.hidden=!premiumActive();
+  if(!woodlandCharactersToggle.hidden){
+    woodlandCharactersToggle.textContent=woodlandCharactersEnabled?'♞ Characters: IN WORLD':'▣ Characters: TOKENS';
+    woodlandCharactersToggle.setAttribute('aria-pressed',String(woodlandCharactersEnabled));
+    woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
+  }
+  if(v2ArtToggle&&isPremiumWoodlandRoom(me.room)){
+    const label=v2ArtEnabled?(premiumWoodlandReady()?(me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }
   const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
@@ -706,13 +743,17 @@ function render(){if(!state||!me)return;
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
   for(const [x,y] of state.roomWalls?.[me.room]||[]){
-    if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y);
+    if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
     else if(s.iso)drawStoneIso(s,x,y,terrain);
     else drawStoneTile(s,x,y,terrain);
   }
   // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
-  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled);
+  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled,me.room);
   else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
+  // Illustrated undergrowth tucks into existing obstacle footprints and is
+  // rendered below all actors/targets, leaving the full battle state untouched.
+  if(premiumActive()&&woodlandDepthEnabled)
+    paintPremiumWoodlandUnderbrush(ctx,s,state.roomWalls?.[me.room]||[],performance.now(),!reducedMotion);
   // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
   ctx.save();ctx.strokeStyle='#f1b475';ctx.fillStyle='#f1b47526';ctx.lineWidth=3;
@@ -746,9 +787,27 @@ function render(){if(!state||!me)return;
   const actors=[...battle.enemies.filter(e=>e.hp>0).map(e=>({p:e,kind:'enemy'})),...Object.values(state.players).filter(p=>p.room===me.room).map(p=>({p,kind:p.id}))];
   if(s.iso)actors.sort((a,b)=>(a.p.x+a.p.y)-(b.p.x+b.p.y));
   for(const a of actors){
-    if(woodlandLightActive())paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);
+    const integrated=premiumActive()&&woodlandCharactersEnabled;
+    if(woodlandLightActive()&&!integrated)paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);
     const medium=roomSize(me.room).width>9;
-    iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
+    const abbreviations={normal:'',swift:'S',ranged:'R',armoured:'A',zombie:'Z',ghost:'G',teleporter:'T',cloner:'C',healer:'H',ninja:'N'};
+    const label=a.kind==='enemy'&&medium?`${abbreviations[a.p.role||'normal']||''}D${a.p.faces}`:a.kind==='enemy'?a.p.name:(a.p.name||'Player').slice(0,medium?4:8);
+    const drew=integrated&&paintPremiumWoodlandActor(ctx,s,a.p,a.kind,images[a.kind==='enemy'&&me.room==='clearing'&&a.p.faces===6?'d6':a.kind==='enemy'?'d8':a.kind],{
+      label,selected:a.kind==='enemy'&&selectedEnemyId===a.p.id,
+      active:a.kind!=='enemy'&&state.turn?.activePlayer===a.p.id,
+      motion:!reducedMotion,timeMs:performance.now(),light:woodlandLightingEnabled,roomId:me.room
+    });
+    if(!drew)iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
+  }
+  // Foreground passes run AFTER the units. Painted canopy silhouettes sit at
+  // the board rim; their opacity falls away near heroes/enemies and labels.
+  if(premiumActive()){
+    if(woodlandDepthEnabled){
+      const movement=!reducedMotion;
+      const timestamp=performance.now();
+      paintPremiumWoodlandForeground(ctx,s,actors,timestamp,movement);
+      paintPremiumWoodlandForestLife(ctx,s,actors,timestamp,movement);
+    }
   }
   const banner=$('turnBanner');
   const global=state.turn||{};

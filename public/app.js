@@ -4,7 +4,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · ISOLATED DEVELOPMENT COPY';
+const CLIENT_BUILD='VISUAL V2 · WOODLAND PATH ART PILOT';
 const $ = id => document.getElementById(id);
 const canvas = $('gameCanvas');
 const ctx=canvas.getContext('2d');
@@ -157,7 +157,7 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
- if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=v2ArtEnabled?'✦ V2 art: ON':'◇ V2 art: OFF';v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
+ if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=me.room==='woodland'?(v2ArtEnabled?'🌿 Forest art: ON':'◇ Forest art: OFF'):(v2ArtEnabled?'✦ V2 art: ON':'◇ V2 art: OFF');v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
 
   // Prominent fixed-order turn strip visible even when no enemies are present.
   const turn=state.turn||{};turnStrip.replaceChildren();
@@ -526,7 +526,7 @@ function sceneFloor(s){
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
       const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
-      if(artActive())paintStoneFloorTile(ctx,{x:X,y:Y,size:cs,tileX:x,tileY:y,texture:images.wallcap});
+      if(artActive())paintStoneFloorTile(ctx,{x:X,y:Y,size:cs,tileX:x,tileY:y,texture:images.wallcap,theme:me.room});
       else {ctx.fillStyle=even(x,y)?'#314858':'#253847';ctx.fillRect(X,Y,cs,cs);
       if(images.wallface?.complete&&images.wallface.naturalWidth){ctx.globalAlpha=.12;ctx.drawImage(images.wallface,X,Y,cs,cs);ctx.globalAlpha=1;}}
       if(!(state.roomWalls?.[me.room]||[]).some(([wx,wy])=>wx===x&&wy===y)){
@@ -554,7 +554,7 @@ function sceneFloor(s){
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const v=s.at(x,y),hw=RES.tx*s.scale,hh=RES.ty*s.scale;
       ctx.beginPath();ctx.moveTo(v.x,v.y-hh);ctx.lineTo(v.x+hw,v.y);ctx.lineTo(v.x,v.y+hh);ctx.lineTo(v.x-hw,v.y);ctx.closePath();
-      if(artActive()) {paintIsoFloorTile(ctx,{position:v,halfW:hw,halfH:hh,tileX:x,tileY:y});}
+      if(artActive()) {paintIsoFloorTile(ctx,{position:v,halfW:hw,halfH:hh,tileX:x,tileY:y,theme:me.room});}
       else {ctx.fillStyle=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y)?(roomDef(me.room).quest===10?'#89528b':roomDef(me.room).quest===13?'#957d56':'#30748a'):(even(x,y)?'#495c65':'#374955');ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#c4aa7380';ctx.strokeStyle='#c4aa7380';ctx.stroke();}
       if(y===centre&&(x===0||x===cols-1)){ctx.fillStyle='#d5b97650';ctx.fill()}
     }
@@ -672,7 +672,7 @@ function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect()
   if(canvas.width!==Math.round(box.width*dpr)||canvas.height!==Math.round(box.height*dpr)){canvas.width=Math.max(1,Math.round(box.width*dpr));canvas.height=Math.max(1,Math.round(box.height*dpr))}
   ctx.setTransform(dpr,0,0,dpr,0,0);const w=box.width,h=box.height;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#08111e';ctx.fillRect(0,0,w,h);
-  if(artActive())paintArtBackdrop(ctx,w,h);else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
+  if(artActive())paintArtBackdrop(ctx,w,h,{theme:me.room==='woodland'?'woodland':undefined});else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
   const s=gridProjection(w,h);frameMetrics=s;sceneFloor(s);positionPortalArrows(s,w,h);
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.

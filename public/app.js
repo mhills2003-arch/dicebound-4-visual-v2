@@ -1,11 +1,13 @@
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere} from './v2-premium-woodland.mjs';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · COMPLETE CAMPAIGN ART PASS';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 PREMIUM ART PILOT';
 const $ = id => document.getElementById(id);
+initPremiumWoodland();
 const canvas = $('gameCanvas');
 const ctx=canvas.getContext('2d');
 // Visible verification: if the badge does not appear, the browser is still using old app.js.
@@ -25,6 +27,7 @@ let v2ArtEnabled=localStorage.getItem('db4_v2_room_art')!=='off';
 const v2ArtToggle=document.getElementById('v2ArtToggle');
 if(v2ArtToggle)v2ArtToggle.addEventListener('click',()=>{v2ArtEnabled=!v2ArtEnabled;localStorage.setItem('db4_v2_room_art',v2ArtEnabled?'on':'off');render()});
 const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
+const premiumActive=()=>artActive()&&me?.room==='woodland'&&view==='tactical'&&premiumWoodlandReady();
 
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
@@ -522,11 +525,13 @@ function sceneFloor(s){
   const even=(x,y)=>(x+y)%2===0;
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
-    const cs=s.cell;
+    const cs=s.cell, premium=premiumActive();
+    if(premium)paintPremiumWoodlandFloor(ctx,s);
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
       const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
-      if(artActive())paintStoneFloorTile(ctx,{x:X,y:Y,size:cs,tileX:x,tileY:y,texture:images.wallcap,theme:me.room});
+      if(premium) { /* image-backed room painted once across the entire board */ }
+      else if(artActive())paintStoneFloorTile(ctx,{x:X,y:Y,size:cs,tileX:x,tileY:y,texture:images.wallcap,theme:me.room});
       else {ctx.fillStyle=even(x,y)?'#314858':'#253847';ctx.fillRect(X,Y,cs,cs);
       if(images.wallface?.complete&&images.wallface.naturalWidth){ctx.globalAlpha=.12;ctx.drawImage(images.wallface,X,Y,cs,cs);ctx.globalAlpha=1;}}
       if(!(state.roomWalls?.[me.room]||[]).some(([wx,wy])=>wx===x&&wy===y)){
@@ -539,7 +544,7 @@ function sceneFloor(s){
         }
       }
       if(hazard){ctx.fillStyle=roomDef(me.room).quest===10?'#be6ad070':roomDef(me.room).quest===13?'#e9dcb070':'#51b6dd70';ctx.fillRect(X+3,Y+3,cs-6,cs-6);ctx.fillStyle='#fff';ctx.font=`bold ${Math.max(10,cs*.34)}px system-ui`;ctx.fillText(roomDef(me.room).quest===10?'⚡':roomDef(me.room).quest===13?'🌪':'≈',X+cs*.5,Y+cs*.7);}
-      ctx.strokeStyle='#b9a16a50';ctx.lineWidth=1;ctx.strokeRect(X+.5,Y+.5,cs-1,cs-1);
+      if(!premium){ctx.strokeStyle='#b9a16a50';ctx.lineWidth=1;ctx.strokeRect(X+.5,Y+.5,cs-1,cs-1);}
       if((x===0||x===cols-1)&&(y===centre)){ctx.fillStyle='#cfb46e40';ctx.fillRect(X+2,Y+2,cs-4,cs-4)}
     }
     const left=roomDef(me.room).left,right=roomDef(me.room).right||(roomDef(me.room).final&&state.rooms[me.room].battle.status==='cleared'?'camp':null);
@@ -668,7 +673,12 @@ function drawStoneIso(s,tx,ty,terrain){
   }
   ctx.restore();
 }
-function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+function render(){if(!state||!me)return;
+  if(v2ArtToggle&&me.room==='woodland'){
+    const label=v2ArtEnabled?(premiumWoodlandReady()?'🌲 Premium woodland art: ON':'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
+    if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
+  }
+  const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
   if(canvas.width!==Math.round(box.width*dpr)||canvas.height!==Math.round(box.height*dpr)){canvas.width=Math.max(1,Math.round(box.width*dpr));canvas.height=Math.max(1,Math.round(box.height*dpr))}
   ctx.setTransform(dpr,0,0,dpr,0,0);const w=box.width,h=box.height;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#08111e';ctx.fillRect(0,0,w,h);
@@ -678,11 +688,13 @@ function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect()
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
   for(const [x,y] of state.roomWalls?.[me.room]||[]){
-    if(s.iso)drawStoneIso(s,x,y,terrain);
+    if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y);
+    else if(s.iso)drawStoneIso(s,x,y,terrain);
     else drawStoneTile(s,x,y,terrain);
   }
   // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
-  if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
+  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s);
+  else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
   // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
   ctx.save();ctx.strokeStyle='#f1b475';ctx.fillStyle='#f1b47526';ctx.lineWidth=3;

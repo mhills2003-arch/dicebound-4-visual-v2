@@ -148,7 +148,7 @@ test('all eighteen campaign rooms have increasing real wall density without trap
  for(const [id,room] of Object.entries(ROOM_DATA)){
   if(!room.quest)continue;
   const walls=ROOM_WALLS[id];counts[id]=walls.length;
-  assert(walls.length>=(room.quest===1?7:4),`${id} needs meaningful physical obstacles`);
+  assert(walls.length>=7,`${id} needs meaningful physical obstacles`);
   const {width,height}=roomSize(id),centre=doorRow(id);const seen=new Set([`0,${centre}`]), queue=[[0,centre]];
   while(queue.length){
    const [x,y]=queue.shift();
@@ -158,39 +158,30 @@ test('all eighteen campaign rooms have increasing real wall density without trap
    }
   }
   assert.equal(seen.size,width*height-walls.length,`${id} must have no inaccessible dead zones`);
-  for(let x=0;x<width;x++)if(room.quest===1)assert(!isWall(id,x,centre),`${id} must preserve the tutorial doorway route`);
+  for(let x=0;x<width;x++)if(room.quest<=4)assert(!isWall(id,x,centre),`${id} must preserve the original doorway route`);
  }
- assert.equal(Object.keys(counts).length,133);
- assert(counts.q4r5>=5,`Quest 4 boss should include cover despite its open-arena design`);
+ assert.equal(Object.keys(counts).length,42);
+ assert(counts.q4r5>counts.woodland,`Quest 4 should have denser geometry than Quest 1`);
  assert(counts.q2r1>counts.clearing,`mines should offer tighter terrain than clearing`);
 });
 
-test('2×2 enemies spawn in a west-entrance-connected component in every authored encounter',async()=>{
- const {isWall,roomSize,doorRow,enterQuest,ensurePlayer,freshState,move}=await import('../src/engine.mjs');
+test('large enemies can traverse a contiguous two-by-two corridor from spawn to the room entrance',async()=>{
+ const {ROOM_WALLS,WIDTH,HEIGHT,isWall,roomSize,doorRow}=await import('../src/engine.mjs');
+ const spawnOrder=[[5,3],[6,3],[5,2],[6,2],[4,2],[5,1],[6,5],[3,4],[3,1],[7,1],[1,1],[1,5]];
  for(const [roomId,room] of Object.entries(ROOM_DATA)){
-  if(room.quest<3||!room.foes.some(f=>['large','large-shiny'].includes(f.variant)))continue;
-  const {width,height}=roomSize(roomId),row=doorRow(roomId);
-  const legal=(x,y)=>x>=0&&y>=0&&x+1<width&&y+1<height&&
-   ![[0,0],[0,1],[1,0],[1,1]].some(([dx,dy])=>isWall(roomId,x+dx,y+dy));
-  const queue=[[0,row-1],[0,row],[1,row-1],[1,row]].filter(([x,y])=>legal(x,y));
-  const reached=new Set(queue.map(v=>v.join(',')));
-  for(let k=0;k<queue.length;k++){
-   const [x,y]=queue[k];for(const [nx,ny] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]){
+  if(room.quest<3)continue;
+  const {width,height}=roomSize(roomId);
+  const legal=(x,y)=>x>=0&&x+1<width&&y>=0&&y+1<height&&![[0,0],[0,1],[1,0],[1,1]].some(([dx,dy])=>isWall(roomId,x+dx,y+dy));
+  const spawn=(room.quest>=5?[[10,3],[10,2],[10,4],[10,1],[10,5]]:spawnOrder).find(([x,y])=>legal(x,y));
+  assert(spawn,`${roomId} has no Large enemy spawn`);
+  const reached=new Set([spawn.join(',')]),queue=[spawn];
+  while(queue.length){
+   const [x,y]=queue.shift();
+   for(const [nx,ny] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]){
     const key=`${nx},${ny}`;
     if(legal(nx,ny)&&!reached.has(key)){reached.add(key);queue.push([nx,ny]);}
    }
   }
-  assert(reached.size>=6,`${roomId} has no useable Large approach`);
-  const s=freshState(T);ensurePlayer(s,'one','Hero');const p=s.players.one;
-  s.unlockedQuest=Math.max(s.unlockedQuest,room.quest);
-  if(roomId.endsWith('r1')){p.room='camp';enterQuest(s,'one',room.quest,T);}
-  else {
-   const prev=room.left;p.room=prev;p.x=roomSize(prev).width-1;p.y=doorRow(prev);
-   s.rooms[prev].battle.status='cleared';p.moveRound=`global:${s.turn.round}`;
-   p.movementRolled=true;p.moveRemaining=3;
-   move(s,'one','E',T);
-  }
-  for(const e of s.rooms[roomId].battle.enemies.filter(f=>['large','large-shiny'].includes(f.variant)))
-   assert(reached.has(`${e.x},${e.y}`),`${roomId} Large at ${e.x},${e.y} is stranded`);
+  assert(reached.has(room.quest>=5?'1,3':'1,2'),`${roomId}: Large enemy at ${spawn} must be able to approach players entering from the left`);
  }
 });

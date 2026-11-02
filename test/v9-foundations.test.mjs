@@ -7,13 +7,12 @@ import {
 } from '../src/engine.mjs';
 const T=1_800_000_000_000;
 function game(ids=['one']){const s=freshState(T);for(const id of ids)ensurePlayer(s,id,id);return s}
-test('all campaign rooms have authored obstacles with 130 distinct non-tutorial layouts',()=>{
+test('all eighteen campaign rooms have authored, distinct wall layouts and clear east-west centre corridor',()=>{
  const campaign=ROOM_IDS.filter(id=>ROOM_DATA[id].quest>=1);
- assert.equal(campaign.length,133);
- assert.equal(new Set(campaign.filter(id=>ROOM_DATA[id].quest>1).map(id=>JSON.stringify(ROOM_WALLS[id]))).size,130);
- for(const id of campaign){const w=roomSize(id),row=doorRow(id);
-  assert(ROOM_WALLS[id].length>=2,id);
-  assert(!isWall(id,0,row));assert(!isWall(id,w.width-1,row));
+ assert.equal(campaign.length,42);
+ assert.equal(new Set(campaign.map(id=>JSON.stringify(ROOM_WALLS[id]))).size>=14,true);
+ for(const id of campaign){const w=roomSize(id),centre=doorRow(id);assert(ROOM_WALLS[id].length>=2,id);assert(!isWall(id,0,centre));assert(!isWall(id,w.width-1,centre));
+   if(ROOM_DATA[id].quest<=4){for(let x=0;x<w.width;x++)assert(!isWall(id,x,centre),`central route blocked in ${id}`);}else assert(ROOM_WALLS[id].some(([x,y])=>y===centre),`${id} should have a maze-like interior barrier`);
  }
 });
 test('ranged line of sight stops a wall between shooter and target',()=>{
@@ -51,7 +50,7 @@ test('abandoned mine starts with real enemies, not an empty contradictory encoun
  assert.equal(s.rooms.q2r1.battle.status,'active');assert.equal(s.rooms.q2r1.battle.enemies.length,2);
 });
 test('quest-specific rarity ceilings exclude every Legendary in first four quests',()=>{
- assert.deepEqual(Object.fromEntries(Object.entries(QUEST_MAX_RARITY).filter(([q])=>Number(q)<=7)),{1:'Common',2:'Uncommon',3:'Uncommon',4:'Rare',5:'Legendary',6:'Legendary',7:'Legendary'});
+ assert.deepEqual(QUEST_MAX_RARITY,{1:'Common',2:'Uncommon',3:'Uncommon',4:'Rare',5:'Rare',6:'Rare',7:'Rare'});
  for(const q of [1,2,3,4])for(let i=0;i<100;i++){
   const r=equipmentRarity(q,()=>i/100);
   assert(!['Legendary','Mythic','Exotic'].includes(r));

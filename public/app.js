@@ -1,12 +1,12 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
-import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-20261102-r1';
+import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-cinematic-20261102-r2';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 MINE ART · CINEMATIC HUD';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 MINE CINEMATIC ART · CINEMATIC HUD';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 initPremiumMine();
@@ -33,7 +33,7 @@ function paintCinematicMineSurround(ctx,s,w,h){
  const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#111b24');bg.addColorStop(1,'#231a32');
  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
  for(const [side,x,width] of [['left',0,leftW+2],['right',rightX-2,rightW+2]]){
-  const img=mineFrameImage(side);if(img?.complete&&img.naturalWidth&&width>1)ctx.drawImage(img,x,0,width,h);
+  const img=mineFrameImage(side,me?.room);if(img?.complete&&img.naturalWidth&&width>1)ctx.drawImage(img,x,0,width,h);
  }
  ctx.save();const edge=ctx.createLinearGradient(s.originX-24,0,s.originX+15,0);
  edge.addColorStop(0,'#020712d8');edge.addColorStop(1,'#02071200');ctx.fillStyle=edge;ctx.fillRect(s.originX-24,0,39,h);

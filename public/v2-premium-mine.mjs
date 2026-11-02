@@ -24,10 +24,15 @@ export const MINE_FILES = Object.freeze({
   left:'./assets/premium-mine/mine-frame-left.jpg',
   right:'./assets/premium-mine/mine-frame-right.jpg'
 });
+// Independent per-room side scenery; never baked into game coordinates.
+export const MINE_FRAMES=Object.freeze(Object.fromEntries(
+ MINE_ROOMS.flatMap(room=>['left','right'].map(side=>[room+'-'+side,
+  `./assets/premium-mine/${({q2r1:'abandoned-mine',q2r2:'crystal-hollow',q2r3:'glittering-gallery',q2r4:'miners-vault',q2r5:'crystal-heart'})[room]}-frame-${side}.jpg`]))
+));
 const art=Object.create(null);let initiated=false;
 export function initPremiumMine(ImageCtor=typeof Image!=='undefined'?Image:null){
  if(!ImageCtor||initiated)return;initiated=true;
- for(const [name,path] of Object.entries(MINE_FILES)){
+ for(const [name,path] of Object.entries({...MINE_FILES,...MINE_FRAMES})){
   const image=new ImageCtor();image.decoding='async';image.src=path;art[name]=image;
  }
 }
@@ -64,7 +69,7 @@ export function paintPremiumMineFloor(ctx,s,roomId='q2r1'){
 }
 export function mineWallArt(roomId,x,y){
  const code=(x*11+y*7+x*y*3+roomIndex(roomId)*5)%7;
- if(roomId==='q2r1')return code<4?'timber':'rubble';
+ if(roomId==='q2r1')return code<4?'cyan':code<6?'rubble':'timber';
  if(roomId==='q2r2')return code<4?'cyan':code<6?'rubble':'timber';
  if(roomId==='q2r3')return code<4?'amber':code<6?'timber':'rubble';
  if(roomId==='q2r4')return code<4?'timber':code<6?'rubble':'amber';
@@ -73,13 +78,13 @@ export function mineWallArt(roomId,x,y){
 export function paintPremiumMineWall(ctx,s,x,y,roomId='q2r1'){
  if(!premiumMineReady(roomId)||s.iso)return false;
  const pt=s.at(x,y),c=s.cell,key=mineWallArt(roomId,x,y),img=ready(key)?art[key]:art.rubble;
- const sz=c*(key==='timber'?1.42:key==='rubble'?1.49:1.63);
+ const sz=c*(key==='timber'?1.36:key==='rubble'?1.43:1.49);
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
  ctx.shadowColor='rgba(2,4,12,.84)';ctx.shadowBlur=c*.18;ctx.shadowOffsetY=c*.10;
  ctx.drawImage(img,pt.x-sz*.5,pt.y-sz*.53,sz,sz);
  ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
- ctx.strokeStyle=roomId==='q2r5'?'rgba(207,160,255,.70)':'rgba(197,207,216,.56)';
- ctx.lineWidth=Math.max(1,c*.021);
+ ctx.strokeStyle=roomId==='q2r5'?'rgba(207,160,255,.42)':'rgba(197,207,216,.35)';
+ ctx.lineWidth=Math.max(.8,c*.013);
  ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
  ctx.restore();return true;
 }
@@ -185,4 +190,4 @@ export function paintPremiumMineActor(ctx,s,p,kind,sprite,{label='',selected=fal
  }else if(p.hp===0){ctx.fillStyle='#f6a4a7';ctx.fillText('DOWN',pt.x,pt.y-c*.55)}
  ctx.restore();return true;
 }
-export function mineFrameImage(side){return art[side]}
+export function mineFrameImage(side,roomId='q2r1'){return art[roomId+'-'+side]||art[side]}

@@ -36,13 +36,13 @@ test('premium room renderer derives props only from the canonical wall coordinat
  assert.equal(JSON.stringify(walls),snapshot);
  assert.deepEqual([...new Set(walls.map(([x,y])=>woodlandObstacleArt(x,y)))].sort(),[...new Set(walls.map(([x,y])=>woodlandObstacleArt(x,y)))].sort());
 });
-test('premium is restricted to Quest 1 woodland/clearing/watchpost and is render-only in the existing client',()=>{
+test('Quest 1 premium remains isolated and visual after Quest 2 mine is added',()=>{
  const js=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(js,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
- assert.match(js,/if\(premium\)\{paintPremiumWoodlandFloor\(ctx,s,me.room\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
+ assert.match(js,/if\(premiumActive\(\)\)\{paintPremiumWoodlandFloor\(ctx,s,me.room\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandWall\(ctx,s,x,y,me.room\)/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
- assert.match(js,/if\(woodlandLightActive\(\)&&!integrated\)paintPremiumWoodlandContactShadow/);
+ assert.match(js,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a.p\);else paintPremiumWoodlandContactShadow/);
  assert.match(js,/if\(!premium\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);

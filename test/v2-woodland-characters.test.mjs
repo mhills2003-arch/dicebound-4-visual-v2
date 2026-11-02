@@ -48,12 +48,12 @@ test('safe fallback outside premium tactical scene, no image, no coordinates',()
   assert.equal(calls.length,0);
  }
 });
-test('V2 integrates in-world sprites only for premium Woodland Path and keeps toggle and fallback',()=>{
+test('V2 still integrates Quest 1 actor artwork and safe fallback alongside mine actors',()=>{
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
  assert.match(app,/woodlandCharactersToggle\.addEventListener\('click'/);
  assert.match(app,/if\(!drew\)iconAt\(/);
- assert.match(app,/paintPremiumWoodlandActor\(ctx,s,a\.p,a\.kind,images\[/);
+ assert.match(app,/paintPremiumWoodlandActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|WebSocket\(|localStorage\.|\baddEventListener\(/);
 });

@@ -37,13 +37,13 @@ test('contact shadows accept all four player IDs, do not edit player positions o
  const m=tracker();assert.equal(paintPremiumWoodlandContactShadow(m.ctx,{...s,iso:true},{x:1,y:3}),false);
  assert.equal(paintPremiumWoodlandGroundLighting(m.ctx,{...s,iso:true},ROOM_WALLS.woodland),false);
 });
-test('lighting stays confined to premium Woodland Path tactical renderer',()=>{
+test('woodland lighting stays within Quest 1 rendering, with separate mine ambient pass',()=>{
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
  assert.match(app,/paintPremiumWoodlandGroundLighting\(ctx,s,state\.roomWalls\?\.\[me\.room\]\|\|\[\],me\.room\)/);
- assert.match(app,/if\(woodlandLightActive\(\)&&!integrated\)paintPremiumWoodlandContactShadow/);
+ assert.match(app,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a.p\);else paintPremiumWoodlandContactShadow/);
  assert.match(app,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
- assert.match(app,/const woodlandLightActive=\(\)=>premiumActive\(\)\&\&woodlandLightingEnabled/);
+ assert.match(app,/const woodlandLightActive=\(\)=>anyPremiumActive\(\)\&\&woodlandLightingEnabled/);
  assert.match(app,/woodlandLightingToggle\.addEventListener\('click'/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\b(send|fetch|localStorage|WebSocket|addEventListener)\s*\(/);

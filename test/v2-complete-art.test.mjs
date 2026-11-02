@@ -45,7 +45,7 @@ test('all 15 themes draw floor, isometric surface, backdrop, real walls, lights,
 test('visual-only change: server engine and worker code remain untouched',()=>{
  const js=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  const kit=readFileSync(new URL('../public/v2-theme-kit.mjs',import.meta.url),'utf8');
- assert.match(js,/QUEST 1 PREMIUM LIGHTING PILOT/);
+ assert.match(js,/QUEST 1 DEPTH & FOREST LIFE PILOT/);
  assert.match(js,/theme:me\.room/);
  assert.match(js,/Scene art: ON/);
  assert.doesNotMatch(kit,/(fetch\(|WebSocket|localStorage|send\(|document\.)/);

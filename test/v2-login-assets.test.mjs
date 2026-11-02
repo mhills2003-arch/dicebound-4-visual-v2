@@ -26,17 +26,17 @@ function envWithAssets(){
   return { ...vars, ASSETS: {fetch: async request => {
     const pathname=new URL(request.url).pathname;
     hits.push(pathname);
-    if(pathname==='/')return new Response('<html>DICEBOUND-V2-APP</html>', {headers:{'content-type':'text/html'}});
+    if(pathname==='/index.html')return new Response('<html>DICEBOUND-V2-APP</html>', {headers:{'content-type':'text/html'}});
     if(pathname==='/v2-art-preview.html')return new Response('<html>V2-ART-LAB</html>', {headers:{'content-type':'text/html'}});
     if(pathname==='/app.js')return new Response('/* app */', {headers:{'content-type':'text/javascript'}});
     return new Response('Not found',{status:404});
   }}, hits};
 }
 
-test('V2 disables Cloudflare HTML canonical redirects that leave authenticated prefix',()=>{
+test('V2 uses literal index.html asset with html_handling none (no index alias)',()=>{
   assert.match(config,/^html_handling = "none"$/m);
   assert.match(config,/run_worker_first = true/);
-  assert.match(workerSource,/assetUrl\.pathname=\(u\.pathname===ROOT\+'\/'\)\?'\/'/);
+  assert.match(workerSource,/assetUrl\.pathname=\(u\.pathname===ROOT\+'\/'\)\?'\/index\.html'/);
 });
 
 test('successful V2 login redirects into prefix and protected game + Art Lab paths resolve',async()=>{
@@ -58,7 +58,14 @@ test('successful V2 login redirects into prefix and protected game + Art Lab pat
     assert.match(await result.text(),new RegExp(marker));
     assert.equal(result.headers.get('location'),null,'no unwanted canonical redirect');
   }
-  assert.deepEqual(e.hits,['/','/v2-art-preview.html','/app.js']);
+  assert.deepEqual(e.hits,['/index.html','/v2-art-preview.html','/app.js']);
   const forbidden=await worker.fetch(new Request(`${ROOT}/v2-art-preview.html`),e);
   assert.equal(forbidden.status,401,'Art Lab must remain gated behind V2 login');
+});
+
+
+test('Cloudflare html_handling none does not alias root slash to index.html',async()=>{
+  const assets=envWithAssets();
+  assert.equal((await assets.ASSETS.fetch(new Request('https://test.example/'))).status,404);
+  assert.equal((await assets.ASSETS.fetch(new Request('https://test.example/index.html'))).status,200);
 });

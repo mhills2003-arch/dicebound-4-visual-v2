@@ -272,3 +272,11 @@
 /* V2 identity marker only; the dungeon renderer is intentionally still baseline. */
 .v2-ribbon { border-top: 1px solid #73dbdb !important; border-bottom: 1px solid #73dbdb !important; }
 .v2-ribbon strong { color: #a9ffff; letter-spacing: .06em; }
+
+/* V2 artwork is an independent Canvas layer. This comparison control never changes game state. */
+.v2-art-toggle{border-color:#d6ae68;background:linear-gradient(150deg,#564128,#1e3542);color:#fbe0a6;box-shadow:inset 0 1px 0 #fbd89342}
+.v2-art-toggle[aria-pressed="false"]{border-color:#59768c;background:#1d3041;color:#bfc9d1;box-shadow:none}
+.v2-art-toggle[hidden]{display:none!important}
+
+.v2-preview-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap;color:#f1d79c;border-color:#94764d;background:#1c2d39}
+@media(max-width:760px){.v2-preview-link{font-size:10px;padding:6px 8px}}

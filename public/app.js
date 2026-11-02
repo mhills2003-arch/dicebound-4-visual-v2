@@ -1,3 +1,4 @@
+import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
@@ -20,6 +21,11 @@ const roomDef=id=>state?.roomDefinitions?.[id]||ROOM_DATA[id]||{name:'Unknown ro
 const roomSize=id=>roomDef(id).quest>=10?{width:15,height:11}:roomDef(id).quest>=5?{width:13,height:9}:{width:9,height:7};
 const doorRow=id=>Math.floor(roomSize(id).height/2);
 let socket,state,me,view='tactical',connected=false,errorTimer,frameMetrics,authClosed=false,deadlineOffset=0;
+let v2ArtEnabled=localStorage.getItem('db4_v2_room_art')!=='off';
+const v2ArtToggle=document.getElementById('v2ArtToggle');
+if(v2ArtToggle)v2ArtToggle.addEventListener('click',()=>{v2ArtEnabled=!v2ArtEnabled;localStorage.setItem('db4_v2_room_art',v2ArtEnabled?'on':'off');render()});
+const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
+
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
@@ -151,6 +157,8 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
+ if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=v2ArtEnabled?'✦ V2 art: ON':'◇ V2 art: OFF';v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
+
   // Prominent fixed-order turn strip visible even when no enemies are present.
   const turn=state.turn||{};turnStrip.replaceChildren();
   turnStrip.append(el('strong','turn-heading','GLOBAL ROUND '+(turn.round||1)+' · '));
@@ -518,13 +526,14 @@ function sceneFloor(s){
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
       const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
-      ctx.fillStyle=even(x,y)?'#314858':'#253847';ctx.fillRect(X,Y,cs,cs);
-      if(images.wallface?.complete&&images.wallface.naturalWidth){ctx.globalAlpha=.12;ctx.drawImage(images.wallface,X,Y,cs,cs);ctx.globalAlpha=1;}
+      if(artActive())paintStoneFloorTile(ctx,{x:X,y:Y,size:cs,tileX:x,tileY:y,texture:images.wallcap});
+      else {ctx.fillStyle=even(x,y)?'#314858':'#253847';ctx.fillRect(X,Y,cs,cs);
+      if(images.wallface?.complete&&images.wallface.naturalWidth){ctx.globalAlpha=.12;ctx.drawImage(images.wallface,X,Y,cs,cs);ctx.globalAlpha=1;}}
       if(!(state.roomWalls?.[me.room]||[]).some(([wx,wy])=>wx===x&&wy===y)){
         const plan=roomDef(me.room).formation||'stagger';
         const accents={island:'#a6bfa0',ghost:'#8ed8d5',rush:'#c7a476',boss:'#cfaa78',archers:'#d3b883',shield:'#b8b8b7',flanks:'#bdb7a0',stagger:'#8cabb5',gate:'#b7a48b',centre:'#b6c49b',guard:'#b6baa8'};
         const step=plan==='rush'?3:plan==='ghost'?4:5;
-        if((x*5+y*7+roomDef(me.room).name.length)%step===0){
+        if(!artActive()&&(x*5+y*7+roomDef(me.room).name.length)%step===0){
           ctx.strokeStyle=(accents[plan]||'#aab8a9')+'45';ctx.lineWidth=Math.max(1,cs*.025);
           ctx.beginPath();ctx.moveTo(X+cs*.27,Y+cs*.50);ctx.lineTo(X+cs*.73,Y+cs*.50);ctx.stroke();
         }
@@ -545,7 +554,8 @@ function sceneFloor(s){
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const v=s.at(x,y),hw=RES.tx*s.scale,hh=RES.ty*s.scale;
       ctx.beginPath();ctx.moveTo(v.x,v.y-hh);ctx.lineTo(v.x+hw,v.y);ctx.lineTo(v.x,v.y+hh);ctx.lineTo(v.x-hw,v.y);ctx.closePath();
-      ctx.fillStyle=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y)?(roomDef(me.room).quest===10?'#89528b':roomDef(me.room).quest===13?'#957d56':'#30748a'):(even(x,y)?'#495c65':'#374955');ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#c4aa7380';ctx.stroke();
+      if(artActive()) {paintIsoFloorTile(ctx,{position:v,halfW:hw,halfH:hh,tileX:x,tileY:y});}
+      else {ctx.fillStyle=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y)?(roomDef(me.room).quest===10?'#89528b':roomDef(me.room).quest===13?'#957d56':'#30748a'):(even(x,y)?'#495c65':'#374955');ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#c4aa7380';ctx.strokeStyle='#c4aa7380';ctx.stroke();}
       if(y===centre&&(x===0||x===cols-1)){ctx.fillStyle='#d5b97650';ctx.fill()}
     }
   }
@@ -662,7 +672,7 @@ function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect()
   if(canvas.width!==Math.round(box.width*dpr)||canvas.height!==Math.round(box.height*dpr)){canvas.width=Math.max(1,Math.round(box.width*dpr));canvas.height=Math.max(1,Math.round(box.height*dpr))}
   ctx.setTransform(dpr,0,0,dpr,0,0);const w=box.width,h=box.height;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#08111e';ctx.fillRect(0,0,w,h);
-  const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);
+  if(artActive())paintArtBackdrop(ctx,w,h);else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
   const s=gridProjection(w,h);frameMetrics=s;sceneFloor(s);positionPortalArrows(s,w,h);
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.
@@ -671,6 +681,8 @@ function render(){if(!state||!me)return;const box=canvas.getBoundingClientRect()
     if(s.iso)drawStoneIso(s,x,y,terrain);
     else drawStoneTile(s,x,y,terrain);
   }
+  // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
+  if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
   // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
   ctx.save();ctx.strokeStyle='#f1b475';ctx.fillStyle='#f1b47526';ctx.lineWidth=3;

@@ -1,11 +1,11 @@
-import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs';
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT · CINEMATIC GAME HUD · GOLD ART PILOT';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · CINEMATIC HUD';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 const canvas = $('gameCanvas');
@@ -878,7 +878,7 @@ function render(){if(!state||!me)return;
     woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
   }
   if(v2ArtToggle&&isPremiumWoodlandRoom(me.room)){
-    const label=v2ArtEnabled?(premiumWoodlandReady()?(me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
+    const label=v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }
   const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);

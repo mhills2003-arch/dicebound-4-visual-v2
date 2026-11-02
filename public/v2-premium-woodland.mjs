@@ -1,15 +1,19 @@
 /**
- * DICEBOUND V2 · Premium Woodland vertical slice · Quest 1 rooms 1-1 and 1-2 only.
+ * DICEBOUND V2 · Premium Woodland vertical slice · Quest 1 rooms 1-1, 1-2 and 1-3.
  * Visual assets are genuine environment textures and transparent scenery pieces.
  * The game's server controls every wall, position, target, HP and turn.
  * No state mutations, input handlers, fetch calls, random gameplay or WebSockets.
  */
 export const PREMIUM_ROOM = 'woodland';
-export const PREMIUM_ROOMS = Object.freeze(['woodland','clearing']);
+export const PREMIUM_ROOMS = Object.freeze(['woodland','clearing','watchpost']);
 export const isPremiumWoodlandRoom = roomId => PREMIUM_ROOMS.includes(roomId);
 export const PREMIUM_FILES = Object.freeze({
   ground: './assets/premium-woodland/forest-ground.jpg',
   clearing: './assets/premium-woodland/training-clearing-ground.jpg',
+  watchpost: './assets/premium-woodland/old-watchpost-ground.jpg',
+  watchpostRuinA: './assets/premium-woodland/watchpost-ruin-a.png',
+  watchpostRuinB: './assets/premium-woodland/watchpost-ruin-b.png',
+  watchpostBoss: './assets/premium-woodland/watchpost-boss-d8.png',
   boulderA: './assets/premium-woodland/boulder-a.png',
   boulderB: './assets/premium-woodland/boulder-b.png',
   fernTreeA: './assets/premium-woodland/fern-tree-a.png',
@@ -42,7 +46,9 @@ export function paintPremiumWoodlandFloor(ctx,s,roomId='woodland') {
   if (!premiumWoodlandReady() || s.iso) return false;
   const {originX:x, originY:y, cell:c} = s;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  ctx.drawImage(roomId==='clearing'&&art.clearing?.complete&&art.clearing.naturalWidth ? art.clearing : art.ground,x,y,9*c,7*c);
+  const groundName=roomId==='watchpost'?'watchpost':roomId==='clearing'?'clearing':'ground';
+  const floorImg=art[groundName]?.complete&&art[groundName]?.naturalWidth?art[groundName]:art.ground;
+  ctx.drawImage(floorImg,x,y,9*c,7*c);
   // Training Clearing is open woodland, with distinct painted ground but no invented walls.
   // All actors, barriers and interaction remain separate authoritative layers.
   // The tactical grid is accessible, but deliberately subordinate to the scene.
@@ -55,10 +61,12 @@ export function paintPremiumWoodlandFloor(ctx,s,roomId='woodland') {
 export function paintPremiumWoodlandWall(ctx,s,x,y,roomId='woodland') {
   if (!premiumWoodlandReady() || s.iso) return false;
   const {cell:c} = s,pt=s.at(x,y);
-  const name=woodlandObstacleArt(x+(roomId==='clearing'?11:0),y+(roomId==='clearing'?7:0)),img=art[name];
+  const name=roomId==='watchpost'?((x*7+y*11)%2?'watchpostRuinA':'watchpostRuinB'):
+    woodlandObstacleArt(x+(roomId==='clearing'?11:0),y+(roomId==='clearing'?7:0));
+  const img=art[name]?.complete&&art[name]?.naturalWidth?art[name]:art.boulderA;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   // The visual silhouette may exceed a cell; its authoritative footprint never does.
-  const r=c*(name.startsWith('boulder')?1.36:1.65);
+  const r=c*(roomId==='watchpost'?1.55:name.startsWith('boulder')?1.36:1.65);
   const px=pt.x-r/2,py=pt.y-r/2-c*.09;
   ctx.shadowColor='rgba(4,12,8,.76)';ctx.shadowBlur=c*.17;
   ctx.shadowOffsetY=c*.08;
@@ -308,19 +316,28 @@ export function paintPremiumWoodlandActor(ctx,s,p,kind,sprite,{label='',selected
     ctx.lineWidth=Math.max(1.6,c*.038);
     ctx.beginPath();ctx.ellipse(pt.x,pt.y+c*.27*scale,c*.43*scale,c*.17*scale,0,0,Math.PI*2);ctx.stroke();
   }
+  // The quest-one D8 guardian has a low, ember-coloured in-world ring.
+  // Its presence is purely visual; no targeting or cell semantics are altered.
+  if(roomId==='watchpost'&&kind==='enemy'&&p.variant==='boss'){
+    softOval(ctx,pt.x,pt.y+c*.22,c*.82,c*.36,'227,88,41',.29);
+    ctx.strokeStyle='rgba(255,177,91,.70)';ctx.lineWidth=Math.max(2,c*.025);
+    ctx.beginPath();ctx.ellipse(pt.x,pt.y+c*.26,c*.61,c*.23,0,0,Math.PI*2);ctx.stroke();
+  }
   // A low shadow catches the real silhouette's feet, not an arbitrary square.
   softOval(ctx,pt.x+c*.08*scale,pt.y+c*.31*scale,c*.49*scale,c*.15*scale,
     '5,13,9',light?.75:.53);
   // Larger hero silhouettes bring the original illustrated art up to the same
   // readable visual scale as the full-size D6 creatures at tablet resolution.
-  const clearing=roomId==='clearing';
-  const imageSize=c*(clearing?(kind==='enemy'?1.26:1.42):1.14)*scale;
-  const left=pt.x-imageSize*(clearing&&kind!=='enemy'?.50:.59),top=pt.y-imageSize*(clearing?.59:.56)+blink;
+  const clearing=roomId==='clearing'||roomId==='watchpost';
+  const watchpostBoss=roomId==='watchpost'&&kind==='enemy'&&p.variant==='boss';
+  if(watchpostBoss&&art.watchpostBoss?.complete&&art.watchpostBoss.naturalWidth)sprite=art.watchpostBoss;
+  const imageSize=c*(watchpostBoss?1.83:clearing?(kind==='enemy'?1.26:1.42):1.14)*scale;
+  const left=pt.x-imageSize*(watchpostBoss?.50:clearing&&kind!=='enemy'?.50:.59),top=pt.y-imageSize*(watchpostBoss?.58:clearing?.59:.56)+blink;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   // Two subtle effects: environmental cast shadow and warm/cool edge scattering.
   ctx.shadowColor='rgba(6,16,10,.82)';ctx.shadowBlur=c*.13;
   ctx.shadowOffsetX=c*.065;ctx.shadowOffsetY=c*.09;
-  if(clearing&&kind==='enemy'&&sprite.naturalHeight>0){
+  if(clearing&&kind==='enemy'&&!watchpostBoss&&sprite.naturalHeight>0){
     // Original dice PNG contains old red/green HUD slivers at its top/bottom.
     // Crop those from the *drawn image* and let this renderer supply the live HP.
     const sh=sprite.naturalHeight,sw=sprite.naturalWidth;

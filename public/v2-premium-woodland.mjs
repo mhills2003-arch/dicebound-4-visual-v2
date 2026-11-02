@@ -62,16 +62,118 @@ export function paintPremiumWoodlandWall(ctx,s,x,y) {
   ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
   ctx.restore();return true;
 }
-export function paintPremiumWoodlandAtmosphere(ctx,s) {
-  if (!premiumWoodlandReady() || s.iso) return false;
+
+/**
+ * Directional lighting, staged beneath walls and before game overlays.
+ * Each gradient is anchored to the existing board projection. All random-looking
+ * placement is deterministic visual maths, never a game roll.
+ */
+function softOval(ctx,x,y,rx,ry,rgb,opacity=1){
+  ctx.save();
+  ctx.translate(x,y);ctx.scale(rx,ry);
+  const g=ctx.createRadialGradient(0,0,0,0,0,1);
+  g.addColorStop(0,`rgba(${rgb},${opacity})`);
+  g.addColorStop(.46,`rgba(${rgb},${opacity*.57})`);
+  g.addColorStop(1,`rgba(${rgb},0)`);
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,1,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+const LIGHT_PATCHES=Object.freeze([
+  [.10,.18,.13,.19,.72],[.25,.10,.17,.19,.72],[.41,.24,.11,.16,.56],
+  [.58,.12,.19,.20,.78],[.81,.29,.12,.19,.58],[.70,.56,.20,.25,.77],
+  [.43,.66,.17,.21,.69],[.19,.71,.16,.22,.57],[.87,.76,.15,.18,.45]
+]);
+const CANOPY_SHADOWS=Object.freeze([
+  [.03,.02,.20,.22],[.24,.06,.18,.12],[.46,-.01,.17,.20],
+  [.75,.05,.26,.17],[.99,.19,.18,.26],[.03,.51,.21,.23],
+  [.88,.51,.23,.18],[.14,.99,.20,.17],[.57,.98,.27,.17],
+  [.98,.95,.25,.23]
+]);
+export function paintPremiumWoodlandGroundLighting(ctx,s,walls=[]){
+  if(!premiumWoodlandReady() || s.iso) return false;
   const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
-  const vignette=ctx.createRadialGradient(x+w*.50,y+h*.43,w*.27,x+w*.50,y+h*.43,w*.71);
-  vignette.addColorStop(0,'rgba(6,17,7,0)');vignette.addColorStop(1,'rgba(4,12,7,.32)');
-  ctx.fillStyle=vignette;ctx.fillRect(x,y,w,h);
-  // Warm light across the trail; never painted over actor outlines and labels.
-  const light=ctx.createRadialGradient(x+w*.61,y+h*.19,0,x+w*.61,y+h*.19,w*.40);
-  light.addColorStop(0,'rgba(249,210,123,.10)');light.addColorStop(1,'rgba(249,210,123,0)');
-  ctx.fillStyle=light;ctx.fillRect(x,y,w,h);
+  // A unified ambient grade replaces the old weak diffuse radial colour wash.
+  const ambient=ctx.createLinearGradient(x,y,x+w*.72,y+h);
+  ambient.addColorStop(0,'rgba(255,221,152,.065)');
+  ambient.addColorStop(.43,'rgba(24,34,21,.045)');
+  ambient.addColorStop(1,'rgba(7,19,14,.21)');
+  ctx.fillStyle=ambient;ctx.fillRect(x,y,w,h);
+  // Broad canopy occlusion at the edges and underneath hanging branches.
+  for(const [cx,cy,rx,ry] of CANOPY_SHADOWS)
+    softOval(ctx,x+cx*w,y+cy*h,rx*w,ry*h,'5,16,10',.48);
+  // Irregular sunlight openings in the forest canopy. No new obstacles.
+  for(const [cx,cy,rx,ry,strength] of LIGHT_PATCHES)
+    softOval(ctx,x+cx*w,y+cy*h,rx*w,ry*h,'255,229,151',strength*.25);
+  // Dappled spots have a common light direction and deterministic placement.
+  for(let i=0;i<54;i++){
+    const fx=(Math.sin(i*92.71+4.09)*43758.5453)%1;
+    const fy=(Math.sin(i*57.83+8.73)*12741.383)%1;
+    const nx=fx<0?fx+1:fx,ny=fy<0?fy+1:fy;
+    const radius=c*(.10+((i*7)%9)*.017);
+    softOval(ctx,x+nx*w,y+ny*h,radius*1.45,radius*.69,'250,221,144',.10);
+  }
+  // Long ground-cast shadows always point away from upper-left sunlight.
+  // Authoritative walls[] supplies positions; lighting never changes that array.
+  for(const [tx,ty] of walls){
+    const px=x+(tx+.53)*c,py=y+(ty+.64)*c;
+    softOval(ctx,px+c*.36,py+c*.35,c*.79,c*.37,'4,13,11',.50);
+    softOval(ctx,px+c*.13,py+c*.12,c*.46,c*.26,'5,15,9',.37);
+  }
+  ctx.restore();return true;
+}
+
+/** Contact shadow behind the existing 2-D character icon. Never changes token art. */
+export function paintPremiumWoodlandContactShadow(ctx,s,p,kind='one'){
+  if(!premiumWoodlandReady() || s.iso || !p || !Number.isFinite(p.x)||!Number.isFinite(p.y))return false;
+  const giant=kind==='enemy'&&(p.variant==='large'||p.variant==='large-shiny');
+  const c=s.cell,pt=s.at(p.x+(giant?.5:0),p.y+(giant?.5:0));
+  ctx.save();
+  // Shadow is deliberately below the unit, avoiding any obstruction to its label.
+  softOval(ctx,pt.x+c*.065,pt.y+c*.20,c*(giant?.78:.48),c*(giant?.29:.18),'3,11,7',.84);
+  softOval(ctx,pt.x-c*.045,pt.y+c*.14,c*(giant?.52:.28),c*.085,'243,206,133',.16);
+  ctx.restore();return true;
+}
+/**
+ * Allows comparison with the approved 7/10 asset-based baseline.
+ * The OFF state reproduces the existing, subtle pre-lighting overlay.
+ */
+export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true){
+  if(!premiumWoodlandReady() || s.iso) return false;
+  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  if(!sunlight){
+    const vignette=ctx.createRadialGradient(x+w*.50,y+h*.43,w*.27,x+w*.50,y+h*.43,w*.71);
+    vignette.addColorStop(0,'rgba(6,17,7,0)');vignette.addColorStop(1,'rgba(4,12,7,.32)');
+    ctx.fillStyle=vignette;ctx.fillRect(x,y,w,h);
+    const light=ctx.createRadialGradient(x+w*.61,y+h*.19,0,x+w*.61,y+h*.19,w*.40);
+    light.addColorStop(0,'rgba(249,210,123,.10)');light.addColorStop(1,'rgba(249,210,123,0)');
+    ctx.fillStyle=light;ctx.fillRect(x,y,w,h);
+    ctx.restore();return true;
+  }
+  // Three feathered shafts of light, made of overlapping radial veils rather
+  // than hard-edged triangles. This avoids synthetic polygon beam boundaries.
+  ctx.globalCompositeOperation='screen';
+  const beams=[
+    {sx:.22,sy:-.12,dx:.30,dy:1.05,power:.047},
+    {sx:.52,sy:-.12,dx:.25,dy:.94,power:.065},
+    {sx:.72,sy:-.12,dx:.12,dy:.81,power:.036}
+  ];
+  for(const beam of beams){
+    for(let i=0;i<8;i++){
+      const t=i/7;
+      const fx=beam.sx+beam.dx*t,fy=beam.sy+beam.dy*t;
+      // Gentle irregular variations imply tree branches and canopy openings.
+      softOval(ctx,x+w*fx,y+h*fy,w*(.058+.032*t),h*(.16+.045*t),
+        '255,236,184',beam.power*(1-t*.48));
+    }
+  }
+  ctx.globalCompositeOperation='source-over';
+  // Ambient haze at the canopy gap, slightly warmer than the ground texture.
+  softOval(ctx,x+w*.37,y+h*.13,w*.30,h*.23,'255,230,176',.075);
+  const edge=ctx.createRadialGradient(x+w*.52,y+h*.48,w*.25,x+w*.52,y+h*.48,w*.72);
+  edge.addColorStop(0,'rgba(5,17,12,0)');
+  edge.addColorStop(.74,'rgba(5,17,12,.01)');
+  edge.addColorStop(1,'rgba(3,11,11,.29)');
+  ctx.fillStyle=edge;ctx.fillRect(x,y,w,h);
   ctx.restore();return true;
 }

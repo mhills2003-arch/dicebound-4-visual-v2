@@ -1,11 +1,11 @@
-import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere} from './v2-premium-woodland.mjs';
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow} from './v2-premium-woodland.mjs';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 PREMIUM ART PILOT';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 PREMIUM LIGHTING PILOT';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 const canvas = $('gameCanvas');
@@ -26,8 +26,21 @@ let socket,state,me,view='tactical',connected=false,errorTimer,frameMetrics,auth
 let v2ArtEnabled=localStorage.getItem('db4_v2_room_art')!=='off';
 const v2ArtToggle=document.getElementById('v2ArtToggle');
 if(v2ArtToggle)v2ArtToggle.addEventListener('click',()=>{v2ArtEnabled=!v2ArtEnabled;localStorage.setItem('db4_v2_room_art',v2ArtEnabled?'on':'off');render()});
+let woodlandLightingEnabled=localStorage.getItem('db4_v2_woodland_lighting')!=='off';
+const woodlandLightingToggle=document.createElement('button');
+woodlandLightingToggle.id='woodlandLightingToggle';
+woodlandLightingToggle.type='button';
+woodlandLightingToggle.className=v2ArtToggle?.className||'';
+woodlandLightingToggle.hidden=true;
+v2ArtToggle?.insertAdjacentElement('afterend',woodlandLightingToggle);
+woodlandLightingToggle.addEventListener('click',()=>{
+  woodlandLightingEnabled=!woodlandLightingEnabled;
+  localStorage.setItem('db4_v2_woodland_lighting',woodlandLightingEnabled?'on':'off');
+  render();
+});
 const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
 const premiumActive=()=>artActive()&&me?.room==='woodland'&&view==='tactical'&&premiumWoodlandReady();
+const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
 
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
@@ -526,7 +539,7 @@ function sceneFloor(s){
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
     const cs=s.cell, premium=premiumActive();
-    if(premium)paintPremiumWoodlandFloor(ctx,s);
+    if(premium){paintPremiumWoodlandFloor(ctx,s);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[]);}
     for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
       const X=s.originX+x*cs,Y=s.originY+y*cs;
       const hazard=(state.roomHazards?.[me.room]||[]).some(([hx,hy])=>hx===x&&hy===y);
@@ -674,6 +687,11 @@ function drawStoneIso(s,tx,ty,terrain){
   ctx.restore();
 }
 function render(){if(!state||!me)return;
+  woodlandLightingToggle.hidden=!(premiumActive());
+  if(!woodlandLightingToggle.hidden){
+    woodlandLightingToggle.textContent=woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF';
+    woodlandLightingToggle.setAttribute('aria-pressed',String(woodlandLightingEnabled));
+  }
   if(v2ArtToggle&&me.room==='woodland'){
     const label=v2ArtEnabled?(premiumWoodlandReady()?'🌲 Premium woodland art: ON':'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
@@ -693,7 +711,7 @@ function render(){if(!state||!me)return;
     else drawStoneTile(s,x,y,terrain);
   }
   // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
-  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s);
+  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled);
   else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
   // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
@@ -728,6 +746,7 @@ function render(){if(!state||!me)return;
   const actors=[...battle.enemies.filter(e=>e.hp>0).map(e=>({p:e,kind:'enemy'})),...Object.values(state.players).filter(p=>p.room===me.room).map(p=>({p,kind:p.id}))];
   if(s.iso)actors.sort((a,b)=>(a.p.x+a.p.y)-(b.p.x+b.p.y));
   for(const a of actors){
+    if(woodlandLightActive())paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);
     const medium=roomSize(me.room).width>9;
     iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
   }

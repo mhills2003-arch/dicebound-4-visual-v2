@@ -1,6 +1,6 @@
 # DICEBOUND 4.0 V2 — ISOLATED VISUAL-DEV FORK
 
-**Status: SOURCE PACKAGE PREPARED. NOT DEPLOYED. NO ART OVERHAUL YET.**
+**Status: FIRST ROOM-ART VERTICAL SLICE IMPLEMENTED. NOT DEPLOYED.**
 
 This is a self-contained copy of the **latest source ZIP available in this conversation**:
 `DICEBOUND4_FOUR_CLASS_BENEFITS_MULTIPLAYER_GITHUB_UPDATE.zip`.
@@ -26,7 +26,7 @@ It contains all current quest, maze, class-perk, combat and test files from that
    Set root directory to repository root (`/` or blank), **Build command = empty** (optional: `npm run build` after using this corrected package), **Deploy command = `npx wrangler deploy`**, and preview command to its default.
    Do NOT choose a Cloudflare Pages / static site template. This project needs a Worker with a Durable Object.
 4. Confirm the Worker has **no custom domain route** and Workers.dev is enabled. This package intentionally does NOT have a route for `sonnylanning.com`. The `wrangler.toml` file at repo root creates an independent SQLite-backed `GameRoom` Durable Object namespace; do not manually attach the original beta's binding.
-5. Add **three NEW Cloudflare Secrets** to the V2 Worker: `INVITE_TOKEN_1`, `INVITE_TOKEN_2`, `COOKIE_SECRET`; use strong new random values, not V1’s tokens. Do not put them in GitHub or in this ZIP.
+5. Add **five NEW Cloudflare Secrets** to the V2 Worker: `INVITE_TOKEN_1`, `INVITE_TOKEN_2`, `INVITE_TOKEN_3`, `INVITE_TOKEN_4`, `COOKIE_SECRET`; use strong new random values, not V1’s tokens. Do not put them in GitHub or in this ZIP.
 6. Confirm a successful build, then open the NEW Worker's workers.dev link with `/dicebound-v2/` appended, and sign in with V2 credentials.
 7. Play one simple room on two test browsers; verify V1 and V2 characters/adventures are distinct and that V1 is still working.
 
@@ -59,4 +59,13 @@ If it says no `wrangler.toml` or `package.json`, ensure these files are at the r
 If it says that a Durable Object namespace/class is missing, replace V2's `wrangler.toml` from this package; do not reuse any existing V1 binding.
 If the build succeeds but the websocket fails, make sure `src/worker.mjs` is the corrected one: it uses `env.V2_GAME_ROOM` for both `get` and `idFromName`.
 
-Secrets are *runtime* secrets, added under the new Worker's Settings → Variables and Secrets, not under Build variables, and not in GitHub. Use independent random values of at least 24 characters for `INVITE_TOKEN_1` and `INVITE_TOKEN_2`, and 32 characters for `COOKIE_SECRET`. Revisit the login after saving them.
+Secrets are *runtime* secrets, added under the new Worker's Settings → Variables and Secrets, not under Build variables, and not in GitHub. Use independent random values of at least 24 characters for all four `INVITE_TOKEN_1..4` and 32 characters for `COOKIE_SECRET`. Revisit the login after saving them.
+
+## Implemented V2 art vertical slice
+
+- **Playable room:** Smuggler's Station `q5r7` only. Its floor, light, walls and cosmetic decor are drawn with the new `public/v2-room-art.mjs` layer. All other campaign rooms and the Maze still use their original look.
+- **Comparison:** The `✦ V2 art: ON/OFF` button appears when you are actually in `q5r7`. It changes only a local browser display preference; server positions, movement and loot are not altered.
+- **Instant art comparison without quest progress:** Once logged into V2, choose `✦ Art Lab` in the game header, or visit `/dicebound-v2/v2-art-preview.html`. This read-only gallery reuses the new Canvas art functions and the real q5r7 wall pattern. It is **not** a playable or saved adventure.
+- The environment-rendering changes are restricted to `public/` and new tests. All multiplayer/server modules in `src/` remain byte-for-byte the same as the starter ZIP. No new artificial obstacles or pickups are introduced.
+- Run `npm run build` (the same as `npm test`). **302 tests pass** in the release source. The headless visual-browser screenshot check is not verified in this container; compare on actual desktop/tablet in V2 before extending the art to more rooms.
+- This is a visual experiment, not an official replacement of the current V1. Do not edit the `sonny-dicebound-lab` Worker or the V1 GitHub repository.

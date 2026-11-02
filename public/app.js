@@ -1,11 +1,11 @@
-import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow} from './v2-premium-woodland.mjs';
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife} from './v2-premium-woodland.mjs';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 PREMIUM LIGHTING PILOT';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 DEPTH & FOREST LIFE PILOT';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 const canvas = $('gameCanvas');
@@ -40,6 +40,19 @@ woodlandLightingToggle.addEventListener('click',()=>{
 });
 const artActive=()=>v2ArtEnabled&&isV2ArtRoom(me?.room);
 const premiumActive=()=>artActive()&&me?.room==='woodland'&&view==='tactical'&&premiumWoodlandReady();
+let woodlandDepthEnabled=localStorage.getItem('db4_v2_woodland_depth')!=='off';
+const woodlandDepthToggle=document.createElement('button');
+woodlandDepthToggle.id='woodlandDepthToggle';
+woodlandDepthToggle.type='button';
+woodlandDepthToggle.className=v2ArtToggle?.className||'';
+woodlandDepthToggle.hidden=true;
+woodlandLightingToggle.insertAdjacentElement('afterend',woodlandDepthToggle);
+woodlandDepthToggle.addEventListener('click',()=>{
+  woodlandDepthEnabled=!woodlandDepthEnabled;
+  localStorage.setItem('db4_v2_woodland_depth',woodlandDepthEnabled?'on':'off');
+  render();
+});
+const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
 const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
 
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
@@ -692,6 +705,12 @@ function render(){if(!state||!me)return;
     woodlandLightingToggle.textContent=woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF';
     woodlandLightingToggle.setAttribute('aria-pressed',String(woodlandLightingEnabled));
   }
+  woodlandDepthToggle.hidden=!premiumActive();
+  if(!woodlandDepthToggle.hidden){
+    woodlandDepthToggle.textContent=!woodlandDepthEnabled?'🍃 Foreground: OFF':'🍃 Foreground: ON';
+    woodlandDepthToggle.setAttribute('aria-pressed',String(woodlandDepthEnabled));
+    woodlandDepthToggle.title=reducedMotion?'Foreground scenery is visible; animation is disabled by your system preference.':'Compare this new foreground and soft drifting-leaf layer against the approved lighting baseline.';
+  }
   if(v2ArtToggle&&me.room==='woodland'){
     const label=v2ArtEnabled?(premiumWoodlandReady()?'🌲 Premium woodland art: ON':'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF';
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
@@ -713,6 +732,10 @@ function render(){if(!state||!me)return;
   // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
   if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled);
   else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
+  // Illustrated undergrowth tucks into existing obstacle footprints and is
+  // rendered below all actors/targets, leaving the full battle state untouched.
+  if(premiumActive()&&woodlandDepthEnabled)
+    paintPremiumWoodlandUnderbrush(ctx,s,state.roomWalls?.[me.room]||[],performance.now(),!reducedMotion);
   // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
   ctx.save();ctx.strokeStyle='#f1b475';ctx.fillStyle='#f1b47526';ctx.lineWidth=3;
@@ -749,6 +772,16 @@ function render(){if(!state||!me)return;
     if(woodlandLightActive())paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);
     const medium=roomSize(me.room).width>9;
     iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
+  }
+  // Foreground passes run AFTER the units. Painted canopy silhouettes sit at
+  // the board rim; their opacity falls away near heroes/enemies and labels.
+  if(premiumActive()){
+    if(woodlandDepthEnabled){
+      const movement=!reducedMotion;
+      const timestamp=performance.now();
+      paintPremiumWoodlandForeground(ctx,s,actors,timestamp,movement);
+      paintPremiumWoodlandForestLife(ctx,s,actors,timestamp,movement);
+    }
   }
   const banner=$('turnBanner');
   const global=state.turn||{};

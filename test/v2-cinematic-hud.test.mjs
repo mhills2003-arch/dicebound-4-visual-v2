@@ -22,7 +22,7 @@ test('Only graphical presentation is changed, not the server authority over wall
   assert.match(js,/selectedEnemyId/);
   assert.match(js,/send\(\{type:'action',action:/);
   assert.match(js,/function paintCinematicWoodlandSurround/);
-  assert.match(art,/PREMIUM_ROOMS = Object\.freeze\(\['woodland','clearing'\]\)/);
+  assert.match(art,/PREMIUM_ROOMS = Object\.freeze\(\['woodland','clearing','watchpost'\]\)/);
 });
 test('The correct class emblem and action/stat icons are real assets and never a flattened mockup',()=>{
   for(const icon of ['attack','defend','special','roll','heart','flask','coin','xp','helm','items']){
@@ -47,6 +47,6 @@ test('Class selection, chat and secondary actions remain reachable without block
 });
 test('Versioned script and stylesheet prevent stale mixed HUD releases',()=>{
   assert.match(html,/styles\.css\?build=v2-cinematic-search-keys-20261102-r1/);
-  assert.match(html,/app\.js\?build=v2-cinematic-search-keys-20261102-r1/);
+  assert.match(html,/app\.js\?build=v2-quest1-watchpost-20261102-r1/);
   assert.match(html,/id="cinematicCritical"/);
 });

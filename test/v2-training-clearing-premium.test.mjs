@@ -20,10 +20,10 @@ test('1-2 is precisely the authoritative Training Clearing room with two D6 crea
  assert.equal(new Set(walls.map(a=>a.join(','))).size,walls.length);
  assert.notDeepEqual(walls,ROOM_WALLS.woodland,'1-2 must use its own wall positions');
 });
-test('premium renderer only supports 1-1 and 1-2; watchpost stays unchanged',()=>{
- assert.deepEqual(PREMIUM_ROOMS,['woodland','clearing']);
- for(const id of ['woodland','clearing'])assert(isPremiumWoodlandRoom(id));
- for(const id of ['watchpost','q2r1','q15r8','camp','__proto__',null])assert.equal(isPremiumWoodlandRoom(id),false);
+test('premium renderer supports all three Quest 1 rooms and stops at Quest 2',()=>{
+ assert.deepEqual(PREMIUM_ROOMS,['woodland','clearing','watchpost']);
+ for(const id of ['woodland','clearing','watchpost'])assert(isPremiumWoodlandRoom(id));
+ for(const id of ['q2r1','q15r8','camp','__proto__',null])assert.equal(isPremiumWoodlandRoom(id),false);
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
  assert.match(app,/paintPremiumWoodlandFloor\(ctx,s,me\.room\)/);

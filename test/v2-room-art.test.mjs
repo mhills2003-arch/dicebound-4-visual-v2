@@ -80,6 +80,6 @@ test('Woodland Path preview draws a distinguishable forest surface and real-wall
  assert.equal(JSON.stringify(walls),before);
  const original=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(original,/theme:me.room/);
- assert.match(original,/QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT/);
+ assert.match(original,/QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN/);
  assert.doesNotMatch(original,/send\(\{type:'v2-art/);
 });

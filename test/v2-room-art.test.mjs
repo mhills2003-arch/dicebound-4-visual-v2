@@ -15,12 +15,12 @@ function drawingContext(){
 }
 const projection={iso:false,cell:36,originX:11,originY:14,at(x,y){return {x:11+(x+.5)*36,y:14+(y+.5)*36}}};
 const isoProjection={iso:true,cell:27,scale:.78,at(x,y){return {x:410+(x-y)*25,y:60+(x+y)*14}}};
-test('Woodland Path and Smuggler’s Station have separate visual pilots; all other campaign rooms unchanged',()=>{
+test('Every campaign room receives visual art; canonical Woodland and Smuggler pilots remain',()=>{
  assert.equal(V2_ART_ROOM,'q5r7');assert.equal(V2_WOODLAND_ROOM,'woodland');
  assert.equal(isV2ArtRoom('q5r7'),true);assert.equal(isV2ArtRoom('woodland'),true);
  assert.equal(ROOM_DATA[V2_ART_ROOM].name,'Smuggler’s Station');
  assert.equal(ROOM_DATA[V2_WOODLAND_ROOM].name,'Woodland Path');
- for(const id of Object.keys(ROOM_DATA))if(![V2_ART_ROOM,V2_WOODLAND_ROOM].includes(id))assert.equal(isV2ArtRoom(id),false,id);
+ for(const [id,room] of Object.entries(ROOM_DATA))if(room.quest>=0&&room.quest<=15)assert.equal(isV2ArtRoom(id),true,id);
 });
 test('art renderer draws real grid-aligned tactical and illustrated floor surfaces',()=>{
  const {ctx,draws}=drawingContext();
@@ -38,10 +38,10 @@ test('decorations are visual-only, use actual wall cells, and leave the authorit
  assert(draws.length>15);
  assert.equal(JSON.stringify(walls),before);
 });
-test('art has zero effect on non-preview rooms',()=>{
+test('art has zero effect on invalid room ids',()=>{
  const {ctx,draws}=drawingContext();
- paintV2Dressing(ctx,projection,ROOM_WALLS.q5r7,{roomId:'q5r8'});
- paintV2Light(ctx,projection,ROOM_WALLS.q5r7,{roomId:'q5r8'});
+ paintV2Dressing(ctx,projection,ROOM_WALLS.q5r7,{roomId:'q99r1'});
+ paintV2Light(ctx,projection,ROOM_WALLS.q5r7,{roomId:'q99r1'});
  assert.equal(draws.length,0);
 });
 test('comparison toggle only changes V2 client rendering state and is not a server command',()=>{
@@ -61,7 +61,7 @@ test('a read-only art gallery is available before unlocking Quest 5',()=>{
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const gallery=readFileSync(new URL('../public/v2-art-preview.html',import.meta.url),'utf8');
  const script=readFileSync(new URL('../public/v2-art-preview.mjs',import.meta.url),'utf8');
- assert.match(html,/href="\.\/v2-art-preview\.html"/);
+ assert.match(html,/href="\.\/v2-theme-gallery\.html"/);
  assert.match(gallery,/not a playable dungeon/);
  assert.match(script,/paintV2Dressing\(/);
  assert.doesNotMatch(script,/fetch\(|WebSocket|localStorage|send\(/);
@@ -80,6 +80,6 @@ test('Woodland Path preview draws a distinguishable forest surface and real-wall
  assert.equal(JSON.stringify(walls),before);
  const original=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(original,/theme:me.room/);
- assert.match(original,/WOODLAND PATH ART PILOT/);
+ assert.match(original,/COMPLETE CAMPAIGN ART PASS/);
  assert.doesNotMatch(original,/send\(\{type:'v2-art/);
 });

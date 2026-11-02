@@ -301,3 +301,133 @@
 .maze-arena-cell.fixture{background:radial-gradient(circle at 42% 30%,#78634d,#313144);border-color:#edcf83}
 .maze-arena-cell.monarch{background:radial-gradient(circle at 50% 25%,#926384,#3a274d);border-color:#ddadeb}
 @media(max-width:430px){.maze-arena{padding:5px;gap:2px}}
+
+/* V2 HUD LAB: board-first presentation. These selectors only apply in
+   .hud-board-focus; the complete previous HUD remains one click away. */
+.hud-main-switch{border-color:#f1d48b;background:#273e45;color:#ffe0a0;font-weight:850}
+.hud-focus-tool{border-color:#586e7a;background:#142736;color:#d8e9e6}
+body:not(.hud-board-focus) .hud-focus-tool{display:none!important}
+body.hud-board-focus .masthead{height:53px;padding:4px 16px}
+body.hud-board-focus .brand strong{font-size:20px}
+body.hud-board-focus .brand small{letter-spacing:.07em;font-size:8px}
+body.hud-board-focus .brand-icon{font-size:23px}
+body.hud-board-focus .v2-ribbon{display:none}
+body.hud-board-focus .workspace{display:block;max-width:none;width:100%;padding:7px 11px;min-height:0}
+body.hud-board-focus .main-area{width:100%;max-width:none;min-width:0;gap:5px}
+body.hud-board-focus .side-left,body.hud-board-focus .side-right{display:none}
+body.hud-board-focus .room-heading{min-height:0;gap:9px;padding:6px 11px;align-items:center}
+body.hud-board-focus .room-heading h1{font-size:20px;margin:0}
+body.hud-board-focus .room-heading p{display:none}
+body.hud-board-focus .room-actions{max-width:none;justify-content:flex-end;gap:4px;align-items:center}
+body.hud-board-focus .room-actions .viewbtn{font-size:11px;padding:5px 8px;min-height:34px}
+body.hud-board-focus .v2-preview-link{display:none}
+/* Compact personal status; backpack remains accessible via Party/Map or classic HUD. */
+body.hud-board-focus .hero-hud{padding:5px 10px;grid-template-columns:minmax(140px,.8fr) minmax(145px,1fr) minmax(290px,1.6fr);gap:8px}
+body.hud-board-focus .hero-hud-title strong{font-size:14px}
+body.hud-board-focus .hero-hud .hud-eyebrow,body.hud-board-focus .hero-hud .hud-note,body.hud-board-focus .hero-hud .hero-bag{display:none}
+body.hud-board-focus .hero-hud .hud-bars{gap:3px}
+body.hud-board-focus .hero-hud .hud-meter-label{line-height:1.12}
+body.hud-board-focus .hero-hud .hud-cells{gap:4px}
+body.hud-board-focus .hero-hud .hud-cell{padding:4px 2px}
+body.hud-board-focus .hero-hud .hud-cell span{font-size:9px}
+body.hud-board-focus .hero-hud .hud-cell strong{font-size:11px}
+body.hud-board-focus .board-and-actions{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;height:auto;min-height:0;gap:5px}
+body.hud-board-focus .board-and-actions .canvas-wrap{width:100%;min-width:0;min-height:390px;height:clamp(370px,54dvh,790px);max-height:none;grid-area:auto;order:2;flex:none}
+body.hud-board-focus .turn-dock{order:1;width:100%;min-width:0;min-height:0;flex:initial;display:flex;flex-direction:row;align-items:center;gap:8px;padding:4px 9px;min-height:42px}
+body.hud-board-focus .turn-dock-head{flex-direction:row;gap:9px;white-space:nowrap}
+body.hud-board-focus .turn-clock{font-size:19px}
+body.hud-board-focus .turn-dock .turn-banner{max-width:270px;padding:5px 8px;font-size:11px!important;line-height:1.25;white-space:normal}
+body.hud-board-focus .turn-dock .turn-dock-help{display:none}
+body.hud-board-focus .turn-dock #globalTurnStrip{display:flex;flex:1 1 auto;flex-direction:row;gap:4px;align-items:center;flex-wrap:wrap;padding:3px 7px}
+body.hud-board-focus .turn-dock #globalTurnStrip .turn-heading{font-size:10px;white-space:nowrap}
+body.hud-board-focus .turn-dock #globalTurnStrip .turn-step{font-size:10px;padding:4px}
+body.hud-board-focus .turn-dock #globalTurnStrip .turn-enemies{display:none}
+body.hud-board-focus .action-dock{order:3;width:100%;max-width:none;min-width:0;height:auto;min-height:0;flex:none;display:flex;flex-direction:row;align-items:center;gap:7px;padding:7px 9px;overflow:visible}
+body.hud-board-focus .action-dock-title{display:none}
+body.hud-board-focus .action-dock #rollMoveBtn{flex:0 0 135px;width:135px;min-height:45px;font-size:12px}
+body.hud-board-focus .action-dock .dock-counter{flex:0 0 90px;font-size:10px}
+body.hud-board-focus .action-dock .combat-controls{display:grid;flex:1 1 auto;min-width:0;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:none;gap:5px;overflow:visible}
+body.hud-board-focus .action-dock .combat-btn{min-height:46px;height:auto;min-width:0;font-size:11px;line-height:1.15;padding:5px 3px}
+body.hud-board-focus .action-dock .combat-btn.special{font-size:10px}
+body.hud-board-focus .action-dock .end-turn-overlay{width:128px;flex:0 0 128px;min-width:0;min-height:45px;font-size:12px;margin:0}
+body.hud-board-focus .target-panel{padding:3px 9px;margin:0;font-size:11px;min-height:0}
+body.hud-board-focus .movement-roll{display:none}
+body.hud-board-focus .controls{min-height:0;padding:3px 9px;gap:10px;background:transparent;border:0}
+body.hud-board-focus .dpad{display:flex;align-items:center;gap:2px}
+body.hud-board-focus .dpad button{height:34px;min-width:38px}
+body.hud-board-focus .toolhint{font-size:10px}
+body.hud-board-focus .toolhint small{display:none}
+body.hud-board-focus .class-select-panel{position:relative}
+/* Open party or encounter panes as overlays only on demand. */
+.hud-drawer-shade{position:fixed;inset:0;z-index:75;background:rgba(1,8,14,.66);backdrop-filter:blur(2px)}
+.hud-drawer-shade[hidden],.hud-drawer-close[hidden]{display:none!important}
+.hud-drawer-close{position:fixed;right:calc(max(9px,env(safe-area-inset-right)) + 7px);top:calc(3dvh + 7px);z-index:83;border:1px solid #f4db9f;background:#243946;color:#ffe6ac;border-radius:8px;padding:8px 12px;font-weight:750}
+body.hud-board-focus .sidebar.hud-panel-open{display:flex!important;position:fixed;z-index:80;top:3dvh;right:max(9px,env(safe-area-inset-right));bottom:3dvh;width:min(465px,calc(100vw - 18px));max-height:94dvh;overflow-y:auto;overscroll-behavior:contain;background:#0d2031;border:2px solid #b59a69;border-radius:15px;padding:48px 11px 11px;gap:10px;box-shadow:0 18px 65px #000b;grid-column:auto;flex-direction:column}
+body.hud-board-focus .side-left.hud-panel-open{left:max(9px,env(safe-area-inset-left));right:auto}
+body.hud-board-focus .side-right.hud-panel-open.hud-log-only > section:not(.adventurelog){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-shop-only > section:not(#merchantPanel){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-rewards-only > section:not(#questRewardPanel){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-details-only > section:is(.adventurelog,#merchantPanel,#questRewardPanel){display:none!important}
+body.hud-board-focus .side-right.hud-panel-open.hud-shop-only .shop-item{min-height:45px}
+body.hud-board-focus .side-right.hud-panel-open .adventurelog{min-height:65dvh}
+body.hud-board-focus .side-right.hud-panel-open .adventurelog #log{max-height:73dvh;min-height:50dvh}
+body.hud-board-focus .chat-launcher{z-index:69}
+@media(max-width:1100px){
+ body.hud-board-focus .room-heading{flex-wrap:wrap}
+ body.hud-board-focus .room-actions{justify-content:flex-start}
+ body.hud-board-focus .hero-hud{grid-template-columns:1fr 1fr}
+ body.hud-board-focus .hero-hud .hud-cells{grid-column:1/-1}
+ body.hud-board-focus .turn-dock{flex-wrap:wrap}
+ body.hud-board-focus .action-dock{flex-wrap:wrap}
+ body.hud-board-focus .action-dock .combat-controls{order:2;flex-basis:100%;grid-template-columns:repeat(6,minmax(0,1fr))}
+ body.hud-board-focus .action-dock .end-turn-overlay{margin-left:auto}
+}
+@media(max-width:700px){
+ body.hud-board-focus .masthead{height:50px;padding:4px 7px}
+ body.hud-board-focus .brand strong{font-size:15px}
+ body.hud-board-focus .brand small{display:none}
+ body.hud-board-focus .workspace{padding:4px}
+ body.hud-board-focus .room-heading{padding:5px}
+ body.hud-board-focus .room-heading h1{font-size:17px}
+ body.hud-board-focus .room-actions .viewbtn{min-height:38px;font-size:11px;padding:5px 7px}
+ body.hud-board-focus .hero-hud{grid-template-columns:1fr 1fr;padding:5px}
+ body.hud-board-focus .hero-hud .hud-cells{grid-column:1/-1}
+ body.hud-board-focus .hero-hud .hud-cell{padding:3px}
+ body.hud-board-focus .board-and-actions{display:flex;flex-direction:column;gap:5px}
+ body.hud-board-focus .board-and-actions .canvas-wrap{order:2;height:clamp(300px,50dvh,570px);min-height:300px;max-height:none;width:100%;flex:none}
+ body.hud-board-focus .turn-dock{order:1;width:100%;flex:0 0 auto;display:flex;padding:4px;gap:4px}
+ body.hud-board-focus .turn-dock .turn-banner{font-size:10px!important;padding:4px}
+ body.hud-board-focus .turn-dock #globalTurnStrip{display:flex;grid-column:auto;padding:3px;gap:2px}
+ body.hud-board-focus .action-dock{order:3;width:100%;min-width:0;height:auto;display:flex;padding:5px;gap:4px;flex-wrap:wrap}
+ body.hud-board-focus .action-dock #rollMoveBtn{flex:1 1 110px;min-width:100px}
+ body.hud-board-focus .action-dock .dock-counter{flex:0 1 90px}
+ body.hud-board-focus .action-dock .end-turn-overlay{flex:0 0 110px;width:110px}
+ body.hud-board-focus .action-dock .combat-controls{flex:1 1 100%;order:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:none;gap:4px}
+ body.hud-board-focus .action-dock .combat-btn{min-height:43px;font-size:11px}
+ body.hud-board-focus .dpad button{height:39px;min-width:42px}
+ body.hud-board-focus .toolhint{display:none}
+ body.hud-board-focus .canvas-help{font-size:10px}
+}
+@media(max-width:380px){body.hud-board-focus .room-actions .viewbtn{font-size:10px;padding:4px 6px}}
+
+/* Art-comparison tools are optional rather than a permanent wall of controls. */
+.hud-visual-settings{position:relative;flex:none}
+.hud-visual-settings summary{list-style:none;display:block;cursor:pointer;user-select:none}
+.hud-visual-settings summary::-webkit-details-marker{display:none}
+.hud-visual-settings[open] summary{border-color:#e4cb89;color:#ffe9bd}
+.hud-art-buttons{position:absolute;right:0;top:calc(100% + 6px);width:min(270px,calc(100vw - 20px));z-index:58;background:#0d2131;border:1px solid #ad976e;border-radius:12px;box-shadow:0 12px 38px #000b;padding:8px;display:flex;flex-direction:column;gap:5px}
+.hud-art-buttons button{white-space:normal!important;text-align:left;min-height:39px;width:100%}
+/* Backpack uses the same pop-up principle as the shop: no duplicate inventory state. */
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open{display:block!important;position:fixed;z-index:80;top:3dvh;right:max(9px,env(safe-area-inset-right));bottom:3dvh;width:min(480px,calc(100vw - 18px));max-height:94dvh;overflow-y:auto;background:#0c2030;border:2px solid #b59a69;border-radius:14px;box-shadow:0 18px 65px #000b;padding:58px 12px 14px;color:#f6dfab}
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open .hero-bag-content{grid-template-columns:1fr;gap:8px}
+body.hud-board-focus .hero-hud .hero-bag.hud-bag-open summary{font-size:16px}
+@media(min-width:701px) and (max-width:1100px){body.hud-board-focus .board-and-actions .canvas-wrap{height:clamp(340px,49dvh,620px)}}
+
+/* Put low-frequency HUD panels behind one small pop-out menu. */
+body:not(.hud-board-focus) .hud-hud-menu{display:none}
+.hud-hud-menu{position:relative;flex:none}
+.hud-hud-menu summary{list-style:none;display:block;cursor:pointer;user-select:none}
+.hud-hud-menu summary::-webkit-details-marker{display:none}
+.hud-hud-menu[open] summary{border-color:#e4cb89;color:#ffe9bd}
+.hud-menu-buttons{position:absolute;top:calc(100% + 6px);right:0;z-index:58;width:min(260px,calc(100vw - 20px));background:#0c2131;border:1px solid #b59a69;border-radius:12px;padding:9px;box-shadow:0 12px 38px #000b;display:flex;flex-direction:column;gap:6px}
+.hud-menu-buttons button{width:100%;min-height:43px;white-space:normal!important;text-align:left}

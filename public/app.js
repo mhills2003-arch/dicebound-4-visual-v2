@@ -5,7 +5,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1-2 TRAINING CLEARING PREMIUM COMBAT · BOARD FOCUS HUD';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 const canvas = $('gameCanvas');
@@ -66,6 +66,53 @@ woodlandCharactersToggle.addEventListener('click',()=>{
   render();
 });
 const woodlandLightActive=()=>premiumActive()&&woodlandLightingEnabled;
+
+// Board-first HUD sandbox: UI state only. No WebSocket commands or game-state
+// mutations are issued by these controls. Classic layout is always available.
+let boardFocus=localStorage.getItem('db4_v2_board_focus')!=='off';
+let hudOpenPanel=null;
+const hudLeft=$('sideLeftPanel'),hudRight=$('sideRightPanel'),hudBag=$('heroBag');
+const hudShade=$('hudShade'),hudClose=$('hudDrawerClose');
+function closeHudPanel(){
+  hudOpenPanel=null;
+  for(const pane of [hudLeft,hudRight]){
+    pane.classList.remove('hud-panel-open','hud-log-only','hud-shop-only','hud-details-only','hud-rewards-only');
+    pane.removeAttribute('role');pane.removeAttribute('aria-modal');pane.removeAttribute('aria-label');
+  }
+  hudBag.classList.remove('hud-bag-open');hudBag.open=false;hudBag.removeAttribute('role');hudBag.removeAttribute('aria-modal');hudBag.removeAttribute('aria-label');
+  hudShade.hidden=true;hudClose.hidden=true;
+}
+function setBoardFocus(enabled){
+  boardFocus=!!enabled;
+  document.body.classList.toggle('hud-board-focus',boardFocus);
+  localStorage.setItem('db4_v2_board_focus',boardFocus?'on':'off');
+  $('hudLayoutBtn').textContent=boardFocus?'▣ Board Focus: ON':'▦ Board Focus: OFF';
+  $('hudLayoutBtn').setAttribute('aria-pressed',String(boardFocus));
+  closeHudPanel();
+  requestAnimationFrame(render);
+}
+function openHudPanel(panel){
+  if(!boardFocus)return;
+  if(hudOpenPanel===panel){closeHudPanel();return}
+  if(panel==='shop'&&me?.room!=='camp'){toast('Visit camp to open the merchant.');return}
+  if(panel==='rewards'&&$('questRewardPanel').hidden){toast('No reward chest is awaiting your choice.');return}
+  document.querySelector('.hud-hud-menu')?.removeAttribute('open');
+  closeHudPanel();hudOpenPanel=panel;
+  const pane=panel==='party'?hudLeft:panel==='inventory'?hudBag:hudRight;
+  if(panel==='inventory'){hudBag.open=true;hudBag.classList.add('hud-bag-open')}else pane.classList.add('hud-panel-open');
+  if(panel!=='party')pane.classList.add(({log:'hud-log-only',shop:'hud-shop-only',rewards:'hud-rewards-only',encounter:'hud-details-only'})[panel]);
+  const title=({party:'Party and map',inventory:'Equipment and backpack',log:'Adventure log',shop:'Camp merchant',rewards:'Victory rewards',encounter:'Encounter, supplies and treasure'})[panel];
+  pane.setAttribute('role','dialog');pane.setAttribute('aria-modal','true');pane.setAttribute('aria-label',title);
+  hudShade.hidden=false;hudClose.hidden=false;hudClose.focus({preventScroll:true});
+}
+$('hudLayoutBtn').addEventListener('click',()=>setBoardFocus(!boardFocus));
+for(const [button,panel] of [['hudInventoryBtn','inventory'],['hudPartyBtn','party'],['hudEncounterBtn','encounter'],['hudLogBtn','log'],['hudShopBtn','shop'],['hudRewardsBtn','rewards']]){
+  $(button).addEventListener('click',()=>openHudPanel(panel));
+}
+hudClose.addEventListener('click',closeHudPanel);
+hudShade.addEventListener('click',closeHudPanel);
+setBoardFocus(boardFocus);
+
 
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
@@ -260,7 +307,9 @@ function syncUI(){if(!state||!me)return;
   $('endTurnQuickBtn').textContent=myTurn?'✓ END TURN':'⌛ WAITING';
   $('returnCampBtn').disabled=!connected||active||me.hp<=0||state.turn?.activePlayer!==me.id;
   $('returnCampBtn').textContent=me.room==='camp'?'🪙 View Merchant ↓':'🏕 Camp / Shop';
-  $('returnCampBtn').title=active?'Finish the encounter first':me.room==='camp'?'Scroll to the merchant below':'Visit the merchant independently, without moving teammates';
+  $('returnCampBtn').title=active?'Finish the encounter first':me.room==='camp'?'Open the camp merchant':'Visit the merchant independently, without moving teammates';
+  $('hudShopBtn').hidden=me.room!=='camp';
+  if(hudOpenPanel==='shop'&&me.room!=='camp')closeHudPanel();
   const lastQuest=me.lastCampQuest,bookmark=me.questBookmarks?.[lastQuest];
   $('resumeQuestBtn').hidden=!(me.room==='camp'&&bookmark);
   $('resumeQuestBtn').disabled=!connected||state.turn?.activePlayer!==me.id||me.hp<=0;
@@ -299,6 +348,7 @@ function syncUI(){if(!state||!me)return;
   updateDoorControls();
   updateHeroHud();
   updateLootPanel();updateShopPanel();updateQuestRewards();updateCombatItemsPanel();updateMazeUI();updateMoveControls();
+  $('hudRewardsBtn').hidden=$('questRewardPanel').hidden;
   if(!$('questOverlay').hidden)renderCampaign();
   requestAnimationFrame(render);
 }
@@ -825,7 +875,7 @@ $('rollMoveBtn').onclick=()=>send({type:'roll-move'});
 $('endTurnBtn').onclick=()=>send({type:'end-turn'});
 $('endTurnQuickBtn').onclick=()=>send({type:'end-turn'});
 $('resumeQuestBtn').onclick=()=>send({type:'resume-quest'});
-$('returnCampBtn').onclick=()=>me?.room==='camp'?$('merchantPanel').scrollIntoView({behavior:'smooth',block:'start'}):send({type:'return-camp'});
+$('returnCampBtn').onclick=()=>me?.room==='camp'?(boardFocus?openHudPanel('shop'):$('merchantPanel').scrollIntoView({behavior:'smooth',block:'start'})):send({type:'return-camp'});
 $('attackBtn').onclick=()=>send({type:'action',action:{type:'attack',target:selectedEnemyId||null}});
 $('specialBtn').onclick=()=>send({type:'action',action:{type:'special',target:selectedEnemyId||null}});
 $('defendBtn').onclick=()=>send({type:'action',action:{type:'defend'}});
@@ -841,7 +891,8 @@ $('potionAllyBtn').onclick=()=>{
 $('toggleView').onclick=()=>{view=view==='tactical'?'illustrated':'tactical';$('toggleView').textContent=view==='tactical'?'▦ Tactical':'◇ Illustrated';render()};
 $('logoutBtn').onclick=()=>{const form=document.createElement('form');form.method='POST';form.action=ROOT+'/api/logout';document.body.append(form);form.submit()};
 window.addEventListener('keydown',ev=>{
-  if(ev.ctrlKey||ev.metaKey||!$('questOverlay').hidden||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+  if(ev.key==='Escape'&&hudOpenPanel){closeHudPanel();ev.preventDefault();return;}
+  if(ev.ctrlKey||ev.metaKey||hudOpenPanel||!$('questOverlay').hidden||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
   const dir={ArrowUp:'N',ArrowDown:'S',ArrowLeft:'W',ArrowRight:'E',w:'N',s:'S',a:'W',d:'E'}[ev.key];
   if(dir){requestMove(dir);ev.preventDefault()}
   else if(ev.key===' '){$('attackBtn').click();ev.preventDefault()}

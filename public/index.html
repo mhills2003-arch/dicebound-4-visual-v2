@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07101e"><title>DICEBOUND 4.0 V2 · Visual Lab</title><link rel="stylesheet" href="./styles.css"></head>
-<body>
+<body class="hud-board-focus">
 <div id="app">
   <header class="masthead">
-    <div class="brand"><span class="brand-icon">🎲</span><div><strong>DICEBOUND <span>4.0 V2</span></strong><small>V2 CAMPAIGN ART PASS · SEPARATE SAVES</small></div></div>
+    <div class="brand"><span class="brand-icon">🎲</span><div><strong>DICEBOUND <span>4.0 V2</span></strong><small>V2 QUEST 1 PREMIUM · BOARD FOCUS LAB · SEPARATE SAVES</small></div></div>
     <div class="connection"><span class="status-dot" id="connectionDot"></span><span id="connectionText">Connecting…</span><button class="textbtn" id="logoutBtn" aria-label="Log out">Exit</button></div>
   </header>
   <nav class="trial-mode v2-ribbon"><strong>V2 VISUAL SANDBOX · SEPARATE GAME DATA</strong> · <span id="modeLabel">QUESTS 10–12 · HARD CAMPAIGN · CHAOS, TIDES & CITY</span> · <a href="?trial=balance-v9">Fresh balance trial</a> · <a href="./">Earlier saved lab characters</a> <small>(Separate save worlds; original game untouched)</small></nav>
   <div class="workspace">
-    <aside class="sidebar side-left">
+    <aside class="sidebar side-left" id="sideLeftPanel">
       <section class="plate"><h2>YOUR ADVENTURERS</h2><div id="people" aria-live="polite">Connecting to the dungeon…</div></section>
       <section class="plate"><h2>SHARED QUEST MAP</h2><p class="muted">Exploration belongs to the team. Find the doorway at the east or west wall.</p><div id="roomMap"></div></section>
       <section class="plate campaign-promo"><h2>ORIGINAL CAMPAIGN</h2><p class="quest-count"><strong>15</strong> quests · <strong>133</strong> rooms</p><p class="muted">Recovered from the actual DICEBOUND 3.2.1 game. The full catalogue is available to inspect; the co-operative port is being built quest by quest.</p><button id="openQuestsSide" class="campaign-open">🗺 View quest chronicle</button></section><section class="plate smallprint"><h2>BUILD STATUS</h2><p>This is an <strong>adult-only development lab</strong>. Quests 1–15 are playable technical beta encounters (133 rooms); Extreme quests 13–15 add 45 distinct storm, darkness and final-trial rooms. Parental safeguards remain in development.</p></section>
     </aside>
     <main class="main-area">
-      <div class="room-heading"><div><span class="eyebrow" id="currentQuestLabel">QUEST 1 · A ROLL IN THE WOODS</span><h1 id="roomName">Woodland Path</h1><p id="roomSub">Awaiting shared dungeon state…</p></div><div class="room-actions"><button class="viewbtn quest-launch" id="openQuests" type="button">🗺 Quests (Q)</button><button class="viewbtn" id="returnCampBtn" type="button">🏕 Camp / Shop</button><button class="viewbtn resume-quest" id="resumeQuestBtn" type="button" hidden>↩ Return to quest</button><button class="viewbtn" id="toggleView" title="Switch between tactical and illustrated room views">▦ Tactical</button><button class="viewbtn v2-art-toggle" id="v2ArtToggle" type="button" aria-pressed="true" hidden title="Compare enhanced room artwork with the original map, without changing gameplay">✦ V2 art: ON</button><a class="viewbtn v2-preview-link" href="./v2-theme-gallery.html" title="Preview every campaign environment without unlocking quests">✦ Theme Gallery</a></div></div>
+      <div class="room-heading"><div><span class="eyebrow" id="currentQuestLabel">QUEST 1 · A ROLL IN THE WOODS</span><h1 id="roomName">Woodland Path</h1><p id="roomSub">Awaiting shared dungeon state…</p></div><div class="room-actions"><button class="viewbtn hud-main-switch" id="hudLayoutBtn" type="button" aria-pressed="true">▣ Board Focus: ON</button><button class="viewbtn hud-focus-tool" id="hudLogBtn" type="button" aria-controls="sideRightPanel">📜 Log</button><details class="hud-hud-menu"><summary class="viewbtn">☰ Panels</summary><div class="hud-menu-buttons"><button class="viewbtn hud-focus-tool" id="hudInventoryBtn" type="button" aria-controls="heroBag">🎒 Inventory</button><button class="viewbtn hud-focus-tool" id="hudPartyBtn" type="button" aria-controls="sideLeftPanel">👥 Party / Map</button><button class="viewbtn hud-focus-tool" id="hudEncounterBtn" type="button" aria-controls="sideRightPanel">⚔ Encounter / Loot</button><button class="viewbtn hud-focus-tool" id="hudShopBtn" type="button" aria-controls="sideRightPanel" hidden>🪙 Shop</button><button class="viewbtn hud-focus-tool" id="hudRewardsBtn" type="button" aria-controls="sideRightPanel" hidden>🎁 Rewards</button></div></details><button class="viewbtn quest-launch" id="openQuests" type="button">🗺 Quests (Q)</button><button class="viewbtn" id="returnCampBtn" type="button">🏕 Camp / Shop</button><button class="viewbtn resume-quest" id="resumeQuestBtn" type="button" hidden>↩ Return to quest</button><button class="viewbtn" id="toggleView" title="Switch between tactical and illustrated room views">▦ Tactical</button><details class="hud-visual-settings"><summary class="viewbtn">✦ Visuals</summary><div class="hud-art-buttons"><button class="viewbtn v2-art-toggle" id="v2ArtToggle" type="button" aria-pressed="true" hidden title="Compare enhanced room artwork with the original map, without changing gameplay">✦ V2 art: ON</button></div></details><a class="viewbtn v2-preview-link" href="./v2-theme-gallery.html" title="Preview every campaign environment without unlocking quests">✦ Theme Gallery</a></div></div>
       <section class="hero-hud" id="heroHud" aria-label="Your character statistics">
         <div class="hero-hud-title"><div><span class="hud-eyebrow">YOUR CHARACTER</span><strong id="heroName">Connecting…</strong><span id="heroClass" class="hud-muted">—</span></div><span class="hero-level" id="heroLevel">Level —</span></div>
         <div class="hud-bars">
@@ -66,7 +66,7 @@
         <button id="endTurnBtn" type="button" hidden tabindex="-1" aria-hidden="true">Legacy End Turn</button>
       </div>
     </main>
-    <aside class="sidebar side-right">
+    <aside class="sidebar side-right" id="sideRightPanel">
       <section class="plate"><h2>ENCOUNTER</h2><div id="battleStatus" class="battle-status">No enemies nearby</div><div id="enemies"></div></section><section class="plate consumable-panel" id="combatItemsPanel"><h2>💣 COMBAT SUPPLIES</h2><p class="muted">One item uses your combat action for the turn. Buy at the camp merchant; quantities are personal.</p><div id="combatItemsList" aria-live="polite"></div></section>
       <section class="plate lab-loot"><h2>PERSONAL ROOM TREASURE · TEST</h2>
         <p class="muted">Each room has four independent searches, each with a 50% chance of finding nothing; quest rarity ceilings apply. The server records each claim. Equipment, off-hand weapons, dice attacks and specials can be tested; balance is being playtested. Training gear is for mechanics checks only.</p>
@@ -93,6 +93,8 @@
       <section class="plate instructions"><h2>QUICK CONTROLS</h2><p><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or WASD: move</p><p><kbd>Space</kbd> Attack · <kbd>F</kbd> Defend · <kbd>R</kbd> Revive · <kbd>N</kbd> Disable adjacent Warrens nest · <kbd>L</kbd> Light an adjacent Abyss lantern</p><p class="muted">Separate browser sessions with individual adult-test invitation codes simulate co-operative tablets.</p></section>
     </aside>
   </div>
+  <div id="hudShade" class="hud-drawer-shade" hidden></div>
+  <button id="hudDrawerClose" class="hud-drawer-close" type="button" aria-label="Close side panel" hidden>✕ Close panel</button>
   <button id="chatLauncher" class="chat-launcher" type="button" aria-expanded="false" aria-controls="chatDrawer">💬 Chat <span id="chatUnread" class="chat-unread" hidden>New</span></button>
   <section id="chatDrawer" class="chat-drawer" aria-label="Supervised adventurer chat" hidden>
     <header class="chat-header"><div><strong>💬 Adventurer Chat</strong><small>Private test players · parent supervised</small></div><button id="chatClose" type="button" aria-label="Close chat">✕</button></header>

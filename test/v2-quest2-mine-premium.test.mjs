@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,statSync} from 'node:fs';
 import {ROOM_DATA,ROOM_WALLS} from '../src/engine.mjs';
-import {MINE_ROOMS,MINE_FILES,initPremiumMine,premiumMineReady,isPremiumMineRoom,mineWallArt,
+import {MINE_ROOMS,MINE_FILES,MINE_FRAMES,mineFrameImage,initPremiumMine,premiumMineReady,isPremiumMineRoom,mineWallArt,
  paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineActor,
  paintPremiumMineAtmosphere,paintPremiumMineForeground} from '../public/v2-premium-mine.mjs';
 class ImageStub{constructor(){this.complete=true;this.naturalWidth=420;this.naturalHeight=420;this.src='stub'}}
@@ -70,7 +70,20 @@ test('Quest 2 is frontend-only, with unique cache-busting and no networking or i
  const mod=readFileSync(new URL('../public/v2-premium-mine.mjs',import.meta.url),'utf8');
  assert.match(app,/premiumMineActive=\(\)=>artActive\(\)&&isPremiumMineRoom\(me\?\.room\)&&view==='tactical'&&premiumMineReady\(me\?\.room\)/);
  assert.match(app,/paintPremiumMineActor\(ctx,s,a.p,a.kind,baseSprite,visualOptions\)/);
- assert.match(html,/app\.js\?build=v2-quest1-watchpost-20261102-r1&mine=v2-quest2-mine-20261102-r1/);
- assert.match(app,/v2-premium-mine\.mjs\?build=v2-quest2-mine-20261102-r1/);
+ assert.match(html,/app\.js\?build=v2-quest1-watchpost-20261102-r1&mine=v2-quest2-mine-cinematic-20261102-r2/);
+ assert.match(app,/v2-premium-mine\.mjs\?build=v2-quest2-mine-cinematic-20261102-r2/);
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);
+});
+
+
+test('each premium mine room has two distinct environment frames, not a recoloured common placeholder',()=>{
+ assert.equal(Object.keys(MINE_FRAMES).length,10);
+ for(const id of MINE_ROOMS){
+  for(const side of ['left','right']){
+   const key=id+'-'+side;
+   assert.match(MINE_FRAMES[key],/\.jpg$/);
+   assert(statSync(new URL('../public/'+MINE_FRAMES[key].slice(2),import.meta.url)).size>20000,key);
+   assert.equal(mineFrameImage(side,id).src,MINE_FRAMES[key]);
+  }
+ }
 });

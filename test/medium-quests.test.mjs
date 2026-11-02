@@ -13,7 +13,7 @@ function fight(room,foes,hero={x:1,y:3}){
 }
 const next=(s,room)=>resolveRound(s,room,T,()=>0.5);
 test('Medium Quests 5, 6, 7 add exactly 24 original rooms with correct sequence and final bosses',()=>{
- assert.equal(ROOM_IDS.filter(id=>ROOM_DATA[id].quest>0).length,42);
+ assert.equal(ROOM_IDS.filter(id=>ROOM_DATA[id].quest>0).length,133);
  for(const q of [5,6,7]){const rooms=Object.values(ROOM_DATA).filter(r=>r.quest===q);
   assert.equal(rooms.length,8);assert.deepEqual(rooms.map(r=>r.name),catalog.quests[q-1].rooms.map(r=>r.name));
   assert.equal(PLAYABLE_QUESTS[q].difficulty,'Medium');assert(rooms.at(-1).final);assert(rooms.at(-1).foes.some(f=>f.variant==='boss'));
@@ -36,14 +36,15 @@ test('existing Level 2–3 characters retain their inventories while Quest 5–7
  const s=world();const p=s.players.one;p.xp=58;p.level=3;p.gold=532;
  p.inventory.equipment.push({id:'sword-x',kind:'equipment',name:'Rare sword',rarity:'Rare',category:'Sword',level:3});
  for(const id of ROOM_IDS.filter(x=>ROOM_DATA[x].quest>=5))delete s.rooms[id];ensureWorld(s);
- assert.equal(Object.keys(s.rooms).length,43);assert.equal(p.level,3);assert.equal(p.xp,58);assert.equal(p.gold,532);
+ assert.equal(Object.keys(s.rooms).length,134);assert.equal(p.level,3);assert.equal(p.xp,58);assert.equal(p.gold,532);
  assert.equal(p.inventory.equipment[0].id,'sword-x');
 });
-test('Medium ordinary equipment remains Rare capped, with rare loot actually rare',()=>{
- for(const q of [5,6,7]){assert.equal(QUEST_MAX_RARITY[q],'Rare');
+test('Medium equipment has 5% Legendary and 8% Rare on successful finds',()=>{
+ for(const q of [5,6,7]){assert.equal(QUEST_MAX_RARITY[q],'Legendary');
   const rolls=Array.from({length:10000},(_,i)=>equipmentRarity(q,()=>(i+.5)/10000));
-  assert.equal(rolls.filter(r=>r==='Rare').length,400);
-  assert(!rolls.some(r=>['Legendary','Mythic','Exotic'].includes(r)));
+  assert.equal(rolls.filter(r=>r==='Rare').length,800);
+  assert.equal(rolls.filter(r=>r==='Legendary').length,500);
+  assert(!rolls.some(r=>['Mythic','Exotic'].includes(r)));
  }
 });
 test('one potion means one use; legacy potion stacks preserve every earned use',()=>{
@@ -111,16 +112,14 @@ test('chat emoji buttons and one-use potions are visible and no Trapper labels a
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert(html.includes('chatEmojiBar'));assert(app.includes('🎲'));assert(app.includes('chat-emoji'));
- assert(html.includes('Quests 1–7'));assert(!html.includes('Trapper'));
+ assert(html.includes('Quests 1–15'));assert(!html.includes('Trapper'));
 });
-test('Ghosts can cross a stone wall while ordinary enemies must use a corridor',()=>{
- // The wall at (4,4) is a genuine internal crypt divider.
- assert(ROOM_WALLS.q6r1.some(([x,y])=>x===4&&y===4));
- const g=fight('q6r1',[en('ghost',{x:5,y:4})],{x:2,y:4});
- next(g.s,'q6r1');assert.deepEqual([g.b.enemies[0].x,g.b.enemies[0].y],[4,4]);
- const n=fight('q6r1',[en('normal',{x:5,y:4})],{x:2,y:4});
- next(n.s,'q6r1');assert.notDeepEqual([n.b.enemies[0].x,n.b.enemies[0].y],[4,4]);
- // Reconnect/migration must not strand a ghost outside the wall in mid-phase.
+test('Ghosts cross the solid crypt wing while ordinary enemies must walk around',()=>{
+ assert(ROOM_WALLS.q6r3.some(([x,y])=>x===4&&y===4));
+ const g=fight('q6r3',[en('ghost',{x:5,y:4})],{x:2,y:4});
+ next(g.s,'q6r3');assert.deepEqual([g.b.enemies[0].x,g.b.enemies[0].y],[4,4]);
+ const n=fight('q6r3',[en('normal',{x:5,y:4})],{x:2,y:4});
+ next(n.s,'q6r3');assert.notDeepEqual([n.b.enemies[0].x,n.b.enemies[0].y],[4,4]);
  ensureWorld(g.s);assert.deepEqual([g.b.enemies[0].x,g.b.enemies[0].y],[4,4]);
 });
 test('Teleporters blink at most four squares during their third enemy phase',()=>{

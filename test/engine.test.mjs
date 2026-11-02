@@ -135,7 +135,7 @@ test('two players never start or remain on the same square after reconnect',()=>
   const s=game();s.players.two.x=1;s.players.two.y=3;
   ensurePlayer(s,'two','Friend');
   assert.notDeepEqual([s.players.one.x,s.players.one.y],[s.players.two.x,s.players.two.y]);
-  assert.equal(s.version,6);
+  assert.equal(s.version,8);
 });
 test('encounter spawn does not place a newly summoned enemy onto a player',()=>{
   const s=game();
@@ -217,7 +217,7 @@ test('claims for separate rooms are independent but returning cannot reroll',()=
 test('returning an existing saved player adds inventory fields without resetting cleared encounters',()=>{
  const s=game();delete s.players.one.lootClaimed;delete s.players.one.inventory;delete s.players.one.gold;
  s.rooms.watchpost.battle.status='cleared';ensurePlayer(s,'one','Joe');
- assert.deepEqual(s.players.one.inventory,{potions:[],equipment:[],enchantments:[]});
+ assert.deepEqual(s.players.one.inventory,{potions:[],equipment:[],enchantments:[],consumables:[]});
  assert.equal(s.rooms.watchpost.battle.status,'cleared');
 });
 test('Coin of Ages is only in its exact 1/500 coin sample band and Multishot V only in 1/1500 band',()=>{
@@ -498,13 +498,13 @@ test('Mythic mace special rolls D20 against up to five dice',()=>{
 test('training rack grants controlled test gear once and preserves room drop odds',()=>{
  const s=game(),p=s.players.one;
  const countBefore=p.inventory.equipment.length;
- claimTrainingRack(s,'one',t0);assert.equal(p.inventory.equipment.length,countBefore+6);
+ claimTrainingRack(s,'one',t0);assert.equal(p.inventory.equipment.length,countBefore+7);
  assert.equal(p.inventory.enchantments[0].school,'Multishot');
  assert.equal(p.trainingRackClaimed,true);
  assert.deepEqual(p.lootClaimed,{});
  assert.throws(()=>claimTrainingRack(s,'one',t0),/already collected/);
  assert.equal(s.players.two.inventory.equipment.length,0);
- claimTrainingRack(s,'two',t0);assert.equal(s.players.two.inventory.equipment.length,6);
+ claimTrainingRack(s,'two',t0);assert.equal(s.players.two.inventory.equipment.length,7);
  const reset=resetTestAdventure(s,t0);assert.equal(reset.players.one.trainingRackClaimed,false);
 });
 test('training rack rejected during combat or away from Woodland',()=>{
@@ -523,7 +523,7 @@ test('old equipped saved items preserve their ID and acquire optional offhand sl
 test('broadcast shows allies without exposing their private inventory or treasure claims',()=>{
  const s=game();claimTrainingRack(s,'two');
  const mine=publicState(s,'two'),theirs=publicState(s,'one');
- assert.equal(mine.players.two.inventory.equipment.length,6);
+ assert.equal(mine.players.two.inventory.equipment.length,7);
  assert.equal(theirs.players.two.inventory,undefined);
  assert.equal(theirs.players.two.lootClaimed,undefined);
  assert.equal(theirs.players.two.equipped,undefined);

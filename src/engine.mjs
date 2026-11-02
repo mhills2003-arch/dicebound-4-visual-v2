@@ -1,10 +1,5 @@
 import {PLAYABLE_QUESTS} from './campaign.mjs';
-import {HARD_ENCOUNTERS} from './hard-encounters.mjs';
-import {HARD_BLUEPRINTS} from './hard-rooms.mjs';
-import {EXTREME_ENCOUNTERS} from './extreme-encounters.mjs';
-import {EXTREME_BLUEPRINTS,ABYSS_LANTERNS} from './extreme-rooms.mjs';
-import {ROOM_BLUEPRINTS,ROOM_CHALLENGES,MEDIUM_BRIDGE_BLUEPRINTS,MEDIUM_BRIDGE_CHALLENGES} from './level-designs.mjs';
-/** DICEBOUND 4.0 co-op campaign beta: Quests 1–15 of 15.
+/** DICEBOUND 4.0 co-op campaign beta: Quests 1–4 of 15.
  * Deterministic rules module. Original Quest 1 names, DICE HP = faces, classes,
  * free room exploration, shared room-specific tactical turns and 60s clock.
  * This is an independent multiplayer prototype, not the whole 3.2 engine port.
@@ -387,9 +382,6 @@ export const ROOM_DATA = {
   "q7r8": {"name":"The Abbot’s Chamber","subtitle":"Boss Ninja D20, Cloner and Group Healer support","left":"q7r7","right":null,"encounter":[20,10,10,8],"foes":[{"faces":20,"variant":"boss","role":"ninja"},{"faces":10,"variant":"normal","role":"cloner"},{"faces":10,"variant":"normal","role":"healer"},{"faces":8,"variant":"normal","role":"ninja"}],"quest":7,"final":true,"stageTwo":false}
 };
 
-// Quests 8 and 9 only: original Medium rooms, distinct encounters and eight-room quest chains.
-Object.assign(ROOM_DATA, {"q8r1": {"name": "Broken Assembly", "subtitle": "Enter the abandoned dice factory", "left": null, "right": "q8r2", "encounter": [12, 12, 10, 10, 10, 10, 10], "foes": [{"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 10, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "swift"}, {"faces": 10, "variant": "normal", "role": "armoured"}, {"faces": 10, "variant": "normal", "role": "ranged"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r2": {"name": "Conveyor Passage", "subtitle": "Ranged defenders cover narrow approaches", "left": "q8r1", "right": "q8r3", "encounter": [12, 12, 12, 12, 10, 10, 10], "foes": [{"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "swift"}, {"faces": 10, "variant": "normal", "role": "ranged"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r3": {"name": "Forging Floor", "subtitle": "Armoured protectors hold the central route", "left": "q8r2", "right": "q8r4", "encounter": [14, 12, 12, 12, 10, 12, 12], "foes": [{"faces": 14, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r4": {"name": "Repair Chamber", "subtitle": "Healers keep damaged sentries fighting", "left": "q8r3", "right": "q8r5", "encounter": [12, 10, 14, 12, 12, 12, 10], "foes": [{"faces": 12, "variant": "normal", "role": "healer"}, {"faces": 10, "variant": "normal", "role": "healer"}, {"faces": 14, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "ninja"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r5": {"name": "The Production Line", "subtitle": "The first shielded firing line", "left": "q8r4", "right": "q8r6", "encounter": [14, 14, 12, 12, 12, 12, 12, 10], "foes": [{"faces": 14, "variant": "normal", "role": "ranged"}, {"faces": 14, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "armoured"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r6": {"name": "Counting Hall", "subtitle": "Two separated coordinated formations", "left": "q8r5", "right": "q8r7", "encounter": [14, 14, 12, 12, 12, 12, 10], "foes": [{"faces": 14, "variant": "normal", "role": "armoured"}, {"faces": 14, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "healer"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r7": {"name": "Vault of Dies", "subtitle": "Crossfire and hidden treasure", "left": "q8r6", "right": "q8r8", "encounter": [14, 12, 14, 12, 12, 12, 12, 10], "foes": [{"faces": 14, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 14, "variant": "normal", "role": "armoured"}, {"faces": 12, "variant": "normal", "role": "ninja"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "healer"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 8, "final": false, "stageTwo": false}, "q8r8": {"name": "The Shattered Core", "subtitle": "Boss Armoured D20 and its final firing line", "left": "q8r7", "right": null, "encounter": [20, 14, 14, 12, 12, 12, 12, 12], "foes": [{"faces": 20, "variant": "boss", "role": "armoured"}, {"faces": 14, "variant": "normal", "role": "armoured"}, {"faces": 14, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "healer"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "normal"}], "quest": 8, "final": true, "stageTwo": false}, "q9r1": {"name": "The Outer Burrow", "subtitle": "Swift scouts and a strange spawning nest", "left": null, "right": "q9r2", "encounter": [12, 12, 12, 10, 10, 10, 12], "foes": [{"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "ranged"}, {"faces": 10, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}], "quest": 9, "final": false, "stageTwo": false}, "q9r2": {"name": "Splintering Passages", "subtitle": "Faster swarms and a second nesting chamber", "left": "q9r1", "right": "q9r3", "encounter": [14, 12, 12, 12, 10, 12, 10], "foes": [{"faces": 14, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 9, "final": false, "stageTwo": false}, "q9r3": {"name": "The Crystal Maze", "subtitle": "Two original Cloners at most", "left": "q9r2", "right": "q9r4", "encounter": [12, 12, 12, 12, 12, 12, 10], "foes": [{"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "ninja"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 9, "final": false, "stageTwo": false}, "q9r4": {"name": "The Breeding Hollows", "subtitle": "Up to three original Cloners and active nests", "left": "q9r3", "right": "q9r5", "encounter": [14, 12, 12, 12, 14, 10, 12], "foes": [{"faces": 14, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 14, "variant": "normal", "role": "swift"}, {"faces": 10, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "ranged"}], "quest": 9, "final": false, "stageTwo": false}, "q9r5": {"name": "Tunnel of Mirrors", "subtitle": "Teleporters and multiplying defenders", "left": "q9r4", "right": "q9r6", "encounter": [14, 14, 12, 12, 12, 14, 12], "foes": [{"faces": 14, "variant": "normal", "role": "teleporter"}, {"faces": 14, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "ninja"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 14, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "normal"}], "quest": 9, "final": false, "stageTwo": false}, "q9r6": {"name": "The Shifting Hive", "subtitle": "Swift and Teleporter swarms", "left": "q9r5", "right": "q9r7", "encounter": [14, 14, 12, 12, 12, 12, 12, 10], "foes": [{"faces": 14, "variant": "normal", "role": "swift"}, {"faces": 14, "variant": "normal", "role": "teleporter"}, {"faces": 12, "variant": "normal", "role": "swift"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 10, "variant": "normal", "role": "normal"}], "quest": 9, "final": false, "stageTwo": false}, "q9r7": {"name": "The Thousandfold Gate", "subtitle": "Up to four Cloners; dangerous nest burst", "left": "q9r6", "right": "q9r8", "encounter": [14, 12, 12, 12, 14, 14, 12, 12], "foes": [{"faces": 14, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 12, "variant": "normal", "role": "cloner"}, {"faces": 14, "variant": "normal", "role": "swift"}, {"faces": 14, "variant": "normal", "role": "ninja"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "normal"}], "quest": 9, "final": false, "stageTwo": false}, "q9r8": {"name": "The Swarm Throne", "subtitle": "Boss Cloner D20, escorts and the last nest", "left": "q9r7", "right": null, "encounter": [20, 14, 14, 14, 12, 12, 12, 12], "foes": [{"faces": 20, "variant": "boss", "role": "cloner"}, {"faces": 14, "variant": "normal", "role": "cloner"}, {"faces": 14, "variant": "normal", "role": "swift"}, {"faces": 14, "variant": "normal", "role": "teleporter"}, {"faces": 12, "variant": "normal", "role": "ninja"}, {"faces": 12, "variant": "normal", "role": "normal"}, {"faces": 12, "variant": "normal", "role": "ranged"}, {"faces": 12, "variant": "normal", "role": "normal"}], "quest": 9, "final": true, "stageTwo": false}} );
-
 // 1 Nov Medium escalation: preserve all original rooms, role introductions and bosses,
 // but upgrade the arena encounters to purposeful, mixed groups. The new roster is
 // server-authoritative, not a client-side cosmetic multiplier.
@@ -398,18 +390,15 @@ const MEDIUM_REINFORCEMENTS = {
   6: ["zombie:8 normal:10 zombie:8 normal:8", "zombie:10 normal:10 zombie:8", "ghost:10 zombie:10 ghost:8", "teleporter:10 ghost:8 normal:10", "zombie:10 ghost:10 teleporter:10 normal:10", "teleporter:10 ghost:10 zombie:10 normal:10", "ghost:12 zombie:10 teleporter:10", "ghost:12 teleporter:12 zombie:12 normal:10"],
   7: ["ninja:12 normal:10 ninja:10 normal:12 normal:10", "ninja:12 normal:12 ninja:10 normal:10", "cloner:12 ninja:12 normal:10 normal:12", "healer:12 ninja:12 armoured:12 normal:10", "ninja:12 healer:12 ninja:10 normal:12", "cloner:12 ninja:12 normal:12 healer:10", "ninja:12 cloner:10 healer:12 armoured:12", "ninja:14 armoured:12 healer:12 normal:12"]
 };
-Object.assign(ROOM_DATA,HARD_ENCOUNTERS,EXTREME_ENCOUNTERS);
 for(const [quest,rosters] of Object.entries(MEDIUM_REINFORCEMENTS))for(const [index,roster] of rosters.entries()){
   const room=ROOM_DATA[`q${quest}r${index+1}`];
   const extra=roster.split(' ').map(entry=>{const [role,faces]=entry.split(':');return {faces:Number(faces),variant:'normal',role};});
   room.foes.push(...extra);room.encounter=room.foes.map(enemy=>enemy.faces);
 }
-// Every post-tutorial room has its own terrain, encounter formation and tactical hook.
-for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHALLENGES}))Object.assign(ROOM_DATA[room],plan);
 ROOM_DATA.camp={name:'Adventurers’ Camp',subtitle:'Quest board, supplies and the travelling merchant',left:null,right:null,encounter:[],foes:[],quest:0,final:false,stageTwo:false};
 export const ROOM_IDS=Object.keys(ROOM_DATA);
 export const WIDTH=9,HEIGHT=7,ROUND_MS=60_000; // Base rooms stay 9 × 7.
-export const roomSize=roomId=>(ROOM_DATA[roomId]?.quest>=10?{width:15,height:11}:ROOM_DATA[roomId]?.quest>=5?{width:13,height:9}:{width:WIDTH,height:HEIGHT});
+export const roomSize=roomId=>(ROOM_DATA[roomId]?.quest>=5?{width:13,height:9}:{width:WIDTH,height:HEIGHT});
 export const doorRow=roomId=>Math.floor(roomSize(roomId).height/2);
 // Purpose-built terrain blocks movement, enemy footprints and ranged line of sight.
 // Base nine-by-seven sketches use # for walls and . for floor. Medium quests have thirteen-by-nine arenas.
@@ -459,18 +448,84 @@ const WALL_LAYOUTS={
   q5r2: ['##.##.###', '#..#..#..', '.........', '.........', '.........', '....#.#..', '#.###.##.'],
   q5r1: ['##.##.###', '.........', '.........', '.........', '.........', '.#...#.#.', '##.###.##'],
 };
-// Hand-authored room-by-room designs replace the repetitive four-template maze
-// generator. Their terrain must be stable on reload and identical across clients.
-for(const [id,rows] of Object.entries({...ROOM_BLUEPRINTS,...MEDIUM_BRIDGE_BLUEPRINTS,...HARD_BLUEPRINTS,...EXTREME_BLUEPRINTS}))WALL_LAYOUTS[id]=rows;
+// 1 Nov maze upgrade. A corridor or a wall must matter to combat: every Medium
+// chamber has two substantial interior partitions, alcoves and offset gaps.
+// Unlike scattered cosmetic cover, these walls create branching movement and
+// restrict ranged line of sight. Ghosts can cross the partitions directly.
+// 13×9, deterministic per room. The top/bottom 2–3-tile gaps deliberately
+// admit the large 2×2 footprint as well as the individual adventurers.
+const MAZE_SCHEMES={
+  5: [ // Desert highways: broken barricades, s-bends, scattered stone cover
+    [[3,0,3,5],[8,3,8,8]],
+    [[4,3,4,8],[8,0,8,5]],
+    [[3,0,3,5],[7,3,7,8]],
+    [[4,3,4,8],[9,0,9,5]],
+  ],
+  6: [ // Crypts: thick tomb partitions and blind corners; ghosts phase across
+    [[3,0,4,5],[8,3,9,8]],
+    [[3,3,4,8],[8,0,9,5]],
+    [[4,0,5,5],[8,3,9,8]],
+    [[3,3,4,8],[7,0,8,5]],
+  ],
+  7: [ // Fortress/caverns: long zigzags with defensive recesses
+    [[3,0,4,5],[8,3,8,8]],
+    [[4,3,5,8],[9,0,9,5]],
+    [[3,0,4,5],[8,3,9,8]],
+    [[4,3,5,8],[8,0,9,5]],
+  ]
+};
+// Secondary short walls form alcoves and useful cover without ever choking a
+// two-tile-wide traversal route. Reject any cover segment that disconnects the
+// floor or strands a 2×2 monster behind a one-square tunnel.
+const MAZE_COVER={
+  5:[[[1,1,2,1],[5,7,6,7],[10,1,11,1]],[[1,6,2,6],[5,1,6,1],[10,7,11,7]],[[1,7,2,7],[5,1,6,1],[9,6,10,6]],[[1,1,2,1],[6,7,7,7],[10,2,11,2]]],
+  6:[[[1,1,1,3],[6,7,7,7],[11,1,11,2]],[[1,6,1,7],[6,1,7,1],[11,6,11,7]],[[1,2,2,2],[6,7,7,7],[11,1,11,2]],[[1,1,2,1],[5,7,6,7],[10,6,11,6]]],
+  7:[[[1,2,2,2],[5,7,7,7],[10,1,11,1]],[[1,6,3,6],[6,1,8,1],[11,6,11,7]],[[1,7,2,7],[5,1,7,1],[11,2,11,3]],[[1,1,3,1],[6,7,7,7],[11,1,11,2]]]
+};
+function connectedMaze(rows,footprint){
+  const w=13,h=9,pass=(x,y)=>x>=0&&y>=0&&x+footprint<=w&&y+footprint<=h&&Array.from({length:footprint*footprint},(_,i)=>rows[y+Math.floor(i/footprint)][x+i%footprint]==='.').every(Boolean);
+  const start=footprint===1?[0,4]:[10,3],end=footprint===1?[12,4]:[1,3];
+  if(!pass(...start)||!pass(...end))return false;
+  const queue=[start],seen=new Set([start.join(',')]);
+  for(let i=0;i<queue.length;i++)for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+    const [x,y]=queue[i],nx=x+dx,ny=y+dy,key=`${nx},${ny}`;
+    if(pass(nx,ny)&&!seen.has(key)){seen.add(key);queue.push([nx,ny]);}
+  }
+  if(!seen.has(end.join(',')))return false;
+  if(footprint===1){
+    const floor=rows.flat().filter(c=>c==='.').length;
+    return seen.size===floor&&floor>=85;
+  }
+  return true;
+}
+function mediumArena(quest,room){
+  const rows=Array.from({length:9},()=>Array(13).fill('.'));
+  const scheme=MAZE_SCHEMES[quest][(room-1)%4];
+  // Reflect every second sequence of four rooms to keep familiar design
+  // language while changing routes, attack angles and doorway approaches.
+  const flipX=room>=5,flipY=room%2===0;
+  for(const [x0,y0,x1,y1] of scheme)for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    const tx=flipX?12-x:x,ty=flipY?8-y:y;
+    rows[ty][tx]='#';
+  }
+  // Optional short recesses: they must never make a room impossible to clear.
+  for(const [x0,y0,x1,y1] of MAZE_COVER[quest][(room-1)%4]){
+    const proposed=rows.map(row=>[...row]);
+    for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+      const tx=flipX?12-x:x,ty=flipY?8-y:y;proposed[ty][tx]='#';
+    }
+    if(connectedMaze(proposed,1)&&connectedMaze(proposed,2))
+      for(let y=0;y<9;y++)rows[y]=proposed[y];
+  }
+  rows[4][0]='.';rows[4][12]='.';
+  return rows.map(row=>row.join(''));
+}
+for(let quest=5;quest<=7;quest++)for(let room=1;room<=8;room++)
+  WALL_LAYOUTS[`q${quest}r${room}`]=mediumArena(quest,room);
 export const ROOM_WALLS=Object.fromEntries(Object.entries(WALL_LAYOUTS).map(([room,rows])=>[
   room, rows.flatMap((row,y)=>[...row].flatMap((tile,x)=>tile==='#'?[[x,y]]:[]))
 ]));
 ROOM_WALLS.camp=[];
-export const HARD_HAZARDS=Object.fromEntries(Object.entries({...HARD_BLUEPRINTS,...EXTREME_BLUEPRINTS}).filter(([roomId])=>ROOM_DATA[roomId].hazard==='chaos'||ROOM_DATA[roomId].hazard==='tide'||ROOM_DATA[roomId].hazard==='flood'||ROOM_DATA[roomId].hazard==='storm').map(([roomId,rows])=>{
- const seed=Number(roomId.match(/r(\d+)/)[1]), tiles=[];
- for(let y=1;y<rows.length-1;y++)for(let x=3;x<rows[0].length-3;x++)if(rows[y][x]==='.' && (((x*11+y*7+seed*13+ROOM_DATA[roomId].quest)%11===0)||(((x+seed*2)%6===0)&&(y===(seed%5+2)))))tiles.push([x,y]);
- return [roomId,tiles];
-}));
 export function isWall(roomId,x,y){return !!ROOM_WALLS[roomId]?.some(([wx,wy])=>wx===x&&wy===y)}
 export function clearLine(roomId,ax,ay,bx,by){
   if(isWall(roomId,ax,ay)||isWall(roomId,bx,by))return false;
@@ -483,28 +538,7 @@ export function clearLine(roomId,ax,ay,bx,by){
   }return true;
 }
 
-// Four permanently selectable hero classes. Existing legacy characters retain
-// their level, inventory, coins and achievements when choosing for the first time.
-export const CLASS_DATA={
- knight:{label:'Knight',hp:50,atk:12,arm:8,range:1,description:'Steady frontline defender',starter:'Sword'},
- outlaw:{label:'Outlaw',hp:44,atk:14,arm:6,range:1,description:'Fast and aggressive scout',starter:'Bow'},
- warlock:{label:'Warlock',hp:40,atk:16,arm:4,range:2,description:'Arcane attacker who specialises in staffs',starter:'Staff'},
- tinker:{label:'Tinker',hp:48,atk:10,arm:10,range:1,description:'Resilient field inventor and equipment specialist',starter:'Mace'}
-};
-// Class perks: independent 25% increases to successful eligible search chances.
-// All rolls are performed on the server; no rarities or rare-item odds are altered.
-export const CLASS_PERKS=Object.freeze({
- knight:{search:'Equipment searches: +25% chance to find',cost:'Maces and Plate Mail: 25% cheaper',combat:'Mace attacks +D2 / Plate Mail blocks +D2'},
- outlaw:{search:'Gold discoveries: +25% coins',cost:'Swords and Shields: 25% cheaper',combat:'Sword attacks +D2 / Shield blocks +D2'},
- warlock:{search:'Potion searches: +25% chance to find',cost:'Staffs and Guardian Tonic: 25% cheaper',combat:'Staff attacks +D4'},
- tinker:{search:'Enchantment searches: +25% chance to find',cost:'Superstrength, Meteors, Bombs and Guardian Tonic: 25% cheaper',combat:'Bombs and Meteors +D4'}
-});
-export function classFindChance(klass,slot,base=.5){return Math.min(1,base*((klass==='knight'&&slot==='equipment')||(klass==='warlock'&&slot==='potion')||(klass==='tinker'&&slot==='enchantment')?1.25:1));}
-export function classGoldBonus(klass,gold){return klass==='outlaw'?Math.floor(gold*1.25):gold;}
-export function classBonusAttackDie(p){if(!p?.classChosen)return 0;const main=(p.inventory?.equipment||[]).find(x=>x.id===p.equipped?.weapon);return (p.klass==='knight'&&main?.category==='Mace'||p.klass==='outlaw'&&main?.category==='Sword')?2:p.klass==='warlock'&&main?.category==='Staff'?4:0;}
-export function classBonusDefenceDie(p){if(!p?.classChosen)return 0;const eq=p.inventory?.equipment||[];const armour=eq.find(x=>x.id===p.equipped?.armour),off=eq.find(x=>x.id===p.equipped?.offhand);return p.klass==='knight'&&armour?.category==='Armour'||p.klass==='outlaw'&&off?.category==='Shield'?2:0;}
-export function classBombDie(p,sku){return p.classChosen&&p.klass==='tinker'&&['blast-bomb','meteor-scroll'].includes(sku)?4:0;}
-export function classPrice(p,item,cityDiscount=false){const c=p?.classChosen?p.klass:null;const eligible=c==='knight'&&['Mace','Armour'].includes(item.category)||c==='outlaw'&&['Sword','Shield'].includes(item.category)||c==='warlock'&&(item.category==='Staff'||item.sku==='guardian-ward')||c==='tinker'&&['super-potion','meteor-scroll','blast-bomb','guardian-ward'].includes(item.sku);return Math.max(1,Math.ceil(item.cost*(eligible?.75:1)*(cityDiscount?.9:1)));}
+export const CLASS_DATA={knight:{label:'Knight',hp:50,atk:12,arm:8,range:1},outlaw:{label:'Outlaw',hp:44,atk:14,arm:6,range:1}};
 export const LEVEL_CAP=30;
 // Prototype progression uses the locked 100 XP to Level 2, then 1.4× per level.
 // Encounter XP amounts are temporary lab values awaiting full quest balancing.
@@ -515,12 +549,9 @@ export function xpRequiredForLevel(level){
 // the shown D values are upper faces, not a guaranteed damage figure.
 // Tier prices and complete shop balancing remain future work.
 export const RARITY_DICE={Common:4,Uncommon:6,Rare:8,Legendary:12,Mythic:20,Exotic:30};
-export const MEDIUM_LEGENDARY_CHANCE=.05; // Per eligible successful equipment find or merchant restock, never guaranteed.
 const SWORD_SPECIALS={Legendary:{dice:[30],cooldown:3},Mythic:{dice:[40],cooldown:2},Exotic:{dice:[100,100],cooldown:5}};
 const MACE_SPECIALS={Legendary:{dice:[12],targets:4,cooldown:3},Mythic:{dice:[20],targets:5,cooldown:2},Exotic:{dice:[30],targets:99,cooldown:5}};
-const BOW_SPECIALS={Legendary:{dice:[12],targets:2,cooldown:3},Mythic:{dice:[20],targets:3,cooldown:2},Exotic:{dice:[30],targets:4,cooldown:2}};
-const STAFF_SPECIALS={Legendary:{dice:[20],targets:2,cooldown:3},Mythic:{dice:[30],targets:3,cooldown:2},Exotic:{dice:[50],targets:4,cooldown:3}};
-const isWeapon=item=>item&&['Sword','Bow','Mace','Staff'].includes(item.category);
+const isWeapon=item=>item&&['Sword','Bow','Mace'].includes(item.category);
 function itemBonusDie(item){return item?Math.max(1,Math.floor(item.bonusDie||RARITY_DICE[item.rarity]||4)):0;}
 function enchantBonus(item,school){return (item?.enchantments||[]).filter(e=>e.school===school).reduce((total,e)=>total+Math.max(0,Number(e.level)||0)*(school==='Sharpness'?3:2),0);}
 function attackDieOf(item){return isWeapon(item)?itemBonusDie(item)+enchantBonus(item,'Sharpness'):0;}
@@ -538,26 +569,23 @@ export function effectiveStats(player){
   const armour=equippedItem(player,'armour');
   const baseAttack=Math.round(base.atk*scale);
   const baseArmour=Math.round(base.arm*scale);
-  const boosted=player.superRoom===player.room&&player.superRoom!==undefined;
   const offhandDie=attackDieOf(offhand);
-  const shieldArmour=offhand?.category==='Shield'?Math.max(2,Math.ceil(itemBonusDie(offhand)*.5)):0;
   const weaponDie=attackDieOf(weapon);
   return {
-    attack:Math.round((baseAttack+weaponDie)*(boosted?2:1)),
-    armour:Math.round((baseArmour+(armour?Math.max(2,Math.round(itemBonusDie(armour)*.6)):0)+enchantBonus(armour,'Fortification')+shieldArmour)*(boosted?2:1)),
+    attack:baseAttack+weaponDie,
+    armour:baseArmour+(armour?Math.max(2,Math.round(itemBonusDie(armour)*.6)):0)+enchantBonus(armour,'Fortification'),
     offhand:offhandDie, offhandMax:Math.ceil(offhandDie/2),
-    classAttackDie:classBonusAttackDie(player),classDefenceDie:classBonusDefenceDie(player),
     maxHp:Math.round(base.hp*scale),
-    range:Math.max(weapon?(weapon.category==='Sword'?1:['Bow','Staff'].includes(weapon.category)?3:2):base.range,offhand?(offhand.category==='Sword'?1:['Bow','Staff'].includes(offhand.category)?3:2):0),
-    mainRange:weapon?(weapon.category==='Sword'?1:['Bow','Staff'].includes(weapon.category)?3:2):base.range,
-    offhandRange:offhand?(offhand.category==='Sword'?1:['Bow','Staff'].includes(offhand.category)?3:2):0,
+    range:Math.max(weapon?(weapon.category==='Sword'?1:weapon.category==='Bow'?3:2):base.range,offhand?(offhand.category==='Sword'?1:offhand.category==='Bow'?3:2):0),
+    mainRange:weapon?(weapon.category==='Sword'?1:weapon.category==='Bow'?3:2):base.range,
+    offhandRange:offhand?(offhand.category==='Sword'?1:offhand.category==='Bow'?3:2):0,
     weapon:weapon?.name||null, offhandItem:offhand?.name||null, armourItem:armour?.name||null,
     category:weapon?.category||null, rarity:weapon?.rarity||null,
-    special:weapon?.category==='Sword'?SWORD_SPECIALS[weapon.rarity]||null:weapon?.category==='Mace'?MACE_SPECIALS[weapon.rarity]||null:weapon?.category==='Bow'?BOW_SPECIALS[weapon.rarity]||null:weapon?.category==='Staff'?STAFF_SPECIALS[weapon.rarity]||null:null,
+    special:weapon?.category==='Sword'?SWORD_SPECIALS[weapon.rarity]||null:weapon?.category==='Mace'?MACE_SPECIALS[weapon.rarity]||null:null,
     multishot:weapon?.category==='Bow'?Math.max(0,...(weapon.enchantments||[]).filter(e=>e.school==='Multishot').map(e=>e.level||0)):0
   };
 }
-export function awardXp(player,amount,state,now){
+function awardXp(player,amount,state,now){
   ensureProgress(player);
   if(player.level>=LEVEL_CAP)return;
   player.xp+=amount;
@@ -595,10 +623,8 @@ function ensureProgress(player){
   // Existing saved character progress survives upgrades without being reset.
   player.level=Math.min(LEVEL_CAP,Math.max(1,Math.floor(player.level)));
   if(!Number.isFinite(player.xp)||player.xp<0)player.xp=0;
-  player.inventory??={potions:[],equipment:[],enchantments:[],consumables:[]};
-  for(const key of ['potions','equipment','enchantments','consumables'])player.inventory[key]??=[];
-  player.wardCharges??=0;
-  player.classChosen??=false;
+  player.inventory??={potions:[],equipment:[],enchantments:[]};
+  for(const key of ['potions','equipment','enchantments'])player.inventory[key]??=[];
   player.lootClaimed??={};
   player.equipped??={weapon:null,offhand:null,armour:null};
   player.equipped.offhand??=null;
@@ -644,10 +670,9 @@ export function equipItem(s,id,equipmentId,slotRequested=null,now=nowMs()){
   const item=p.inventory.equipment.find(x=>x.id===equipmentId);
   if(!item)throw new Error('Equipment is not in your backpack');
   if((item.level||1)>p.level)throw new Error('Your real character level is too low to equip this item');
-  if(!['Armour','Shield','Sword','Mace','Bow','Staff'].includes(item.category))throw new Error('Unsupported equipment type');
-  const slot=slotRequested|| (item.category==='Armour'?'armour':item.category==='Shield'?'offhand':'weapon');
+  if(!['Armour','Sword','Mace','Bow'].includes(item.category))throw new Error('Unsupported equipment type');
+  const slot=slotRequested|| (item.category==='Armour'?'armour':'weapon');
   if(!['weapon','offhand','armour'].includes(slot))throw new Error('Invalid equipment slot');
-  if(item.category==='Shield'&&slot!=='offhand')throw new Error('Shields must be equipped in the offhand slot');
   if(item.category==='Armour'&&slot!=='armour')throw new Error('Armour cannot go in a hand');
   if(item.category!=='Armour'&&slot==='armour')throw new Error('A weapon cannot go in the armour slot');
   // A one-handed weapon may be moved from main to off or vice versa, never cloned.
@@ -705,11 +730,11 @@ export function usePotion(s,id,targetId=null,now=nowMs()){
   if(s.rooms[p.room].battle.status==='active')return submitSequentialAction(s,id,{type:'potion',target:targetId||id},now);
   healWithPotion(s,p,targetId||id,now);return {saved:null};
 }
-export const QUEST_MAX_RARITY={1:'Common',2:'Uncommon',3:'Uncommon',4:'Rare',5:'Legendary',6:'Legendary',7:'Legendary',8:'Legendary',9:'Legendary',10:'Mythic',11:'Mythic',12:'Mythic',13:'Exotic',14:'Exotic',15:'Exotic'};
+export const QUEST_MAX_RARITY={1:'Common',2:'Uncommon',3:'Uncommon',4:'Rare',5:'Rare',6:'Rare',7:'Rare'};
 export function equipmentRarity(quest,random=Math.random){
-  const odds=quest<=1?[1,0,0]:quest===2?[.88,.12,0]:quest===3?[.82,.18,0]:quest===4?[.74,.23,.03]:quest<=9?[.57,.30,.08,.05]:quest<=12?[0,.57,.30,.08,.05]:[0,0,0,.57,.38,.05];
+  const odds=quest<=1?[1,0,0]:quest===2?[.88,.12,0]:quest===3?[.82,.18,0]:quest===4?[.74,.23,.03]:[.67,.29,.04];
   let value=random();for(let i=0;i<odds.length;i++){value-=odds[i];if(value<0)return TIER_NAMES[i]}
-  return TIER_NAMES[Math.min(odds.length-1,TIER_NAMES.length-1)];
+  return TIER_NAMES[2];
 }
 function generatePickup(slot,player,random,quest){
   if(slot==='coin'){
@@ -719,7 +744,7 @@ function generatePickup(slot,player,random,quest){
     return {kind:'potion',name:'Healing Potion',charges:1};
   }
   if(slot==='equipment'){
-    const category=['Sword','Bow','Mace','Staff','Armour','Shield'][Math.floor(random()*6)];
+    const category=['Sword','Bow','Mace','Armour'][Math.floor(random()*4)];
     const rarity=equipmentRarity(quest,random);
     return {kind:'equipment',category,rarity,level:player.level,bonusDie:RARITY_DICE[rarity],name:`${rarity} ${category} · L${player.level}`};
   }
@@ -738,7 +763,7 @@ export function claimTrainingRack(s,id,now=nowMs()){
   if(s.balanceTrial)throw new Error('Training gear is disabled for genuine balance testing');
   if(p.room!=='woodland')throw new Error('The training rack is only in the Woodland Path');
   if(p.trainingRackClaimed)throw new Error('You have already collected your training rack');
-  const trial=[['Sword','Common'],['Bow','Uncommon'],['Mace','Rare'],['Staff','Rare'],['Sword','Legendary'],['Mace','Mythic'],['Sword','Exotic']];
+  const trial=[['Sword','Common'],['Bow','Uncommon'],['Mace','Rare'],['Sword','Legendary'],['Mace','Mythic'],['Sword','Exotic']];
   for(const [category,rarity] of trial){
     p.inventory.equipment.push({id:itemId(p,'equipment'),kind:'equipment',category,rarity,level:p.level,bonusDie:RARITY_DICE[rarity],name:`Training ${rarity} ${category} · L${p.level}`,enchantments:[],training:true});
   }
@@ -762,7 +787,7 @@ export function claimLoot(state,id,slot,now=nowMs(),random=Math.random){
   if(p.lootClaimed[p.room][slot])throw new Error('You have already searched for this treasure');
   // Independent 50% empty outcome for every room search, including each category.
   // Preserve the one-search-per-player-per-room restriction even when empty.
-  if(random()<1-classFindChance(p.classChosen?p.klass:null,slot)){
+  if(random()<.5){
     p.lootClaimed[p.room][slot]=true;
     addLog(state,`${p.name} searched for ${slot} but found nothing.`,now);
     emitEvent(state,'search-empty',{player:id,slot},now);
@@ -771,7 +796,7 @@ export function claimLoot(state,id,slot,now=nowMs(),random=Math.random){
   const item=generatePickup(slot,p,random,ROOM_DATA[p.room].quest||1);
   if(item.kind!=='coin')item.id=itemId(p,item.kind);
   if(item.kind==='equipment')item.enchantments=[];
-  if(item.kind==='coin'){item.gold=classGoldBonus(p.classChosen?p.klass:null,item.gold);p.gold+=item.gold;}
+  if(item.kind==='coin')p.gold+=item.gold;
   else if(item.kind==='potion')p.inventory.potions.push(item);
   else if(item.kind==='equipment')p.inventory.equipment.push(item);
   else p.inventory.enchantments.push(item);
@@ -786,7 +811,6 @@ export function claimLoot(state,id,slot,now=nowMs(),random=Math.random){
 export const SHOP_STOCK=[
  {sku:'potion',name:'Healing Potion (1 use)',cost:10,kind:'potion'},
  {sku:'sword-common',name:'Common Sword',cost:45,kind:'equipment',category:'Sword',rarity:'Common'},
- {sku:'staff-common',name:'Common Staff',cost:45,kind:'equipment',category:'Staff',rarity:'Common'},
  {sku:'bow-common',name:'Common Bow',cost:45,kind:'equipment',category:'Bow',rarity:'Common'},
  {sku:'mace-common',name:'Common Mace',cost:35,kind:'equipment',category:'Mace',rarity:'Common'},
  {sku:'armour-common',name:'Common Armour',cost:35,kind:'equipment',category:'Armour',rarity:'Common'},
@@ -794,78 +818,21 @@ export const SHOP_STOCK=[
  {sku:'armour-uncommon',name:'Uncommon Armour',cost:95,kind:'equipment',category:'Armour',rarity:'Uncommon',unlock:2},
  {sku:'bow-uncommon',name:'Uncommon Bow',cost:95,kind:'equipment',category:'Bow',rarity:'Uncommon',unlock:2},
  {sku:'mace-uncommon',name:'Uncommon Mace',cost:120,kind:'equipment',category:'Mace',rarity:'Uncommon',unlock:2},
- {sku:'staff-uncommon',name:'Uncommon Staff',cost:100,kind:'equipment',category:'Staff',rarity:'Uncommon',unlock:2},
  {sku:'armour-rare',name:'Rare Armour',cost:170,kind:'equipment',category:'Armour',rarity:'Rare',unlock:4},
  {sku:'sword-rare',name:'Rare Sword',cost:170,kind:'equipment',category:'Sword',rarity:'Rare',unlock:4},
  {sku:'mace-rare',name:'Rare Mace',cost:200,kind:'equipment',category:'Mace',rarity:'Rare',unlock:4},
- {sku:'bow-rare',name:'Rare Bow',cost:170,kind:'equipment',category:'Bow',rarity:'Rare',unlock:5},
- {sku:'staff-rare',name:'Rare Staff',cost:180,kind:'equipment',category:'Staff',rarity:'Rare',unlock:5},
- {sku:'armour-legendary',name:'Legendary Armour',cost:400,kind:'equipment',category:'Armour',rarity:'Legendary',unlock:10},
- {sku:'sword-mythic',name:'Mythic Sword',cost:900,kind:'equipment',category:'Sword',rarity:'Mythic',unlock:10},
- {sku:'bow-mythic',name:'Mythic Bow',cost:900,kind:'equipment',category:'Bow',rarity:'Mythic',unlock:10},
- {sku:'mace-mythic',name:'Mythic Mace',cost:1200,kind:'equipment',category:'Mace',rarity:'Mythic',unlock:10},
- {sku:'staff-mythic',name:'Mythic Staff',cost:1000,kind:'equipment',category:'Staff',rarity:'Mythic',unlock:10},
- {sku:'armour-mythic',name:'Mythic Armour',cost:900,kind:'equipment',category:'Armour',rarity:'Mythic',unlock:10},
- {sku:'sword-exotic',name:'Exotic Sword',cost:3000,kind:'equipment',category:'Sword',rarity:'Exotic',unlock:13},
- {sku:'bow-exotic',name:'Exotic Bow',cost:3000,kind:'equipment',category:'Bow',rarity:'Exotic',unlock:13},
- {sku:'mace-exotic',name:'Exotic Mace',cost:4000,kind:'equipment',category:'Mace',rarity:'Exotic',unlock:13},
- {sku:'staff-exotic',name:'Exotic Staff',cost:3200,kind:'equipment',category:'Staff',rarity:'Exotic',unlock:13},
- {sku:'armour-exotic',name:'Exotic Armour',cost:3000,kind:'equipment',category:'Armour',rarity:'Exotic',unlock:13},
- {sku:'sword-legendary',name:'Legendary Sword',cost:400,kind:'equipment',category:'Sword',rarity:'Legendary',unlock:5},
- {sku:'bow-legendary',name:'Legendary Bow',cost:400,kind:'equipment',category:'Bow',rarity:'Legendary',unlock:5},
- {sku:'mace-legendary',name:'Legendary Mace',cost:500,kind:'equipment',category:'Mace',rarity:'Legendary',unlock:5},
- {sku:'staff-legendary',name:'Legendary Staff',cost:400,kind:'equipment',category:'Staff',rarity:'Legendary',unlock:5},
- {sku:'shield-common',name:'Common Shield',cost:35,kind:'equipment',category:'Shield',rarity:'Common'},
- {sku:'shield-uncommon',name:'Uncommon Shield',cost:95,kind:'equipment',category:'Shield',rarity:'Uncommon',unlock:2},
- {sku:'shield-rare',name:'Rare Shield',cost:170,kind:'equipment',category:'Shield',rarity:'Rare',unlock:4},
- {sku:'shield-legendary',name:'Legendary Shield',cost:400,kind:'equipment',category:'Shield',rarity:'Legendary',unlock:5},
- {sku:'shield-mythic',name:'Mythic Shield',cost:900,kind:'equipment',category:'Shield',rarity:'Mythic',unlock:10},
- {sku:'shield-exotic',name:'Exotic Shield',cost:3000,kind:'equipment',category:'Shield',rarity:'Exotic',unlock:13},
- {sku:'blast-bomb',name:'💣 Blast Bomb',cost:45,kind:'consumable',effect:'bomb',description:'Once per battle turn: attacks enemies within 3 squares, respecting walls.'},
- {sku:'meteor-scroll',name:'☄️ Meteor Scroll',cost:120,kind:'consumable',effect:'meteor',description:'Once per battle turn: light damage to every living enemy in the room.'},
- {sku:'guardian-ward',name:'🔰 Guardian Tonic',cost:35,kind:'consumable',effect:'ward',description:'Heal 35% maximum HP and block the next enemy strike.'},
- {sku:'super-potion',name:'⚡ Superstrength Potion',cost:150,kind:'consumable',effect:'super',description:'Double attack and defence dice for this room only.'}
+ {sku:'bow-rare',name:'Rare Bow',cost:170,kind:'equipment',category:'Bow',rarity:'Rare',unlock:5}
 ];
-const LEGENDARY_SHOP=SHOP_STOCK.filter(item=>item.rarity==='Legendary'&&item.unlock<=5&&['Sword','Bow','Mace','Staff'].includes(item.category));
-const MYTHIC_SHOP=SHOP_STOCK.filter(item=>item.rarity==='Mythic');
-const EXOTIC_SHOP=SHOP_STOCK.filter(item=>item.rarity==='Exotic');
-// ONE 5%-chance offer per completed boss at Medium access, not 5% per displayed weapon.
-// Reopening the merchant does not reroll the offer. A successful offer is single-stock.
-export function refreshMerchant(s,random=Math.random){
- s.legendaryMerchantOffer=null;
- s.mythicMerchantOffer=null;
- s.exoticMerchantOffer=null;
- if((s.unlockedQuest||1)>=13){
-  if(random()<.05){const offer=EXOTIC_SHOP[Math.min(EXOTIC_SHOP.length-1,Math.floor(random()*EXOTIC_SHOP.length))];s.exoticMerchantOffer={sku:offer.sku,remaining:1};}
-  return;
- }
- if((s.unlockedQuest||1)>=10){
-  if(random()<.05){const offer=MYTHIC_SHOP[Math.min(MYTHIC_SHOP.length-1,Math.floor(random()*MYTHIC_SHOP.length))];s.mythicMerchantOffer={sku:offer.sku,remaining:1};}
-  return;
- }
- if((s.unlockedQuest||1)<5)return;
- if(random()<MEDIUM_LEGENDARY_CHANCE){
-   const offer=LEGENDARY_SHOP[Math.min(LEGENDARY_SHOP.length-1,Math.floor(random()*LEGENDARY_SHOP.length))];
-   s.legendaryMerchantOffer={sku:offer.sku,remaining:1};
- }
-}
-export function merchantStock(s){const tier=s.unlockedQuest||1;return SHOP_STOCK.filter(item=>{if((item.unlock||1)>tier)return false;if(item.kind!=='equipment')return true;if(tier>=13){if(!['Legendary','Mythic','Exotic'].includes(item.rarity))return false;if(item.rarity==='Exotic')return s.exoticMerchantOffer?.sku===item.sku&&s.exoticMerchantOffer.remaining>0;return true;}if(tier>=10){if(['Common','Uncommon'].includes(item.rarity))return false;if(item.rarity==='Mythic')return s.mythicMerchantOffer?.sku===item.sku&&s.mythicMerchantOffer.remaining>0;return true;}return item.rarity!=='Legendary'||(s.legendaryMerchantOffer?.sku===item.sku&&s.legendaryMerchantOffer.remaining>0);});}
 export function buyFromShop(s,id,sku,now=nowMs()){
  const p=readyPlayer(s,id);requireNoFight(s,p);
  if(p.room!=='camp')throw new Error('Visit the merchant in Adventurers’ Camp');
  const stock=SHOP_STOCK.find(x=>x.sku===sku);if(!stock)throw new Error('Unknown merchant item');
  if((stock.unlock||1)>(s.unlockedQuest||1))throw new Error('That stock is not unlocked yet');
- if(!merchantStock(s).some(item=>item.sku===stock.sku))throw new Error('This item is not stocked by the merchant right now');
- const cost=classPrice(p,stock,(s.cityDistricts||[]).includes('q12r2'));
- if(p.gold<cost)throw new Error('Not enough gold');
- p.gold-=cost;
- if(stock.rarity==='Legendary'&&(s.unlockedQuest||1)<10)s.legendaryMerchantOffer.remaining--;
- if(stock.rarity==='Mythic'&&(s.unlockedQuest||1)<13)s.mythicMerchantOffer.remaining--;
- if(stock.rarity==='Exotic')s.exoticMerchantOffer.remaining--;
+ if(p.gold<stock.cost)throw new Error('Not enough gold');
+ p.gold-=stock.cost;
  if(stock.kind==='potion')p.inventory.potions.push({id:itemId(p,'potion'),kind:'potion',name:'Healing Potion',charges:1});
- else if(stock.kind==='consumable')p.inventory.consumables.push({id:itemId(p,'consumable'),kind:'consumable',sku:stock.sku,effect:stock.effect,name:stock.name,charges:1});
  else p.inventory.equipment.push({id:itemId(p,'equipment'),kind:'equipment',category:stock.category,rarity:stock.rarity,level:p.level,bonusDie:RARITY_DICE[stock.rarity],name:stock.name+' · L'+p.level,enchantments:[]});
- addLog(s,`${p.name} bought ${stock.name} for ${cost} gold.`,now);s.revision++;return {saved:'merchant'};
+ addLog(s,`${p.name} bought ${stock.name} for ${stock.cost} gold.`,now);s.revision++;return {saved:'merchant'};
 }
 /** Merchant buyback prices: generally half of equivalent shop price, never
  * reclaim an enchantment once it is permanently bound. Training gear has no resale value. */
@@ -873,11 +840,10 @@ export function resaleValue(item){
  if(!item||item.training)return 0;
  if(item.kind==='equipment'){
   const base=SHOP_STOCK.find(x=>x.kind==='equipment'&&x.category===item.category&&x.rarity===item.rarity)?.cost
-     ?? ({Sword:{Legendary:400,Mythic:900,Exotic:3000},Mace:{Legendary:500,Mythic:1200,Exotic:4000},Staff:{Rare:180,Legendary:400,Mythic:1000,Exotic:3200},Bow:{Rare:170,Legendary:400,Mythic:900,Exotic:3000},Armour:{Rare:170,Legendary:400,Mythic:900,Exotic:3000}}[item.category]?.[item.rarity]||0);
+     ?? ({Sword:{Legendary:400,Mythic:900,Exotic:3000},Mace:{Legendary:500,Mythic:1200,Exotic:4000},Bow:{Rare:170,Legendary:400,Mythic:900,Exotic:3000},Armour:{Rare:170,Legendary:400,Mythic:900,Exotic:3000}}[item.category]?.[item.rarity]||0);
   return Math.floor(base*.5);
  }
  if(item.kind==='potion')return Math.floor((Math.min(2,Math.max(0,item.charges||0)))*5);
- if(item.kind==='consumable')return Math.floor((SHOP_STOCK.find(x=>x.sku===item.sku)?.cost||0)*.5);
  if(item.kind==='enchantment')return Math.floor((20+10*Math.max(1,Math.min(5,item.level||1)))*.5);
  return 0;
 }
@@ -885,7 +851,7 @@ export function resaleValue(item){
 export function sellToShop(s,id,kind,itemIdValue,now=nowMs()){
  const p=readyPlayer(s,id);requireNoFight(s,p);
  if(p.room!=='camp')throw new Error('Only the camp merchant buys items');
- if(!['equipment','potions','enchantments','consumables'].includes(kind))throw new Error('Unknown item category');
+ if(!['equipment','potions','enchantments'].includes(kind))throw new Error('Unknown item category');
  const items=p.inventory[kind]||[];
  const index=items.findIndex(x=>x.id===itemIdValue);
  if(index<0)throw new Error('You do not own that item');
@@ -921,13 +887,12 @@ export function freshState(now=nowMs()){
   for(const [id,def] of Object.entries(ROOM_DATA)){
     rooms[id]={id,discovered:id==='woodland',battle:{status:def.encounter.length?'dormant':'none',round:0,deadline:null,actions:{},eligibleRound:{},enemies:[]}};
   }
-  return {turn:{round:1,ended:{},eligibleRound:{},deadline:now+ROUND_MS},version:8,epoch:now,revision:0,unlockedQuest:1,completedQuests:[],questRewardOffers:{},questRewardClaimed:{},legendaryMerchantOffer:null,mythicMerchantOffer:null,exoticMerchantOffer:null,events:[],nextEventId:1,players:{},rooms,log:[{at:now,text:'A Roll in the Woods begins. Find your friends and explore.'}]};
+  return {turn:{round:1,ended:{},eligibleRound:{},deadline:now+ROUND_MS},version:6,epoch:now,revision:0,unlockedQuest:1,completedQuests:[],events:[],nextEventId:1,players:{},rooms,log:[{at:now,text:'A Roll in the Woods begins. Find your friends and explore.'}]};
 }
 function addLog(s,text,now){s.log.push({at:now,text});if(s.log.length>35)s.log=s.log.slice(-35)}
 function emitEvent(s,type,payload,at){s.events??=[];s.nextEventId??=1;s.events.push({id:s.nextEventId++,type,...payload,at});s.events=s.events.slice(-40)}
 export function ensureWorld(s){
   s.rooms??={};s.events??=[];s.nextEventId??=1;
-  s.legendaryMerchantOffer??=null;s.mythicMerchantOffer??=null;s.exoticMerchantOffer??=null;
   if(!s.turn){
     // Save migration: retain player progress and enemies, but start a clean
     // global turn to prevent old room-local turn owners from conflicting.
@@ -944,14 +909,14 @@ export function ensureWorld(s){
     if(!s.rooms[id])s.rooms[id]={id,discovered:id==='woodland',battle:{status:def.encounter.length?'dormant':'none',round:0,deadline:null,actions:{},eligibleRound:{},enemies:[]}};
     else {const b=s.rooms[id].battle;b.wave??=0;b.participated??={};b.damageBy??={};b.turnEnded??={};}
   }
-  s.completedQuests??=[];s.questRewardOffers??={};s.questRewardClaimed??={};
+  s.completedQuests??=[];
   // Preserve old lab success: a cleared Watchpost unlocks Quest 2 on migration.
   if(s.rooms.watchpost?.battle.status==='cleared'&&!s.completedQuests.includes(1))s.completedQuests.push(1);
-  for(const q of [2,3,4,5,6,7,8,9,10,11,12,13,14,15]){
+  for(const q of [2,3,4,5,6,7]){
     const final=Object.entries(ROOM_DATA).find(([id,meta])=>meta.quest===q&&meta.final)?.[0];
     if(final&&s.rooms[final]?.battle.status==='cleared'&&!s.completedQuests.includes(q))s.completedQuests.push(q);
   }
-  s.unlockedQuest=Math.max(s.unlockedQuest||1,1,...s.completedQuests.map(q=>Math.min(15,q+1)));
+  s.unlockedQuest=Math.max(s.unlockedQuest||1,1,...s.completedQuests.map(q=>Math.min(7,q+1)));
 }
 /** Remember the last SAFE square in each quest; this is per-player and
  * survives camp visits, quest switching and browser reconnects. */
@@ -977,7 +942,7 @@ export function resumeQuest(s,id,now=nowMs()){
 export function enterQuest(s,id,quest,now=nowMs()){
   const p=readyPlayer(s,id);
   ensureWorld(s);
-  if(!Number.isInteger(quest)||quest<1||quest>15||quest>s.unlockedQuest)throw new Error('This quest is not unlocked in the multiplayer beta');
+  if(!Number.isInteger(quest)||quest<1||quest>7||quest>s.unlockedQuest)throw new Error('This quest is not unlocked in the multiplayer beta');
   if(s.rooms[p.room].battle.status==='active')throw new Error('Cannot change quests during combat');
   if(p.hp<=0)throw new Error('Downed players cannot travel to another quest');
   if(p.room!=='camp'&&ROOM_DATA[p.room]?.quest!==quest)saveQuestBookmark(p);
@@ -1034,7 +999,7 @@ export function returnToCamp(s,id,now=nowMs()){
  */
 export function replayQuest(s,id,quest,now=nowMs()){
  const p=readyPlayer(s,id);ensureWorld(s);requireNoFight(s,p);
- if(!s.completedQuests.includes(quest)||!Number.isInteger(quest)||quest<1||quest>15)throw new Error('Finish this quest before replaying it');
+ if(!s.completedQuests.includes(quest)||!Number.isInteger(quest)||quest<1||quest>7)throw new Error('Finish this quest before replaying it');
  const rooms=Object.keys(ROOM_DATA).filter(r=>ROOM_DATA[r].quest===quest);
  if(Object.values(s.players).some(hero=>rooms.includes(hero.room)))throw new Error('All adventurers must leave this quest before it can be replayed');
  for(const player of Object.values(s.players)){delete player.questBookmarks?.[quest];if(player.lastCampQuest===quest)player.lastCampQuest=null;}
@@ -1046,29 +1011,6 @@ export function replayQuest(s,id,quest,now=nowMs()){
  addLog(s,`Quest ${quest} replay started. Rooms and personal discoveries refreshed, but progress and equipment are retained.`,now);
  return enterQuest(s,id,quest,now);
 }
-/** Confirm a class once. A legacy character may migrate at camp without
- * forfeiting gear, gold, XP, level, quest access, or other characters' progress.
- * Server validation makes class choice immutable after confirmation. */
-export function selectClass(s,id,klass,now=nowMs()){
- const p=readyPlayer(s,id);
- if(!Object.hasOwn(CLASS_DATA,klass))throw new Error('Choose Knight, Outlaw, Warlock or Tinker');
- if(p.classChosen)throw new Error('Character class has already been confirmed');
- if(p.mazeSlot||!['woodland','camp'].includes(p.room))throw new Error('Choose your class at camp or the initial Woodland Path');
- requireNoFight(s,p);
- const oldMax=p.maxHp,oldHp=p.hp;
- p.klass=klass;p.classChosen=true;
- p.maxHp=effectiveStats(p).maxHp;
- p.hp=oldHp<=0?0:Math.max(1,Math.min(p.maxHp,oldHp+p.maxHp-oldMax));
- // A thematic starter weapon, granted once per character. Existing progress
- // remains untouched; rare equipment is never gifted during a migration.
- const category=CLASS_DATA[klass].starter;
- const item={id:itemId(p,'equipment'),kind:'equipment',category,rarity:'Common',level:1,bonusDie:4,name:`Starter ${category} · ${CLASS_DATA[klass].label}`,enchantments:[],starter:true};
- p.inventory.equipment.push(item);
- if(!p.equipped.weapon)p.equipped.weapon=item.id;
- addLog(s,`${p.name} confirmed ${CLASS_DATA[klass].label} as their permanent character class.`,now);
- emitEvent(s,'class-choice',{player:id,klass},now);s.revision++;return {saved:'character-class'};
-}
-
 export function ensurePlayer(s,id,name,role){
   if(!['one','two','three','four'].includes(id))throw new Error('Unrecognised player');
   ensureWorld(s);
@@ -1101,7 +1043,7 @@ export function ensurePlayer(s,id,name,role){
     s.players[id].hp=Math.min(maxHp,Math.max(0,s.players[id].hp + (maxHp-s.players[id].maxHp)));
     s.players[id].maxHp=maxHp;
   }
-  s.version=8;
+  s.version=6;
   s.revision++;
   return s.players[id];
 }
@@ -1123,60 +1065,24 @@ function enemyCanOccupy(s,roomId,e,x,y){
   for(let dx=0;dx<w;dx++)for(let dy=0;dy<w;dy++)if(occupied(s,roomId,x+dx,y+dy,null,e.id))return false;
   return true;
 }
-function largeTerrainReachableFromEntrance(roomId){
-  const {width,height}=roomSize(roomId),row=doorRow(roomId);
-  const clear=(x,y)=>x>=0&&y>=0&&x+1<width&&y+1<height&&
-    !isWall(roomId,x,y)&&!isWall(roomId,x+1,y)&&!isWall(roomId,x,y+1)&&!isWall(roomId,x+1,y+1);
-  const starts=[[0,row-1],[0,row],[1,row-1],[1,row]].filter(([x,y])=>clear(x,y));
-  const reached=new Set(starts.map(([x,y])=>`${x},${y}`));
-  const q=[...starts];
-  for(let i=0;i<q.length;i++){
-    const [x,y]=q[i];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
-      const nx=x+dx,ny=y+dy,key=`${nx},${ny}`;
-      if(!reached.has(key)&&clear(nx,ny)){reached.add(key);q.push([nx,ny])}
-    }
-  }
-  return reached;
-}
 function spawnFoes(s,roomId,foes,now){
   const b=s.rooms[roomId].battle;
   for(const [i,foe] of foes.entries()){
     const variant=foe.variant||'normal',size=variant==='large'||variant==='large-shiny'?2:1;
     const role=foe.role||'normal',medium=ROOM_DATA[roomId].quest>=5;
-    const baseHp=variantHp(foe.faces,variant)*(medium?(ROOM_DATA[roomId].quest>=10?(variant==='boss'?3.15:2.25):(variant==='boss'?3.0:2.05)):1);
+    const baseHp=variantHp(foe.faces,variant)*(medium?(variant==='boss'?3.0:2.05):1);
     const armourBase=variant==='boss'||variant==='large-shiny'?8:variant==='large'?6:4;
     const enemy={id:`${roomId}-w${b.wave||0}-${i}`,name:`${variant==='boss'?'Boss ':variant==='normal'?'':variant==='large-shiny'?'Large Shiny ':variant==='shiny'?'Shiny ':'Large '}${role!=='normal'?(role[0].toUpperCase()+role.slice(1)+' '):''}D${foe.faces}`,faces:foe.faces,variant,role,hp:Math.round(baseHp),maxHp:Math.round(baseHp),atk:medium?Math.round((15+(ROOM_DATA[roomId].quest-5)*4+foe.faces*.45+(variant==='boss'?10:0)+(role==='ninja'||role==='ranged'?3:0)))*(size===2?2:1):Math.max(2,Math.round(foe.faces*2/3))*(size===2?2:1),armourDie:medium?Math.round(13+(ROOM_DATA[roomId].quest-5)*3+foe.faces*.20+(variant==='boss'?8:0)+(role==='armoured'?7:0)):armourBase+(role==='armoured'?3:0),x:5,y:3,revived:false,awaitRevival:0,clone:false,teleportPhase:0,clonePhase:0};
     let placed=false;
-    const reachableLarge=size===2?largeTerrainReachableFromEntrance(roomId):null;
-    // A room's formation changes its approach angles. Every candidate remains
-    // server-validated: a large creature cannot clip through even one wall tile.
-    const positions={
-      stagger:[[9,2],[7,6],[10,4],[5,7],[11,1],[6,1],[11,7],[8,4]],
-      island:[[10,4],[6,2],[9,7],[6,6],[11,1],[5,4],[10,2],[8,5]],
-      flanks:[[10,1],[7,7],[10,7],[6,1],[11,4],[8,3],[5,6],[9,5]],
-      guard:[[10,4],[8,3],[8,5],[11,2],[11,6],[6,6],[6,2],[9,7]],
-      boss:[[9,4],[10,2],[10,6],[7,3],[7,5],[11,4],[5,1],[5,7]],
-      centre:[[7,4],[9,3],[9,5],[6,2],[6,6],[11,4],[10,1],[10,7]],
-      gate:[[9,4],[9,2],[9,6],[6,1],[6,7],[11,4],[7,3],[7,5]],
-      rush:[[7,5],[10,1],[9,7],[6,4],[11,4],[8,2],[5,7],[10,5]],
-      archers:[[10,2],[10,6],[11,4],[7,4],[7,2],[8,6],[11,1],[11,7]],
-      shield:[[8,4],[10,2],[10,6],[7,2],[7,6],[11,4],[6,4],[11,1]],
-      ghost:[[9,4],[10,6],[6,1],[8,7],[11,3],[5,5],[10,1],[7,3]]
-    };
-    const formation=ROOM_DATA[roomId].formation||'stagger';
-    const plan=positions[formation]||positions.stagger;
-    const [px,py]=plan[i%plan.length];
-    const targetX=ROOM_DATA[roomId].quest>=10?Math.min(13,px+2):medium?px:Math.max(2,Math.round(px*8/12));
-    const targetY=ROOM_DATA[roomId].quest>=10?py+1:medium?py:Math.min(5,Math.round(py*6/8));
-    const candidates=ROOM_DATA[roomId].quest===1 ? [[5,3],[6,3],[5,2],[6,2],[4,2],[5,1],[6,5],[3,4],[3,1],[7,1],[1,1],[1,5]] : Array.from({length:roomSize(roomId).width*roomSize(roomId).height},(_,k)=>[k%roomSize(roomId).width,Math.floor(k/roomSize(roomId).width)]);
-    if(ROOM_DATA[roomId].quest>1)candidates.sort(([ax,ay],[bx,by])=>{
-      const score=(x,y)=>Math.abs(x-targetX)*3+Math.abs(y-targetY)*3+(x<=2?20:0);
-      return score(ax,ay)-score(bx,by)||bx-ax||ay-by;
-    });
+    const candidates=medium ? [
+      [9,4],[10,5],[10,3],[8,6],[8,2],[11,6],[11,2],[7,7],[7,1],
+      [9,7],[9,1],[6,6],[6,2],[7,5],[7,3],[5,7],[5,1],[5,5],[5,3],
+      [11,4],[12,5],[12,3],[4,6],[4,2],[3,7],[3,1]
+    ] : [[5,3],[6,3],[5,2],[6,2],[4,2],[5,1],[6,5],[3,4],[3,1],[7,1],[1,1],[1,5]];
     for(const [x,y] of candidates){
-      if((!reachableLarge||reachableLarge.has(`${x},${y}`))&&enemyCanOccupy(s,roomId,enemy,x,y)){enemy.x=x;enemy.y=y;placed=true;break}
+      if(enemyCanOccupy(s,roomId,enemy,x,y)){enemy.x=x;enemy.y=y;placed=true;break}
     }
-    if(!placed){for(let y=0;y<roomSize(roomId).height&&!placed;y++)for(let x=0;x<roomSize(roomId).width&&!placed;x++)if((!reachableLarge||reachableLarge.has(`${x},${y}`))&&enemyCanOccupy(s,roomId,enemy,x,y)){enemy.x=x;enemy.y=y;placed=true;}}
+    if(!placed){for(let y=0;y<roomSize(roomId).height&&!placed;y++)for(let x=0;x<roomSize(roomId).width&&!placed;x++)if(enemyCanOccupy(s,roomId,enemy,x,y)){enemy.x=x;enemy.y=y;placed=true;}}
     if(!placed)throw new Error('No room to summon enemy');
     b.enemies.push(enemy);
   }
@@ -1188,20 +1094,7 @@ function spawnEncounter(s,roomId,now){
   const def=ROOM_DATA[roomId];
   b.status='active';b.round=s.turn.round;b.actions={};b.eligibleRound={};b.participated={};b.damageBy={};b.exitVotes={};b.wave=0;b.turnEnded={};b.deadline=null;
   for(const p of Object.values(s.players).filter(p=>p.room===roomId))b.eligibleRound[p.id]=s.turn.round;
-  b.enemies=[];b.litLanterns??=[];spawnFoes(s,roomId,def.foes,now);
-  b.nests=[];b.nestQueue=[];b.nestSpawns=0;
-  if(def.quest===9){
-    // Exceptional double nest in the first two rooms: 1 in 256.
-    const roomNo=Number(roomId.split('r')[1]);
-    const count=roomNo<=2&&Math.random()<1/256?2:1;
-    const candidates=[[5,2],[6,6],[4,6],[7,2],[5,6],[3,2],[8,6],[7,6],[6,2]];
-    for(let i=0;i<count;i++){
-      const place=candidates.find(([x,y])=>!isWall(roomId,x,y)&&!occupied(s,roomId,x,y)&&!b.nests.some(n=>n.x===x&&n.y===y));
-      if(!place)throw new Error('No safe tile for Warrens nest');
-      b.nests.push({id:`${roomId}-nest-${i+1}`,x:place[0],y:place[1],active:true});
-    }
-  }
-
+  b.enemies=[];spawnFoes(s,roomId,def.foes,now);
 }
 function livingParticipants(s,roomId){return Object.values(s.players).filter(p=>p.connected&&p.room===roomId&&p.hp>0)}
 function eligibleParticipants(s,roomId){const b=s.rooms[roomId].battle;return livingParticipants(s,roomId).filter(p=>(b.eligibleRound?.[p.id]??1)<=b.round)}
@@ -1209,7 +1102,7 @@ function needsAction(s,roomId){const b=s.rooms[roomId].battle;return eligiblePar
 // Position checks belong to the authoritative server, not just the browser UI.
 function occupied(s,roomId,x,y,ignorePlayer=null,ignoreEnemy=null){
   const player=Object.values(s.players).find(p=>p.id!==ignorePlayer&&p.room===roomId&&p.x===x&&p.y===y);
-  if(player||isWall(roomId,x,y)||s.rooms[roomId]?.battle?.nests?.some(n=>n.active&&n.x===x&&n.y===y))return true;
+  if(player||isWall(roomId,x,y))return true;
   const battle=s.rooms[roomId].battle;
   return battle.status==='active'&&battle.enemies.some(e=>e.id!==ignoreEnemy&&e.hp>0&&enemyTiles(e).some(([xx,yy])=>xx===x&&yy===y));
 }
@@ -1219,7 +1112,7 @@ function reconcilePositions(s){
     const actors=[...Object.values(s.players).filter(p=>p.room===roomId).sort((a,b)=>a.id.localeCompare(b.id)),...(s.rooms[roomId].battle.enemies||[]).filter(e=>e.hp>0)];
     for(const actor of actors){
       const size=actor.variant?enemyFootprint(actor):1;
-      const valid=(x,y)=>Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&y>=0&&x+size<=roomSize(roomId).width&&y+size<=roomSize(roomId).height&&Array.from({length:size*size},(_,i)=>[x+i%size,y+Math.floor(i/size)]).every(([xx,yy])=>!reserved.has(`${xx},${yy}`)&&(actor.role==='ghost'||!isWall(roomId,xx,yy))&&!s.rooms[roomId]?.battle?.nests?.some(n=>n.active&&n.x===xx&&n.y===yy));
+      const valid=(x,y)=>Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&y>=0&&x+size<=roomSize(roomId).width&&y+size<=roomSize(roomId).height&&Array.from({length:size*size},(_,i)=>[x+i%size,y+Math.floor(i/size)]).every(([xx,yy])=>!reserved.has(`${xx},${yy}`)&&(actor.role==='ghost'||!isWall(roomId,xx,yy)));
       let {x,y}=actor;
       if(!valid(x,y)){
         const safe=[];for(let yy=0;yy<=roomSize(roomId).height-size;yy++)for(let xx=0;xx<=roomSize(roomId).width-size;xx++)if(valid(xx,yy))safe.push({x:xx,y:yy});
@@ -1343,7 +1236,7 @@ export function move(s,id,dir,now=nowMs()){
 }
 export function submitAction(s,id,action,now=nowMs(),deferResolution=false){
   const p=s.players[id];if(!p||!p.connected)throw new Error('Player is not connected');
-  if(!action||!['attack','special','defend','move','revive','potion','item','nest','light'].includes(action.type))throw new Error('Invalid combat action');
+  if(!action||!['attack','special','defend','move','revive','potion'].includes(action.type))throw new Error('Invalid combat action');
   const b=s.rooms[p.room].battle;
   if(b.status!=='active')throw new Error('There is no active fight in this room');
   if(p.hp<=0)throw new Error('You are down');
@@ -1354,36 +1247,17 @@ export function submitAction(s,id,action,now=nowMs(),deferResolution=false){
     ensureProgress(p);potionTarget(s,p,action.target||id);
     if(!p.inventory.potions.some(x=>x.charges>0))throw new Error('No healing potions available');
   }
-  if(action.type==='item'){
-    if(typeof action.sku!=='string'||!['blast-bomb','meteor-scroll','guardian-ward','super-potion'].includes(action.sku))throw new Error('Unknown combat consumable');
-    ensureProgress(p);
-    if(!p.inventory.consumables.some(x=>x.sku===action.sku&&x.charges>0))throw new Error('You do not own that consumable');
-  }
-  if(action.type==='nest'){
-    if(ROOM_DATA[p.room].quest!==9)throw new Error('There are no nests in this room');
-    const targets=(b.nests||[]).filter(n=>n.active&&Math.abs(n.x-p.x)+Math.abs(n.y-p.y)===1);
-    if(!targets.length)throw new Error('Stand beside an active nest to disable it');
-    if(action.target&&!targets.some(n=>n.id===action.target))throw new Error('That nest is not adjacent');
-    action.target=(targets.find(n=>n.id===action.target)||targets[0]).id;
-  }
-  if(action.type==='light'){
-    if(ROOM_DATA[p.room].quest!==14)throw new Error('Lanterns are only found in the Abyss');
-    const sites=ABYSS_LANTERNS[p.room]||[];
-    const reachable=sites.findIndex(([x,y],i)=>!b.litLanterns?.includes(i)&&Math.abs(x-p.x)+Math.abs(y-p.y)<=1);
-    if(reachable<0)throw new Error('Stand beside an unlit lantern');
-    action.target=String(reachable);
-  }
   if(['attack','special'].includes(action.type)){
     if(action.target!=null&&typeof action.target!=='string')throw new Error('Invalid enemy target');
     if(action.target&&!b.enemies.some(e=>e.id===action.target&&e.hp>0))throw new Error('Enemy not found');
     if(action.type==='special'){
       const special=effectiveStats(p).special;
-      if(!special)throw new Error('A Legendary or stronger weapon is required');
+      if(!special)throw new Error('A Legendary or stronger sword/mace is required');
       const last=p.specialUsedAt?.[equippedItem(p,'weapon')?.id];
       if(Number.isInteger(last) && (p.combatTurns||0)<last+special.cooldown)throw new Error('Special attack is recharging');
     }
   }
-  b.actions[id]={type:action.type,dir:action.dir,target:action.target||id,sku:action.type==='item'?action.sku:undefined};
+  b.actions[id]={type:action.type,dir:action.dir,target:action.target||id};
   // A submitted action (including healing, defence or moving tactically) is meaningful participation.
   b.participated??={};b.participated[id]=true;
   s.revision++;
@@ -1422,15 +1296,14 @@ function rollHeroDamage(p,enemy,random,s,now,{specialDice=null,bonusDie=0}={}){
   const atk=mainCanReach?(specialDice?specialDice.reduce((total,die)=>total+rollDie(die,random),0):rollDie(stats.attack,random)):0;
   const offhand=offCanReach?Math.ceil(rollDie(stats.offhand,random)/2):0;
   const extra=mainCanReach&&bonusDie?rollDie(bonusDie,random):0;
-  const classExtra=mainCanReach&&classBonusAttackDie(p)?rollDie(classBonusAttackDie(p),random):0;
   const defence=rollDie(enemy.armourDie||4,random);
-  const rawHit=Math.max(0,atk+offhand+extra+classExtra-defence);
+  const rawHit=Math.max(0,atk+offhand+extra-defence);
   const hit=enemy.role==='armoured'?Math.max(1,rawHit-Math.max(2,Math.ceil(enemy.faces*.45))):rawHit;
   const before=enemy.hp;enemy.hp=Math.max(0,enemy.hp-hit);
   if(before>0&&enemy.hp===0&&enemy.role==='zombie'&&!enemy.revived)enemy.awaitRevival=2;
   const dealt=before-enemy.hp;
   const battle=s.rooms[p.room]?.battle;if(battle){battle.damageBy??={};battle.damageBy[p.id]=(battle.damageBy[p.id]||0)+dealt;}
-  addLog(s,`${p.name} rolled ${mainCanReach?atk+' main':'no main in range'}${offCanReach?' +'+offhand+' half off-hand':''}${extra?' +'+extra+' bonus':''}${classExtra?' +'+classExtra+' class die':''} vs ${enemy.name} D${enemy.armourDie||4} defence (${defence}): ${before-enemy.hp} damage (${enemy.hp}/${enemy.maxHp} HP).`,now);
+  addLog(s,`${p.name} rolled ${mainCanReach?atk+' main':'no main in range'}${offCanReach?' +'+offhand+' half off-hand':''}${extra?' +'+extra+' bonus':''} vs ${enemy.name} D${enemy.armourDie||4} defence (${defence}): ${before-enemy.hp} damage (${enemy.hp}/${enemy.maxHp} HP).`,now);
 }
 function heroStrike(p,enemies,action,now,s,random){
   const stats=effectiveStats(p);
@@ -1458,10 +1331,6 @@ function heroSpecial(p,enemies,action,b,now,s,random){
   const target=nearestTarget(p,enemies,stats.mainRange,action.target);
   if(!target){addLog(s,`${p.name} has no enemy in the main weapon special attack range.`,now);return;}
   let targets=[target];
-  if(stats.category==='Bow'||stats.category==='Staff'){
-    targets=[target,...enemies.filter(e=>e!==target&&e.hp>0&&actorDistance(p,e)<=stats.mainRange&&clearLine(p.room,p.x,p.y,e.x,e.y))
-      .sort((a,b)=>actorDistance(p,a)-actorDistance(p,b))].slice(0,cfg.targets);
-  }
   if(stats.category==='Mace'){
     // Legendary 4, Mythic 5, Exotic all enemies in the room.
     targets=stats.rarity==='Exotic'?enemies.filter(e=>e.hp>0):[
@@ -1472,72 +1341,11 @@ function heroSpecial(p,enemies,action,b,now,s,random){
   p.specialUsedAt??={};p.specialUsedAt[weapon.id]=p.combatTurns||0;
   addLog(s,`${p.name} used ${stats.rarity} ${stats.category} SPECIAL on ${targets.length} target(s) · recharges in ${cfg.cooldown} rounds.`,now);
 }
-function useCombatConsumable(s,p,b,sku,now,random){
-  ensureProgress(p);
-  const index=p.inventory.consumables.findIndex(x=>x.sku===sku&&x.charges>0);
-  if(index<0){addLog(s,`${p.name} no longer has that combat item.`,now);return}
-  const item=p.inventory.consumables[index];
-  const stats=effectiveStats(p);
-  const live=b.enemies.filter(e=>e.hp>0);
-  if(sku==='blast-bomb'&&!live.some(e=>actorDistance(p,e)<=3&&enemyTiles(e).some(([x,y])=>clearLine(p.room,p.x,p.y,x,y)))){
-    addLog(s,`${p.name} has no enemy within blast range.`,now);return;
-  }
-  if(sku==='meteor-scroll'&&!live.length)return;
-  if(sku==='guardian-ward'&&p.hp>=p.maxHp&&p.wardCharges>0){addLog(s,`${p.name} is already fully protected and healthy.`,now);return;}
-  if(sku==='super-potion'&&p.superRoom===p.room){addLog(s,`${p.name} already has superstrength in this room.`,now);return;}
-  // Consume when resolving an eligible, useful combat action, not on button press.
-  p.inventory.consumables.splice(index,1);
-  if(sku==='guardian-ward'){
-    const gain=Math.min(p.maxHp-p.hp,Math.ceil(p.maxHp*.35));
-    p.hp+=gain;p.wardCharges=1;
-    addLog(s,`${p.name} used Guardian Tonic: +${gain} HP and a ward blocking the next enemy strike.`,now);
-  }else if(sku==='super-potion'){
-    p.superRoom=p.room;
-    addLog(s,`${p.name} used Superstrength Potion: attack and armour dice doubled for this room.`,now);
-  }else{
-    const targets=sku==='meteor-scroll'?live:live.filter(e=>actorDistance(p,e)<=3&&enemyTiles(e).some(([x,y])=>clearLine(p.room,p.x,p.y,x,y)));
-    let dealtTotal=0;
-    for(const e of targets){
-      const before=e.hp;
-      let hit;
-      if(sku==='blast-bomb'){
-        const rolled=rollDie(Math.max(4,stats.attack),random)+(classBombDie(p,sku)?rollDie(classBombDie(p,sku),random):0);
-        const armour=rollDie(e.armourDie||4,random);
-        hit=Math.max(1,rolled-armour);
-      }else hit=rollDie(Math.max(3,Math.ceil(stats.attack*.35)),random)+(classBombDie(p,sku)?rollDie(classBombDie(p,sku),random):0);
-      if(e.role==='armoured')hit=Math.max(1,hit-Math.max(2,Math.ceil(e.faces*.3)));
-      e.hp=Math.max(0,e.hp-hit);
-      if(before>0&&e.hp===0&&e.role==='zombie'&&!e.revived)e.awaitRevival=2;
-      dealtTotal+=before-e.hp;
-    }
-    b.damageBy??={};b.damageBy[p.id]=(b.damageBy[p.id]||0)+dealtTotal;
-    addLog(s,`${p.name} used ${item.name} on ${targets.length} enemies (${dealtTotal} total damage).`,now);
-  }
-}
 function applyHeroAction(s,p,a,b,now,random){
  const roomId=p.room;
  if(a.type==='move')moveInCombat(s,p,a.dir,now);
  else if(a.type==='attack')heroStrike(p,b.enemies,a,now,s,random);
  else if(a.type==='special')heroSpecial(p,b.enemies,a,b,now,s,random);
- else if(a.type==='item')useCombatConsumable(s,p,b,a.sku,now,random);
- else if(a.type==='nest'){
-   const nest=(b.nests||[]).find(n=>n.id===a.target&&n.active);
-   if(!nest||Math.abs(nest.x-p.x)+Math.abs(nest.y-p.y)!==1){addLog(s,'The nest is no longer within reach.',now);return;}
-   const roll=rollDie(6,random);
-   if(roll>=5){nest.active=false;addLog(s,`${p.name} rolled ${roll}: ${nest.id} disabled!`,now);emitEvent(s,'nest-disabled',{room:roomId,nest:nest.id},now);}
-   else {const count=Math.min(8,Number(roomId.split('r')[1]));
-     b.nestQueue??=[];b.nestQueue.push({x:nest.x,y:nest.y,count});
-     addLog(s,`${p.name} rolled ${roll}: the nest erupts with ${count} fresh enemy dice after this enemy phase!`,now);
-   }
- }
- else if(a.type==='light'){
-   const index=Number(a.target),sites=ABYSS_LANTERNS[roomId]||[];
-   b.litLanterns??=[];
-   if(sites[index]&&!b.litLanterns.includes(index)&&Math.abs(sites[index][0]-p.x)+Math.abs(sites[index][1]-p.y)<=1){
-     b.litLanterns.push(index);addLog(s,`${p.name} lights a lantern, driving back the shadows!`,now);
-     emitEvent(s,'lantern-lit',{room:roomId,index},now);
-   }
- }
  else if(a.type==='potion'){
    try{healWithPotion(s,p,a.target||p.id,now)}
    catch(err){addLog(s,`${p.name} could not use a potion: ${err.message}.`,now)}
@@ -1551,7 +1359,7 @@ function applyHeroAction(s,p,a,b,now,random){
 const PLAYER_ORDER=['one','two','three','four'];
 export function globalActivePlayer(s){
  const turn=s.turn;if(!turn)return null;
- return PLAYER_ORDER.find(id=>s.players?.[id]?.connected&&!s.players[id].mazeSlot&&s.players[id].hp>0&&
+ return PLAYER_ORDER.find(id=>s.players?.[id]?.connected&&s.players[id].hp>0&&
    (turn.eligibleRound?.[id]??1)<=turn.round&&!turn.ended?.[id])||null;
 }
 // Legacy callers can ask for the global owner even when they are viewing a room.
@@ -1612,7 +1420,7 @@ export function resolveRound(s,roomId,now=nowMs(),random=Math.random){
   }
   // Players who acted via End Turn already advanced their own cooldown.
   for(const p of group)if(!b.actions[p.id]?.resolved)p.combatTurns=(p.combatTurns||0)+1;
-  if(b.enemies.every(e=>e.hp<=0&&!e.awaitRevival)&&!(b.nests||[]).some(n=>n.active)&&!(b.nestQueue||[]).length){
+  if(b.enemies.every(e=>e.hp<=0&&!e.awaitRevival)){
     const def=ROOM_DATA[roomId];
     // Quest 4's final room has two sequential waves: Large Shiny D4, then Boss D12.
     if(def.stageTwo&&b.wave===0){
@@ -1640,36 +1448,14 @@ export function resolveRound(s,roomId,now=nowMs(),random=Math.random){
     b.status='cleared';b.deadline=null;b.actions={};b.exitVotes={};
     addLog(s,`${ROOM_DATA[roomId].name} cleared!`,now);
     if(!def.final)emitEvent(s,'room-cleared',{room:roomId,name:ROOM_DATA[roomId].name},now);
-    if(def.quest===12){
-      s.cityDistricts??=[];
-      if(!s.cityDistricts.includes(roomId)){
-        s.cityDistricts.push(roomId);
-        if(roomId==='q12r4')for(const player of Object.values(s.players)){if(player.hp>0&&player.room===roomId)player.hp=Math.min(player.maxHp,player.hp+Math.ceil(player.maxHp*.25));}
-        if(roomId==='q12r3')for(const player of Object.values(s.players)){if(player.room===roomId)player.gold+=65;}
-        addLog(s,`City district secured: ${def.name}${roomId==='q12r4'?' · temple healing':roomId==='q12r3'?' · warehouse supplies':''}.`,now);
-      }
-    }
     if(def.final){
       s.completedQuests??=[];if(!s.completedQuests.includes(def.quest))s.completedQuests.push(def.quest);
-      const was=s.unlockedQuest||1;s.unlockedQuest=Math.max(was,Math.min(15,def.quest+1));
-      // Only the transition into Medium and Medium-tier bosses can restock a Legendary.
-      // Replaying Beginner/Easy bosses cannot farm the rare-merchant roll.
-      const merchantTier=s.unlockedQuest||1;
-      if(def.quest>=(merchantTier>=13?12:merchantTier>=10?9:4))refreshMerchant(s,random);
+      const was=s.unlockedQuest||1;s.unlockedQuest=Math.max(was,Math.min(7,def.quest+1));
       addLog(s,`QUEST ${def.quest} COMPLETE!${s.unlockedQuest>was?' Quest '+s.unlockedQuest+' unlocked.':''}`,now);
       emitEvent(s,'quest-complete',{quest:def.quest,room:roomId,next:s.unlockedQuest>was?s.unlockedQuest:null},now);
       for(const id of Object.keys(b.participated||{}).filter(id=>s.players[id])){
-        const player=s.players[id];player.gold=(player.gold||0)+([0,12,22,35,50,65,80,95,115,135,170,210,260,330,420,600][def.quest]||0);
-        awardXp(player,([0,10,18,24,32,40,46,52,60,66,85,100,120,145,180,240][def.quest]||0),s,now);
-        // One new personal chest per quest per character. It is sealed when the
-        // boss dies, rather than being rerolled when the UI is reopened.
-        const rewardId=`${id}:${def.quest}`;
-        if(!s.questRewardClaimed?.[rewardId]&&!s.questRewardOffers?.[rewardId]){
-          const q=def.quest;const rarity=q<=1?'Common':q<=3?'Uncommon':q===4?'Rare':
-            q<=9?(random()<.05?'Legendary':'Rare'):
-            q<=12?(random()<.05?'Mythic':'Legendary'):(random()<.05?'Exotic':'Mythic');
-          s.questRewardOffers[rewardId]={quest:q,rarity,level:player.level};
-        }
+        const player=s.players[id];player.gold=(player.gold||0)+([0,12,22,35,50,65,80,95][def.quest]||0);
+        awardXp(player,([0,10,18,24,32,40,46,52][def.quest]||0),s,now);
       }
     }
     s.revision++;return {saved:def.final?'boss-completed':'checkpoint'};
@@ -1692,9 +1478,8 @@ export function resolveRound(s,roomId,now=nowMs(),random=Math.random){
     }
     if(actorDistance(target,e)<=1){
       const defending=(b.actions[target.id]?.type||'defend')==='defend';
-      const raw=rollDie(e.atk,random),blocked=rollDie(effectiveStats(target).armour,random)+(classBonusDefenceDie(target)?rollDie(classBonusDefenceDie(target),random):0);
-      let hit=defending?Math.ceil(Math.max(0,raw-blocked)/2):Math.max(0,raw-blocked);
-      if(target.wardCharges>0){target.wardCharges--;hit=0;addLog(s,`${target.name}'s Guardian Ward blocks the strike!`,now)}
+      const raw=rollDie(e.atk,random),blocked=rollDie(effectiveStats(target).armour,random);
+      const hit=defending?Math.ceil(Math.max(0,raw-blocked)/2):Math.max(0,raw-blocked);
       target.hp=Math.max(0,target.hp-hit);
       addLog(s,`${e.name} strikes ${target.name} for ${hit} damage (${target.hp}/${target.maxHp} HP).`,now);
       if(target.hp===0){target.downedUntil=b.round+3;addLog(s,`${target.name} is down! Three rounds to revive.`,now);emitEvent(s,'downed',{player:target.id},now)}
@@ -1705,24 +1490,6 @@ export function resolveRound(s,roomId,now=nowMs(),random=Math.random){
   // A room's own enemyPhase count is independent of players exploring other quests.
   b.enemyPhases=(b.enemyPhases||0)+1;
   const initialFoes=b.enemies.filter(e=>e.hp>0);
-  if(roomId==='q15r15'){
-    const king=b.enemies.find(e=>e.variant==='boss'&&e.hp>0);
-    if(king){
-      const phase=king.hp>king.maxHp*2/3?1:king.hp>king.maxHp/3?2:3;
-      if(b.kingPhase!==phase){b.kingPhase=phase;king.role=['armoured','teleporter','ninja'][phase-1];
-        king.name=`Dice King · Face ${phase} · D${king.faces}`;
-        addLog(s,`The Dice King turns to FACE ${phase} — ${king.role.toUpperCase()}! Its health does not reset.`,now);}
-    }
-  }
-  if(ROOM_DATA[roomId].quest===10&&ROOM_DATA[roomId].final){
-    const king=initialFoes.find(e=>e.variant==='boss');
-    if(king){
-      const phases=['teleporter','armoured','ghost'];
-      king.role=phases[(b.enemyPhases-1)%phases.length];
-      king.name=`Chaos King · ${king.role} D${king.faces}`;
-      if(b.enemyPhases%3===1)addLog(s,`The Chaos King changes form: ${king.role}!`,now);
-    }
-  }
   const heroTargets=()=>eligibleParticipants(s,roomId).filter(p=>p.hp>0);
   const canStrike=(foe,hero)=>hero&&actorDistance(hero,foe)<=(foe.role==='ranged'?2:1)
     &&(foe.role!=='ranged'||enemyTiles(foe).some(([x,y])=>clearLine(roomId,x,y,hero.x,hero.y)));
@@ -1763,9 +1530,8 @@ export function resolveRound(s,roomId,now=nowMs(),random=Math.random){
   const strike=(foe,hero)=>{
     if(!canStrike(foe,hero))return false;
     const defending=(b.actions[hero.id]?.type||'defend')==='defend';
-    const raw=rollDie(foe.atk,random),blocked=rollDie(effectiveStats(hero).armour,random)+(classBonusDefenceDie(hero)?rollDie(classBonusDefenceDie(hero),random):0);
-    let hit=defending?Math.ceil(Math.max(0,raw-blocked)/2):Math.max(0,raw-blocked);
-    if(hero.wardCharges>0){hero.wardCharges--;hit=0;addLog(s,`${hero.name}'s Guardian Ward blocks the strike!`,now)}
+    const raw=rollDie(foe.atk,random),blocked=rollDie(effectiveStats(hero).armour,random);
+    const hit=defending?Math.ceil(Math.max(0,raw-blocked)/2):Math.max(0,raw-blocked);
     hero.hp=Math.max(0,hero.hp-hit);
     addLog(s,`${foe.name} strikes ${hero.name} for ${hit} damage (${hero.hp}/${hero.maxHp} HP).`,now);
     if(hero.hp===0){hero.downedUntil=b.round+3;addLog(s,`${hero.name} is down! Three rounds to revive.`,now);emitEvent(s,'downed',{player:hero.id},now)}
@@ -1806,59 +1572,6 @@ export function resolveRound(s,roomId,now=nowMs(),random=Math.random){
     const freshTarget=heroTargets().sort((a,z)=>actorDistance(a,foe)-actorDistance(z,foe))[0];
     if(freshTarget)strike(foe,freshTarget);
   }
-  if([10,11,13].includes(ROOM_DATA[roomId].quest)){
-    const hazard=ROOM_DATA[roomId].hazard;
-    const phase=(b.enemyPhases+(ROOM_DATA[roomId].hazardPhaseOffset||0))%3;
-    const active=hazard==='chaos'||hazard==='storm'?phase===0:phase!==0;
-    b.hazardPhase=phase;
-    if(active){
-      const dangerous=new Set((HARD_HAZARDS[roomId]||[]).map(([x,y])=>x+','+y));
-      for(const hero of heroTargets()){
-        if(!dangerous.has(hero.x+','+hero.y))continue;
-        const defending=b.actions[hero.id]?.type==='defend';
-        if(hazard==='storm'){
-          const direction=(Number(roomId.match(/r(\d+)/)?.[1]||1)%2)?1:-1;
-          let shifted=0;for(let step=0;step<2;step++){const nx=hero.x+direction;if(nx<0||nx>=roomSize(roomId).width||occupied(s,roomId,nx,hero.y,hero.id))break;hero.x=nx;shifted++;}
-          addLog(s,`${hero.name} is buffeted by a storm gust${shifted?' and pushed '+shifted+' squares':' but holds position behind cover'}.`,now);
-        }else{const hit=defending?2:5;
-          hero.hp=Math.max(0,hero.hp-hit);
-          addLog(s,`${hero.name} suffers ${hit} ${hazard==='chaos'?'chaos energy':'flood'} damage.`,now);
-          if(!hero.hp){hero.downedUntil=b.round+3;emitEvent(s,'downed',{player:hero.id},now);} }
-      }
-    }
-  }
-  // The Abyss: illuminated pools matter. Lanterns are persistent room state.
-  // Darkness wounds heroes outside the entrance glow or lit lanterns each third phase.
-  if(ROOM_DATA[roomId].quest===14 && (b.enemyPhases+(ROOM_DATA[roomId].hazardPhaseOffset||0))%3===0){
-    const lanterns=ABYSS_LANTERNS[roomId]||[];
-    for(const hero of heroTargets()){
-      const safe=(hero.x<=2&&Math.abs(hero.y-doorRow(roomId))<=2)||lanterns.some(([x,y],i)=>b.litLanterns?.includes(i)&&Math.abs(hero.x-x)+Math.abs(hero.y-y)<=3);
-      if(safe)continue;
-      const defending=b.actions[hero.id]?.type==='defend',damage=defending?2:6;
-      hero.hp=Math.max(0,hero.hp-damage);
-      addLog(s,`${hero.name} suffers ${damage} damage in the unlit abyss. Seek a lantern!`,now);
-      if(!hero.hp){hero.downedUntil=b.round+3;emitEvent(s,'downed',{player:hero.id},now);}
-    }
-  }
-  // Warrens: a failure causes room-number dice to appear AFTER the enemy phase,
-  // making the new arrivals eligible to attack next round, not instantly.
-  if(ROOM_DATA[roomId].quest===9){
-    const activeNests=(b.nests||[]).filter(n=>n.active);
-    const spawnAt=(nest,count)=>{
-      for(let n=0;n<count&&b.enemies.filter(e=>e.hp>0).length<24;n++){
-        const enemy={id:`${roomId}-nest-spawn-${b.nestSpawns++}`,name:'Warrens Swift D10',faces:10,variant:'normal',role:'swift',clone:true,parentId:'nest',hp:20,maxHp:20,atk:36,armourDie:25};
-        const open=[];for(let y=0;y<roomSize(roomId).height;y++)for(let x=0;x<roomSize(roomId).width;x++)
-          if(enemyCanOccupy(s,roomId,enemy,x,y)&&!(b.nests||[]).some(t=>t.active&&t.x===x&&t.y===y))open.push([x,y]);
-        open.sort((a,z)=>(Math.abs(a[0]-nest.x)+Math.abs(a[1]-nest.y))-(Math.abs(z[0]-nest.x)+Math.abs(z[1]-nest.y)));
-        if(!open.length)break;enemy.x=open[0][0];enemy.y=open[0][1];b.enemies.push(enemy);
-      }
-    };
-    for(const pending of b.nestQueue||[])spawnAt(pending,pending.count);
-    b.nestQueue=[];
-    // Active nests periodically hatch a single scout; never an uncontrolled
-    // exponential wave. Players can stop the hatch by pressing N beside a nest.
-    if(b.enemyPhases%3===0)for(const nest of activeNests)spawnAt(nest,1);
-  }
   // A Zombie gets one full enemy phase inert after its first defeat, then rises
   // once at 50% health. It awards combat XP only after its final defeat.
   for(const foe of b.enemies.filter(e=>e.role==='zombie'&&e.hp<=0&&!e.revived)){
@@ -1893,29 +1606,8 @@ export function tick(s,now=nowMs()){
  addLog(s,`${s.players[current].name}'s timed turn ended automatically.`,now);
  return [{room:s.players[current]?.room||'global',result}];
 }
-/** Take an already earned, individually sealed quest-boss equipment chest.
- * Replays do not create endless identical boss chests; XP and gold remain.
- * Choice is one of the four existing equipment classes (including ranged bow specials). */
-export function claimQuestReward(s,id,quest,category,now=nowMs()){
- const p=readyPlayer(s,id);ensureWorld(s);
- if(!['Sword','Bow','Mace','Staff','Armour'].includes(category))throw new Error('Choose Sword, Bow, Mace, Staff or Armour');
- const key=`${id}:${quest}`,offer=s.questRewardOffers?.[key];
- if(!offer||offer.quest!==quest||s.questRewardClaimed?.[key])throw new Error('No unclaimed quest chest');
- const rarity=offer.rarity;const level=Math.min(p.level,offer.level);
- const piece={id:itemId(p,'equipment'),kind:'equipment',category,rarity,level,bonusDie:RARITY_DICE[rarity],name:`${rarity} ${category} · Quest ${quest} Victory · L${level}`,enchantments:[],bossReward:true};
- p.inventory.equipment.push(piece);delete s.questRewardOffers[key];s.questRewardClaimed[key]=true;
- addLog(s,`${p.name} chose a ${rarity} ${category} from Quest ${quest}'s victory chest.`,now);
- emitEvent(s,'victory-reward',{player:id,quest,rarity,category},now);s.revision++;return {saved:null,item:piece};
-}
-
 export function publicState(s,viewerId){
-  const snapshot=clone(s);snapshot.me=viewerId;
- // The Maze has a player-specific public projection. Never send hidden topology,
- // deterministic loot seeds, boss secret, or other players' claim ledgers.
- delete snapshot.mazeRuns;delete snapshot.lastMazeBoss;
- snapshot.questRewardOffers=Object.fromEntries(Object.entries(s.questRewardOffers||{}).filter(([key])=>key.startsWith(viewerId+':')));
- delete snapshot.questRewardClaimed;snapshot.roomDefinitions=ROOM_DATA;snapshot.shopStock=SHOP_STOCK;snapshot.roomWalls=ROOM_WALLS;snapshot.roomHazards=HARD_HAZARDS;snapshot.roomLanterns=ABYSS_LANTERNS;
-  snapshot.shopStock=merchantStock(s).map(item=>({...item,cost:classPrice(s.players[viewerId],item,(s.cityDistricts||[]).includes('q12r2'))}));
+  const snapshot=clone(s);snapshot.me=viewerId;snapshot.roomDefinitions=ROOM_DATA;snapshot.shopStock=SHOP_STOCK;snapshot.roomWalls=ROOM_WALLS;
   snapshot.turn.activePlayer=globalActivePlayer(s);
   for(const [roomId,room] of Object.entries(snapshot.rooms)){if(room.battle.status==='active')room.battle.activePlayer=globalActivePlayer(s);}
   for(const p of Object.values(snapshot.players)){
@@ -1924,7 +1616,7 @@ export function publicState(s,viewerId){
     // another player's private inventory or one-time treasure claims.
     if(p.id!==viewerId){
       delete p.inventory;delete p.equipped;delete p.lootClaimed;
-      delete p.gold;delete p.wardCharges;delete p.superRoom;delete p.specialUsedAt;delete p.trainingRackClaimed;delete p.questBookmarks;delete p.lastCampQuest;
+      delete p.gold;delete p.specialUsedAt;delete p.trainingRackClaimed;delete p.questBookmarks;delete p.lastCampQuest;
     }
   }
   // No personal credentials or authentication data are stored in game state.

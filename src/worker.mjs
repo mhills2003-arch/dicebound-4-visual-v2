@@ -1,9 +1,10 @@
 import { DurableObject } from 'cloudflare:workers';
+import {createMaze,joinMaze,leaveMaze,mazeTravel,mazeSearch,mazeClaim,mazeBonus,mazeAction,mazeRetreat,mazeReward,mazeVoteAbandon,mazeTick,nextMazeDeadline,mazePublic,resumeMazeClock} from './maze-play.mjs';
 import {ensureChat,chatForViewer,postChat,togglePersonalMute,reportChat,toggleAdminMute} from './chat.mjs';
-import {freshState,ensurePlayer,markDisconnected,move,submitAction,claimLoot,resetTestAdventure,equipItem,unequipItem,bindEnchantment,usePotion,claimTrainingRack,enterQuest,replayQuest,rollMovement,voteFinishQuest,returnToCamp,buyFromShop,sellToShop,resumeQuest,submitSequentialAction,endTurn,assertGlobalTurn,tick,publicState,ROOM_DATA} from './engine.mjs';
+import {freshState,ensurePlayer,markDisconnected,move,submitAction,claimLoot,resetTestAdventure,equipItem,unequipItem,bindEnchantment,usePotion,claimTrainingRack,enterQuest,replayQuest,rollMovement,voteFinishQuest,returnToCamp,buyFromShop,sellToShop,resumeQuest,submitSequentialAction,endTurn,assertGlobalTurn,tick,publicState,ROOM_DATA,claimQuestReward,selectClass} from './engine.mjs';
 
-const ROOT='/dicebound-beta';
-const COOKIE='db4_beta_session';
+const ROOT='/dicebound-v2';
+const COOKIE='db4_v2_session';
 const encoder=new TextEncoder();
 const reply=(value,status=200,headers={})=>new Response(typeof value==='string'?value:JSON.stringify(value),{status,headers:{'cache-control':'no-store',...headers,'content-type':typeof value==='string'?'text/html; charset=utf-8':'application/json; charset=utf-8'}});
 function b64url(bytes){let out='';for(const b of bytes)out+=String.fromCharCode(b);return btoa(out).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
@@ -35,7 +36,7 @@ async function validSession(req,env){
 }
 function loginScreen(error=''){
   const message=error?'<p class="error" role="alert">That invitation code was not accepted.</p>':'';
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DICEBOUND 4.0 — Private Prototype</title><style>body{min-height:100dvh;display:grid;place-items:center;background:radial-gradient(#1c3550,#050b16);font:16px system-ui;color:#e9dcc0;margin:0}.card{max-width:370px;width:calc(100% - 48px);padding:30px;background:#101b2be8;border:1px solid #9f804a;border-radius:20px;box-shadow:0 25px 90px #0008}h1{font:32px Georgia;color:#e9c77b}.error{color:#ffaaaa}label{display:block;margin:18px 0 8px}input{width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #9f804a;background:#081323;color:white;font-size:17px}button{width:100%;margin-top:18px;padding:13px;background:#d9b978;color:#151a23;border:0;border-radius:10px;font-weight:700}small{color:#c2c8cc}</style></head><body><main class="card"><h1>🎲 DICEBOUND 4.0</h1><p>Private multiplayer technical beta · adult testers only</p>${message}<form action="${ROOT}/api/login" method="POST"><label for="code">Parent-issued invitation code</label><input id="code" name="code" type="password" autocomplete="off" required minlength="20" maxlength="256"><button type="submit">Enter prototype</button></form><p><small>For development testing only. Do not invite children until parental authentication, moderation and privacy safeguards are complete.</small></p></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DICEBOUND 4.0 V2 — Visual Lab</title><style>body{min-height:100dvh;display:grid;place-items:center;background:radial-gradient(#1c3550,#050b16);font:16px system-ui;color:#e9dcc0;margin:0}.card{max-width:370px;width:calc(100% - 48px);padding:30px;background:#101b2be8;border:1px solid #9f804a;border-radius:20px;box-shadow:0 25px 90px #0008}h1{font:32px Georgia;color:#e9c77b}.error{color:#ffaaaa}label{display:block;margin:18px 0 8px}input{width:100%;box-sizing:border-box;padding:12px;border-radius:9px;border:1px solid #9f804a;background:#081323;color:white;font-size:17px}button{width:100%;margin-top:18px;padding:13px;background:#d9b978;color:#151a23;border:0;border-radius:10px;font-weight:700}small{color:#c2c8cc}</style></head><body><main class="card"><h1>🎲 DICEBOUND 4.0 V2</h1><p>Isolated visual development copy · adult testers only</p>${message}<form action="${ROOT}/api/login" method="POST"><label for="code">Parent-issued invitation code</label><input id="code" name="code" type="password" autocomplete="off" required minlength="20" maxlength="256"><button type="submit">Enter prototype</button></form><p><small>For development testing only. Do not invite children until parental authentication, moderation and privacy safeguards are complete.</small></p></main></body></html>`;
 }
 function goodOrigin(req){const origin=req.headers.get('origin');if(!origin)return false;try{return new URL(origin).origin===new URL(req.url).origin}catch{return false}}
 function configured(env){return env.INVITE_TOKEN_1?.length>=24&&env.INVITE_TOKEN_2?.length>=24&&env.COOKIE_SECRET?.length>=32&&env.INVITE_TOKEN_1!==env.INVITE_TOKEN_2&&![env.INVITE_TOKEN_1,env.INVITE_TOKEN_2,env.COOKIE_SECRET].some(x=>x.includes('REPLACE_WITH'))}
@@ -66,7 +67,7 @@ export default {
     if(req.method==='GET'&&u.pathname===ROOT+'/api/ws'){
       if(req.headers.get('upgrade')?.toLowerCase()!=='websocket')return reply('Upgrade required',426);
       const isTrial=u.searchParams.get('trial')==='balance-v9';
-      const object=env.GAME_ROOM.get(env.GAME_ROOM.idFromName(isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'));
+      const object=env.V2_GAME_ROOM.get(env.V2_GAME_ROOM.idFromName(isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'));
       const headers=new Headers(req.headers);
       headers.set('x-dicebound-player',identity.id);
       headers.set('x-dicebound-name',identity.name);
@@ -78,7 +79,7 @@ export default {
     // PRIVATE ASSET GATE. Worker authenticates before serving each file.
     // Cloudflare's default root assets path works on accounts without base_path.
     const assetUrl=new URL(req.url);
-    assetUrl.pathname=(u.pathname===ROOT+'/')?'/index.html':u.pathname.slice(ROOT.length);
+    assetUrl.pathname=(u.pathname===ROOT+'/')?'/':u.pathname.slice(ROOT.length);
     const result=await env.ASSETS.fetch(new Request(assetUrl.toString(),req));
     const headers=new Headers(result.headers);headers.set('cache-control','private, no-store');headers.set('x-content-type-options','nosniff');headers.set('x-frame-options','DENY');headers.set('referrer-policy','no-referrer');
     return new Response(result.body,{status:result.status,statusText:result.statusText,headers});
@@ -104,7 +105,7 @@ export class GameRoom extends DurableObject {
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({id});
     if(req.headers.get('x-dicebound-trial')==='balance-v9')this.game.balanceTrial=true;
-    ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);
+    ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);resumeMazeClock(this.game,id);
     this.announce(`${this.game.players[id].name} joined the adventure.`);
     await this.persist(null);
     this.broadcast();
@@ -124,7 +125,7 @@ export class GameRoom extends DurableObject {
     this.broadcastChat();
   }
   broadcast(){for(const ws of this.ctx.getWebSockets()){
-    try{ws.send(JSON.stringify({type:'state',state:publicState(this.game,ws.deserializeAttachment()?.id)}))}catch{}
+    try{ws.send(JSON.stringify({type:'state',state:{...publicState(this.game,ws.deserializeAttachment()?.id),maze:mazePublic(this.game,ws.deserializeAttachment()?.id)}}))}catch{}
   }}
   async persist(reason){
     // Durable live coordination data is separate from the designated adventure
@@ -135,7 +136,8 @@ export class GameRoom extends DurableObject {
   }
   async schedule(){
     // One clock for the whole party, even when everyone is in different quests.
-    const next=this.game.turn?.activePlayer===null?null:this.game.turn?.deadline;
+    const ordinary=this.game.turn?.activePlayer===null?Infinity:this.game.turn?.deadline||Infinity;
+    const nextTime=Math.min(ordinary,nextMazeDeadline(this.game));const next=Number.isFinite(nextTime)?nextTime:null;
     if(next)await this.ctx.storage.setAlarm(Math.max(Date.now()+100,next));
     else await this.ctx.storage.deleteAlarm();
   }
@@ -152,17 +154,31 @@ export class GameRoom extends DurableObject {
       if(['chat-send','chat-mute','chat-report','chat-admin-mute'].includes(packet.type)){
         await this.handleChatPacket(ws,id,packet);return;
       }
+      if(this.game.players[id].mazeSlot&&!packet.type.startsWith('maze-')&&!['ping','chat-send','chat-mute','chat-report','chat-admin-mute'].includes(packet.type))throw new Error('Leave the Maze before using campaign actions');
       // All gameplay changes are gated by the same global turn owner.
       // Rolling must precede movements and tactical actions; inventory controls
       // remain available during downtime (but still respect combat rules).
       const freePackets=['ping','reset-lab'];
-      const inventoryPackets=['equip','unequip','bind-enchant'];
-      if(!freePackets.includes(packet.type)&&!inventoryPackets.includes(packet.type)&&packet.type!=='end-turn')
+      const inventoryPackets=['equip','unequip','bind-enchant','class-select'];
+      if(!freePackets.includes(packet.type)&&!inventoryPackets.includes(packet.type)&&packet.type!=='end-turn'&&!packet.type.startsWith('maze-'))
         assertGlobalTurn(this.game,id);
       let result;
-      if(packet.type==='move')result=move(this.game,id,packet.dir);
+      if(packet.type==='maze-create')result=createMaze(this.game,id,packet.slot,crypto.randomUUID());
+      else if(packet.type==='maze-join')result=joinMaze(this.game,id,packet.slot);
+      else if(packet.type==='maze-leave')result=leaveMaze(this.game,id);
+      else if(packet.type==='maze-travel')result=mazeTravel(this.game,id,packet.dir);
+      else if(packet.type==='maze-search')result=mazeSearch(this.game,id);
+      else if(packet.type==='maze-claim')result=mazeClaim(this.game,id,packet.slot);
+      else if(packet.type==='maze-bonus')result=mazeBonus(this.game,id);
+      else if(packet.type==='maze-action')result=mazeAction(this.game,id,packet.action);
+      else if(packet.type==='maze-retreat')result=mazeRetreat(this.game,id);
+      else if(packet.type==='maze-reward')result=mazeReward(this.game,id,packet.category);
+      else if(packet.type==='maze-abandon')result=mazeVoteAbandon(this.game,id);
+      else if(packet.type==='move')result=move(this.game,id,packet.dir);
       else if(packet.type==='action'){if(packet.action?.type==='move')throw new Error('Use dice movement');result=submitSequentialAction(this.game,id,packet.action);}
       else if(packet.type==='claim')result=claimLoot(this.game,id,packet.slot);
+      else if(packet.type==='claim-quest-reward')result=claimQuestReward(this.game,id,packet.quest,packet.category);
+      else if(packet.type==='class-select')result=selectClass(this.game,id,packet.klass);
       else if(packet.type==='equip')result=equipItem(this.game,id,packet.itemId,packet.slot||null);
       else if(packet.type==='training-rack')result=claimTrainingRack(this.game,id);
       else if(packet.type==='enter-quest')result=enterQuest(this.game,id,packet.quest);
@@ -196,5 +212,5 @@ export class GameRoom extends DurableObject {
     const another=this.ctx.getWebSockets().some(s=>s!==ws&&s.deserializeAttachment()?.id===id&&s.readyState===1);
     if(id&&!another){markDisconnected(this.game,id);this.announce(`${this.game.players[id].name} disconnected safely.`);await this.persist(null);this.broadcast()}
   }
-  async alarm(){await this.ready;const changes=tick(this.game);if(changes.length){const save=changes.map(c=>c.result?.saved).find(Boolean);await this.persist(save||null);this.broadcast()}else await this.schedule()}
+  async alarm(){await this.ready;const mazeChanged=mazeTick(this.game);const changes=tick(this.game);if(changes.length||mazeChanged){const save=changes.map(c=>c.result?.saved).find(Boolean);await this.persist(save||null);this.broadcast()}else await this.schedule()}
 }

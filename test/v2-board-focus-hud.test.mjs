@@ -39,3 +39,18 @@ test('Board Focus affects UI only and preserves the current Quest 1 renderer and
  assert.match(engine,/woodland:/);
  assert(!html.includes('DICEBOUND4_V2_Q1_ROOM_1_2_PREMIUM_SCENERY_AND_ACTORS_PATCH.zip'));
 });
+
+test('Focus deployment does not mix old styles with new controls',()=>{
+ assert.match(html,/styles\.css\?build=v2-boardfocus-20261102b/);
+ assert.match(html,/app\.js\?build=v2-boardfocus-20261102b/);
+ assert.match(html,/<style id="boardFocusCritical"/);
+ assert.match(html,/body\.hud-board-focus \.side-left,body\.hud-board-focus \.side-right\{display:none\}/);
+ assert.match(html,/body\.hud-board-focus \.sidebar\.hud-panel-open/);
+ assert.match(html,/body\.hud-board-focus \.board-and-actions/);
+});
+test('Class selector stays accessible from a modal, but does not block the playing area',()=>{
+ assert.match(html,/id="hudClassBtn"/);
+ assert.match(js,/hudClass\.classList\.add\('hud-class-open'\)/);
+ assert.match(js,/\$\('hudClassBtn'\)\.hidden=!!me\.classChosen/);
+ assert.match(css,/#classSelectPanel\.hud-class-open:not\(\[hidden\]\)/);
+});

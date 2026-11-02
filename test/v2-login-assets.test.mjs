@@ -26,7 +26,9 @@ function envWithAssets(){
   return { ...vars, ASSETS: {fetch: async request => {
     const pathname=new URL(request.url).pathname;
     hits.push(pathname);
-    if(pathname==='/')return new Response('<html>DICEBOUND-V2-APP</html>', {headers:{'content-type':'text/html'}});
+    // Cloudflare `html_handling = none` does NOT map '/' to '/index.html'.
+    // An invalid assumption here allowed an authenticated 404 regression.
+    if(pathname==='/index.html')return new Response('<html>DICEBOUND-V2-APP</html>', {headers:{'content-type':'text/html'}});
     if(pathname==='/v2-art-preview.html')return new Response('<html>V2-ART-LAB</html>', {headers:{'content-type':'text/html'}});
     if(pathname==='/app.js')return new Response('/* app */', {headers:{'content-type':'text/javascript'}});
     return new Response('Not found',{status:404});
@@ -36,7 +38,7 @@ function envWithAssets(){
 test('V2 disables Cloudflare HTML canonical redirects that leave authenticated prefix',()=>{
   assert.match(config,/^html_handling = "none"$/m);
   assert.match(config,/run_worker_first = true/);
-  assert.match(workerSource,/assetUrl\.pathname=\(u\.pathname===ROOT\+'\/'\)\?'\/'/);
+  assert.match(workerSource,/assetUrl\.pathname=\(u\.pathname===ROOT\+'\/'\)\?'\/index\.html'/);
 });
 
 test('successful V2 login redirects into prefix and protected game + Art Lab paths resolve',async()=>{
@@ -58,7 +60,7 @@ test('successful V2 login redirects into prefix and protected game + Art Lab pat
     assert.match(await result.text(),new RegExp(marker));
     assert.equal(result.headers.get('location'),null,'no unwanted canonical redirect');
   }
-  assert.deepEqual(e.hits,['/','/v2-art-preview.html','/app.js']);
+  assert.deepEqual(e.hits,['/index.html','/v2-art-preview.html','/app.js']);
   const forbidden=await worker.fetch(new Request(`${ROOT}/v2-art-preview.html`),e);
   assert.equal(forbidden.status,401,'Art Lab must remain gated behind V2 login');
 });
@@ -76,4 +78,22 @@ test('unauthenticated V2 URL shows login before any sign-in, including ChatGPT t
   assert.deepEqual(e.hits,[], 'unauthenticated requests must never access static assets');
   const outside=await worker.fetch(new Request('https://test.example/different-route'),e);
   assert.equal(outside.status,404);
+});
+
+
+test('non-secret health page identifies whether V2 Worker is receiving requests',async()=>{
+  const worker=workerForRoutingTest();
+  const e=envWithAssets();
+  const res=await worker.fetch(new Request(`${ROOT}/health`),e);
+  assert.equal(res.status,200);
+  assert.equal(await res.text(),'DICEBOUND V2 router OK');
+  assert.deepEqual(e.hits,[],'health should not depend on static asset deployment or login cookie');
+});
+
+test('Cloudflare none-mode asset root is not a substitute for explicit index.html',async()=>{
+  const e=envWithAssets();
+  const root=await e.ASSETS.fetch(new Request('https://test.example/'));
+  assert.equal(root.status,404);
+  const index=await e.ASSETS.fetch(new Request('https://test.example/index.html'));
+  assert.equal(index.status,200);
 });

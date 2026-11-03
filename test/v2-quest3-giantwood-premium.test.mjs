@@ -59,7 +59,7 @@ test('Q3 Level N is read clearly in character XP/HP dock; existing XP unchanged'
  assert.match(app,/heroXpFill/);assert.match(app,/heroHpFill/);
  assert.match(app,/paintPremiumGiantFloor/);assert.match(app,/paintPremiumGiantWall/);
  assert.match(app,/paintPremiumGiantActor/);
- assert.match(html,/q3=v2-quest3-giantwood-r2/);
+ assert.match(html,/q3=v2-quest3-giantwood-r3/);
 });
 test('All five Q3 rooms spawn their original enemies safely on the denser maps',async()=>{
  const {freshState,ensurePlayer,enterQuest,move,ROOM_WALLS}=await import('../src/engine.mjs');
@@ -82,14 +82,40 @@ test('All five Q3 rooms spawn their original enemies safely on the denser maps',
  }
 });
 
-test('Q3 R2 uses connected masonry and removes four-square highlighted Large footprint in premium display',()=>{
+test('Q3 R3 renders continuous natural formations without four-square Large highlights',()=>{
  const app=load('../public/app.js');const art=load('../public/v2-premium-giantwood.mjs');
  assert.match(app,/if\(!anyPremiumActive\(\)\)\{/);
- assert.match(app,/paintPremiumGiantWall\(ctx,s,x,y,me.room,state.roomWalls/);
+ assert.match(app,/paintPremiumGiantWallGroups\(ctx,s,me.room,state.roomWalls/);
  assert.match(art,/joinsHorizontal=left\|\|right/);
  assert.match(art,/joinsVertical=up\|\|down/);
- assert.match(art,/stone-wall-horizontal-q3r2/);
- assert.match(art,/stone-wall-corner-q3r2/);
+ assert.match(art,/giant-trunk-continuous-q3r3/);assert.match(art,/whole-moss-outcrop-q3r3/);
+ assert.match(art,/boss-d12-q3r3/);
  assert.match(art,/large-d4-q3r2\.png/);
  assert.match(art,/large-d6-q3r2\.png/);
+});
+
+
+test('R3 aggregates actual blocked cells into one organic visual feature with exact same coordinates', async()=>{
+ const {giantWallGroups}=await import('../public/v2-premium-giantwood.mjs');
+ for (const id of GIANT_ROOMS){
+  const expected=ROOM_WALLS[id].map(([x,y])=>`${x},${y}`).sort();
+  const groups=giantWallGroups(ROOM_WALLS[id]);
+  const actual=groups.flat().map(([x,y])=>`${x},${y}`).sort();
+  assert.deepEqual(actual,expected,`${id}: wall group must neither create nor remove a collision tile`);
+  assert.equal(new Set(actual).size,actual.length);
+  assert(groups.some(g=>g.length>=2),`${id}: at least one connected structure`);
+  for(const group of groups){const set=new Set(group.map(x=>x.join(','))),visited=new Set([group[0].join(',')]),q=[group[0]];
+   for(let i=0;i<q.length;i++){const [x,y]=q[i];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const key=`${x+dx},${y+dy}`;if(set.has(key)&&!visited.has(key)){visited.add(key);q.push([x+dx,y+dy]);}}}
+   assert.equal(visited.size,group.length,`${id}: one sprite per true connected component`);
+  }
+ }
+});
+test('R3 Elder Grove boss remains 1x1 in engine and uses complete isolated artwork',()=>{
+ const {width,height}=(()=>{ const b=readFileSync(new URL('../public/assets/premium-giantwood/boss-d12-q3r3.png',import.meta.url)); assert.equal(b.toString('ascii',1,4),'PNG');return {width:b.readUInt32BE(16),height:b.readUInt32BE(20)}; })();
+ assert(width>=300&&height>=150);
+ const art=load('../public/v2-premium-giantwood.mjs');
+ assert.match(art,/boss\?2\.20/);
+ assert.equal(ROOM_DATA.q3r5.foes[0].variant,'boss');
+ assert.equal(ROOM_DATA.q3r5.foes[0].faces,12);
+ assert.doesNotMatch(load('../public/app.js'),/state\.roomWalls\?\.\[me\.room\]\s*=/);
 });

@@ -1,0 +1,9 @@
+<!doctype html><html><head><meta charset="utf-8"><title>DICEBOUND Q4 - Quarry Entrance art proof of concept</title><style>html,body{margin:0;background:#101922;color:#f3dfac;font-family:system-ui}section{max-width:1152px;margin:16px auto}h1{font-size:20px;margin:0 0 10px}canvas{display:block;width:100%;background:#20231e;border:2px solid #b2944f}p{font-size:13px;opacity:.85}</style></head><body><section><h1>Quarry Entrance · Complete battlefield image (game-renderer test)</h1><canvas id="scene" width="1152" height="896"></canvas><p>Proof of concept only: real 9×7 wall positions; no baked-in player, enemies, loot, labels, or HUD.</p></section><script type="module">
+import {initPremiumQuarry,premiumQuarryReady,paintPremiumQuarryFloor,paintPremiumQuarryConnectedWalls,QUARRY_WALL_BLUEPRINTS} from './v2-premium-quarry.mjs';
+initPremiumQuarry();
+const canvas=document.querySelector('#scene');const ctx=canvas.getContext('2d');
+const walls=QUARRY_WALL_BLUEPRINTS.q4r1.flatMap((line,y)=>[...line].flatMap((v,x)=>v==='#'?[[x,y]]:[]));
+let tries=0;let timer=setInterval(()=>{if(!premiumQuarryReady('q4r1')&&tries++<100)return;clearInterval(timer);const s={iso:false,originX:0,originY:0,cell:128};
+paintPremiumQuarryFloor(ctx,s,'q4r1',walls);paintPremiumQuarryConnectedWalls(ctx,s,walls,'q4r1');
+document.body.dataset.rendered='yes';},100);
+</script></body></html>

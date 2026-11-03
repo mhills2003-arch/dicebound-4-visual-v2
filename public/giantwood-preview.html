@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><title>DICEBOUND Q3 renderer preview</title><style>html,body{margin:0;background:#081421;color:#efddaf;font-family:Georgia,serif}header{height:66px;background:#091726;border-bottom:2px solid #b8934e;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-sizing:border-box}header span{font-size:30px;font-weight:bold;color:#f5d192}header div{text-align:center;font-size:22px;font-weight:bold}header em{display:block;color:#dbd3b0;font-size:16px}.board{width:1536px;height:665px;display:block}.hud{height:108px;background:#091927;border-top:3px solid #d19d50;display:flex;align-items:center;justify-content:space-between;padding:12px 30px;box-sizing:border-box}.stat{font-size:16px;border:1px solid #b8934e;padding:11px 17px;border-radius:9px;background:#142536}.level{font:bold 24px Georgia;color:#ffe0a4;background:#162a25;border:2px solid #efca69;padding:13px 24px;border-radius:8px}#status{font-size:12px;color:#ccc}</style></head><body><header><span>◇ DICEBOUND</span><div>QUEST 3 — A BIG DEAL <em id="room">Giantwood</em></div><small>Visual renderer preview — game logic unchanged</small></header><canvas class="board" id="scene" width="1536" height="665"></canvas><section class="hud"><div class="stat">⚔ Knight <b>Player 0</b></div><div class="stat">♥ HEALTH <b>50 / 50 HP</b></div><div class="stat">✦ XP <b>47 / 100 XP</b></div><div class="level">LEVEL <span id="level">1</span></div><div class="stat">🛡 Armour D8 · ⚔ Attack D12</div></section><script type="module">
+import {initPremiumGiant,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantWall,paintPremiumGiantAtmosphere,paintPremiumGiantLighting,paintPremiumGiantActor,giantFrameImage} from './v2-premium-giantwood.mjs';
+const room=new URLSearchParams(location.search).get('room')||'q3r1';
+const names={q3r1:'Trampled Trail',q3r2:'Giant’s Clearing',q3r3:'Root Maze',q3r4:'Hollow Tree',q3r5:'Elder Grove'};
+document.getElementById('room').textContent=names[room];
+const walls={q3r1:['.........','..#..#...','..##.....','.........','....##...','..#...#..','.........'],q3r2:['.........','..##..#..','...##.#..','.........','.........','..##..##.','.........'],q3r3:['.........','..##...#.','..#....#.','.........','.........','..##.###.','.........'],q3r4:['.........','.........','..####...','..####...','...##....','..#..##..','.........'],q3r5:['.........','.##.#.#..','.#..#.#..','.........','.........','..##.##..','.........']};
+const enemies={q3r1:[{x:6,y:3,faces:4,variant:'normal'}],q3r2:[{x:6,y:3,faces:4,variant:'large'}],q3r3:[{x:6,y:3,faces:6,variant:'large'}],q3r4:[{x:6,y:3,faces:8,variant:'large'},{x:7,y:1,faces:4,variant:'normal'}],q3r5:[{x:6,y:1,faces:12,variant:'boss'},{x:6,y:4,faces:6,variant:'large'}]};
+const ctx=document.getElementById('scene').getContext('2d');const c=91,x0=(1536-9*c)/2,y0=13;
+const s={cell:c,originX:x0,originY:y0,at:(x,y)=>({x:x0+(x+.5)*c,y:y0+(y+.5)*c})};
+initPremiumGiant();const hero=new Image();hero.src='./assets/gary.png';await hero.decode().catch(()=>{});
+for(let i=0;i<70&&!premiumGiantReady(room);i++)await new Promise(r=>setTimeout(r,50));
+ctx.fillStyle='#142518';ctx.fillRect(0,0,1536,665);
+const lx=x0,rx=x0+9*c;
+for(const [side,x,w] of [['left',0,lx],['right',rx,1536-rx]]){const img=giantFrameImage(side,room);if(img?.complete&&img.naturalWidth)ctx.drawImage(img,x,0,w,665)}
+paintPremiumGiantFloor(ctx,s,room);const parsed=[];
+for(let y=0;y<7;y++)for(let x=0;x<9;x++)if(walls[room][y][x]==='#'){parsed.push([x,y]);paintPremiumGiantWall(ctx,s,x,y,room)}
+paintPremiumGiantLighting(ctx,s,parsed,room);paintPremiumGiantAtmosphere(ctx,s,room,0,false,true);
+const player={x:1,y:3,hp:50,maxHp:50,name:'Player 0'};
+paintPremiumGiantActor(ctx,s,player,'one',hero,{label:'Player 0',roomId:room,motion:false});
+for(const e of enemies[room])paintPremiumGiantActor(ctx,s,{...e,hp:25,maxHp:25},'enemy',null,{label:'D'+e.faces,roomId:room,motion:false});
+window.__Q3_READY__=true;
+</script></body></html>

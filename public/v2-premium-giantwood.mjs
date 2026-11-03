@@ -6,11 +6,18 @@
 export const GIANT_ROOMS = Object.freeze(['q3r1','q3r2','q3r3','q3r4','q3r5']);
 export const isPremiumGiantRoom = id => GIANT_ROOMS.includes(id);
 export const GIANT_FILES = Object.freeze({
-  q3r1:'./assets/premium-giantwood/trampled-trail-ground-q3r4.jpg',
-  q3r2:'./assets/premium-giantwood/giants-clearing-ground-q3r4.jpg',
-  q3r3:'./assets/premium-giantwood/root-maze-ground-q3r4.jpg',
-  q3r4:'./assets/premium-giantwood/hollow-tree-ground-q3r4.jpg',
-  q3r5:'./assets/premium-giantwood/elder-grove-ground-q3r4.jpg',
+  q3r1:'./assets/premium-giantwood/trampled-trail-ground-q3r5.jpg',
+  q3r2:'./assets/premium-giantwood/giants-clearing-ground-q3r5.jpg',
+  q3r3:'./assets/premium-giantwood/root-maze-ground-q3r5.jpg',
+  q3r4:'./assets/premium-giantwood/hollow-tree-ground-q3r5.jpg',
+  q3r5:'./assets/premium-giantwood/elder-grove-ground-q3r5.jpg',
+
+  // Fallback assets ensure a missing new cache-busted file does not disable the entire room.
+  q3r1Fallback:'./assets/premium-giantwood/trampled-trail-ground.jpg',
+  q3r2Fallback:'./assets/premium-giantwood/giants-clearing-ground.jpg',
+  q3r3Fallback:'./assets/premium-giantwood/root-maze-ground.jpg',
+  q3r4Fallback:'./assets/premium-giantwood/hollow-tree-ground.jpg',
+  q3r5Fallback:'./assets/premium-giantwood/elder-grove-ground.jpg',
   rubble:'./assets/premium-giantwood/moss-rock.png',
   timber:'./assets/premium-giantwood/root.png',
   cyan:'./assets/premium-giantwood/giant-fern.png',
@@ -48,7 +55,9 @@ export function initPremiumGiant(ImageCtor=typeof Image!=='undefined'?Image:null
 }
 const ready=key=>!!art[key]?.complete&&art[key].naturalWidth>0;
 export function premiumGiantReady(roomId='q3r1'){
- return isPremiumGiantRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst')&&ready('stoneWallH')&&ready('stoneWallV')&&ready('stoneWallCorner')&&ready('giantLog')&&ready('premiumBoulder')&&ready('premiumBush')&&ready('bossD12');
+ // Only a real floor image is required. Missing an OPTIONAL prop must never
+ // revert the entire room to the procedural painter.
+ return isPremiumGiantRoom(roomId)&&(ready(roomId)||ready(roomId+'Fallback'));
 }
 const roomIndex=id=>GIANT_ROOMS.indexOf(id);
 const floorPalette=[
@@ -70,7 +79,8 @@ export function paintPremiumGiantFloor(ctx,s,roomId='q3r1'){
  if(!premiumGiantReady(roomId)||s.iso)return false;
  const {originX:x,originY:y,cell:c}=s;
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.drawImage(art[roomId],x,y,9*c,7*c);
+ const floor=ready(roomId)?art[roomId]:art[roomId+'Fallback'];
+ ctx.drawImage(floor,x,y,9*c,7*c);
  ctx.lineWidth=Math.max(.75,c*.011);
  ctx.strokeStyle=roomId==='q3r5'?'rgba(221,214,143,.23)':'rgba(211,215,159,.18)';
  for(let i=1;i<9;i++){ctx.beginPath();ctx.moveTo(x+i*c,y);ctx.lineTo(x+i*c,y+7*c);ctx.stroke()}

@@ -1,13 +1,13 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
 import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4';
-import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r4b';
+import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r5';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R1 · LEVEL HUD';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 initPremiumMine();
@@ -906,7 +906,7 @@ function render(){if(!state||!me)return;
     woodlandCharactersToggle.setAttribute('aria-pressed',String(woodlandCharactersEnabled));
     woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
   }
-  if(v2ArtToggle&&(isPremiumWoodlandRoom(me.room)||isPremiumMineRoom(me.room))){
+  if(v2ArtToggle&&(isPremiumWoodlandRoom(me.room)||isPremiumMineRoom(me.room)||isPremiumGiantRoom(me.room))){
     const label=isPremiumGiantRoom(me.room)?(v2ArtEnabled?(premiumGiantReady(me.room)?'🌳 Quest 3 giant forest premium: ON':'🌳 Loading giantwood artwork…'):'◇ Quest 3 giantwood premium: OFF'):isPremiumMineRoom(me.room)?(v2ArtEnabled?(premiumMineReady(me.room)?'💎 Quest 2 mine premium: ON':'💎 Loading mine artwork…'):'◇ Quest 2 mine premium: OFF'):(v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF');
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }

@@ -100,24 +100,56 @@ export function paintPremiumGiantWall(ctx,s,x,y,roomId='q3r1',walls=[]){
  if(!premiumGiantReady(roomId)||s.iso)return false;
  const pt=s.at(x,y),c=s.cell;
  const has=(dx,dy)=>walls.some(([wx,wy])=>wx===x+dx&&wy===y+dy);
- const left=has(-1,0),right=has(1,0),up=has(0,-1),down=has(0,1);
- const joinsHorizontal=left||right,joinsVertical=up||down,connected=joinsHorizontal||joinsVertical;
- let key=giantWallArt(roomId,x,y),img=ready(key)?art[key]:art.rubble;
- // Continuous ruined stone walls; adjoining squares receive overlapping stone segments.
- // Obstacle sprites are visually joined but only server-approved coordinates are solid.
- if(connected){
-   if(joinsHorizontal&&joinsVertical)img=art.stoneWallCorner;
-   else if(joinsHorizontal)img=art.stoneWallH;
-   else img=art.stoneWallCorner;
- }
- if(connected&&joinsHorizontal&&(roomId==='q3r2'||roomId==='q3r3')&&((x+y)%3===1))img=art.giantLog;
- if(!connected){img=key==='timber'||key==='cyan'?art.premiumBush:art.premiumBoulder;}
- const width=c*(connected?(joinsHorizontal?1.42:1.20):1.4);
- const height=c*(connected?(joinsVertical&&!joinsHorizontal?1.42:1.28):1.42);
+ const horizontal=has(-1,0)||has(1,0);
+ const vertical=has(0,-1)||has(0,1);
+ const key=giantWallArt(roomId,x,y);
+ // Both branches of a junction must physically connect. Older releases used
+ // a right-handed L-corner even for straight vertical pieces; this produced
+ // detached masonry, and mixing individual timber pieces worsened the joins.
+ const drawPiece=(name,width,height)=>{
+  if(!ready(name))return false;
+  const img=art[name];
+  // Vertical stone file has wide transparent gutters; crop those gutters
+  // BEFORE scaling so the visible masonry has the same weight as horizontal walls.
+  if(name==='stoneWallV')ctx.drawImage(img,96,0,76,256,pt.x-width/2,pt.y-height*.53,width,height);
+  else ctx.drawImage(img,pt.x-width/2,pt.y-height*.53,width,height);
+  return true;
+ };
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.shadowColor='rgba(2,12,7,.74)';ctx.shadowBlur=c*.18;ctx.shadowOffsetY=c*.12;
- ctx.drawImage(img,pt.x-width*.5,pt.y-height*.53,width,height);
- ctx.restore();return true;
+ ctx.shadowColor='rgba(2,12,7,.65)';ctx.shadowBlur=c*.12;ctx.shadowOffsetY=c*.08;
+ let drawn=false;
+ if(horizontal||vertical){
+  // Same moss-covered stone on each side of a connection. No new blocked cells.
+  // At corners/T-junctions, draw both crossing stone courses at the same centre.
+  if(horizontal)drawn=drawPiece('stoneWallH',c*1.28,c*1.24)||drawn;
+  if(vertical)drawn=drawPiece('stoneWallV',c*.88,c*1.33)||drawn;
+ }else{
+  drawn=drawPiece(key==='timber'||key==='cyan'?'premiumBush':'premiumBoulder',c*1.40,c*1.42);
+ }
+ // Optional assets may fail independently; a missing wall sprite must not
+ // disable the floor, enemies, boss, or remaining Quest 3 illustrations.
+ if(!drawn&&ready('rubble'))drawn=drawPiece('rubble',c*1.35,c*1.40);
+ ctx.restore();return drawn;
+}
+/** Thin photographic masonry bridges are drawn underneath the actual obstacle
+ * images at shared tile edges. A bridge exists ONLY when BOTH neighboring cells
+ * are already blocked; it never invents a wall or modifies movement. */
+export function paintPremiumGiantWallJoins(ctx,s,walls=[]){
+ if(s.iso)return 0;
+ const occupied=new Set(walls.map(([x,y])=>`${x},${y}`));
+ const {cell:c,originX,originY}=s;
+ let count=0;
+ ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ for(const [x,y] of walls){
+  for(const [dx,dy,key] of [[1,0,'stoneWallH'],[0,1,'stoneWallV']]){
+   if(!occupied.has(`${x+dx},${y+dy}`)||!ready(key))continue;
+   const im=art[key],px=originX+(x+.5+dx*.5)*c,py=originY+(y+.5+dy*.5)*c;
+   const w=c*(dx?1.04:.80),h=c*(dy?1.30:1.20);
+   if(dy)ctx.drawImage(im,96,0,76,256,px-w/2,py-h*.53,w,h);
+   else ctx.drawImage(im,px-w/2,py-h*.53,w,h);count++;
+  }
+ }
+ ctx.restore();return count;
 }
 /** Returns natural continuous-trunk spans where there are three or more
  * genuinely blocked squares. Everything else uses the proven R2 individual
@@ -143,8 +175,11 @@ export function paintPremiumGiantWalls(ctx,s,roomId='q3r1',walls=[]){
  if(!premiumGiantReady(roomId)||s.iso)return false;
  const runs=giantTreeRuns(roomId,walls);
  const treeCells=new Set(runs.flatMap(run=>Array.from({length:run.length},(_,i)=>`${run.x+i},${run.y}`)));
- // Draw all non-tree walls exactly as R2 did, with unchanged collision placement.
- for(const [x,y] of walls){if(!treeCells.has(`${x},${y}`))paintPremiumGiantWall(ctx,s,x,y,roomId,walls)}
+ // Bridge only existing adjacent blocked cells, before their illustrated faces.
+ // Exclude the continuous full fallen-tree span; it is an approved single asset.
+ const stoneWalls=walls.filter(([x,y])=>!treeCells.has(`${x},${y}`));
+ paintPremiumGiantWallJoins(ctx,s,stoneWalls);
+ for(const [x,y] of stoneWalls)paintPremiumGiantWall(ctx,s,x,y,roomId,walls);
  if(!runs.length)return true;
  if(!ready('wholeTree')){
   // Safe fallback: no absent/cropped wall graphics if the optional file fails.

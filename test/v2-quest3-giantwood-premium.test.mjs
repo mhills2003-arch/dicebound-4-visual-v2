@@ -59,7 +59,7 @@ test('Q3 Level N is read clearly in character XP/HP dock; existing XP unchanged'
  assert.match(app,/heroXpFill/);assert.match(app,/heroHpFill/);
  assert.match(app,/paintPremiumGiantFloor/);assert.match(app,/paintPremiumGiantWall/);
  assert.match(app,/paintPremiumGiantActor/);
- assert.match(html,/q3=v2-quest3-giantwood-r4b/);
+ assert.match(html,/q3=v2-quest3-giantwood-r5/);
 });
 test('All five Q3 rooms spawn their original enemies safely on the denser maps',async()=>{
  const {freshState,ensurePlayer,enterQuest,move,ROOM_WALLS}=await import('../src/engine.mjs');
@@ -109,11 +109,11 @@ test('Q3 R4b floor images resolve to unique continuous cache-safe assets',()=>{
  const names=GIANT_ROOMS.map(id=>GIANT_FILES[id]);
  assert.equal(new Set(names).size,5);
  for(const name of names){
-  assert.match(name,/-ground-q3r4\.jpg$/);
+  assert.match(name,/-ground-q3r5\.jpg$/);
   assert(statSync(new URL('../public/'+name.replace('./',''),import.meta.url)).size>200000);
  }
  const app=load('../public/app.js');
- assert.match(app,/v2-quest3-giantwood-20261103-r4b/);
+ assert.match(app,/v2-quest3-giantwood-20261103-r5/);
  assert.match(app,/paintPremiumGiantWalls\(ctx,s,me.room,state.roomWalls/);
  assert.doesNotMatch(app,/paintPremiumGiantWallGroups/);
 });

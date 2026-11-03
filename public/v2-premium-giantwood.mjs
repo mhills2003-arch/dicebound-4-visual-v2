@@ -6,11 +6,11 @@
 export const GIANT_ROOMS = Object.freeze(['q3r1','q3r2','q3r3','q3r4','q3r5']);
 export const isPremiumGiantRoom = id => GIANT_ROOMS.includes(id);
 export const GIANT_FILES = Object.freeze({
-  q3r1:'./assets/premium-giantwood/trampled-trail-ground.jpg',
-  q3r2:'./assets/premium-giantwood/giants-clearing-ground.jpg',
-  q3r3:'./assets/premium-giantwood/root-maze-ground.jpg',
-  q3r4:'./assets/premium-giantwood/hollow-tree-ground.jpg',
-  q3r5:'./assets/premium-giantwood/elder-grove-ground.jpg',
+  q3r1:'./assets/premium-giantwood/trampled-trail-ground-q3r4.jpg',
+  q3r2:'./assets/premium-giantwood/giants-clearing-ground-q3r4.jpg',
+  q3r3:'./assets/premium-giantwood/root-maze-ground-q3r4.jpg',
+  q3r4:'./assets/premium-giantwood/hollow-tree-ground-q3r4.jpg',
+  q3r5:'./assets/premium-giantwood/elder-grove-ground-q3r4.jpg',
   rubble:'./assets/premium-giantwood/moss-rock.png',
   timber:'./assets/premium-giantwood/root.png',
   cyan:'./assets/premium-giantwood/giant-fern.png',
@@ -28,8 +28,7 @@ export const GIANT_FILES = Object.freeze({
   stoneWallV:'./assets/premium-giantwood/stone-wall-vertical-q3r2.png',
   stoneWallCorner:'./assets/premium-giantwood/stone-wall-corner-q3r2.png',
   giantLog:'./assets/premium-giantwood/giant-fallen-log-q3r2.png',
-  continuousTrunk:'./assets/premium-giantwood/giant-trunk-continuous-q3r3.png',
-  wholeOutcrop:'./assets/premium-giantwood/whole-moss-outcrop-q3r3.png',
+  wholeTree:'./assets/premium-giantwood/whole-fallen-tree-q3r4.png',
   premiumBoulder:'./assets/premium-giantwood/premium-moss-boulder-q3r2.png',
   premiumBush:'./assets/premium-giantwood/premium-forest-bush-q3r2.png',
   left:'./assets/premium-giantwood/trampled-trail-frame-left.jpg',
@@ -49,7 +48,7 @@ export function initPremiumGiant(ImageCtor=typeof Image!=='undefined'?Image:null
 }
 const ready=key=>!!art[key]?.complete&&art[key].naturalWidth>0;
 export function premiumGiantReady(roomId='q3r1'){
- return isPremiumGiantRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst')&&ready('stoneWallH')&&ready('stoneWallV')&&ready('stoneWallCorner')&&ready('giantLog')&&ready('premiumBoulder')&&ready('premiumBush')&&ready('continuousTrunk')&&ready('wholeOutcrop')&&ready('bossD12');
+ return isPremiumGiantRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst')&&ready('stoneWallH')&&ready('stoneWallV')&&ready('stoneWallCorner')&&ready('giantLog')&&ready('premiumBoulder')&&ready('premiumBush')&&ready('bossD12');
 }
 const roomIndex=id=>GIANT_ROOMS.indexOf(id);
 const floorPalette=[
@@ -86,57 +85,6 @@ export function giantWallArt(roomId,x,y){
   if(roomId==='q3r4')return code<5?'cyan':code<8?'timber':'rubble';
   return code<5?'amber':code<8?'timber':'rubble';
 }
-/** Connected real collision tiles form ONE visual obstacle, never a tiled wall sprite.
- * Isolated blocks remain individual boulders/foliage.  This function does not
- * invent or mutate walls, and is safe to run on client-provided state. */
-export function giantWallGroups(walls=[]){
- const all=new Set(walls.map(([x,y])=>`${x},${y}`)),seen=new Set(),groups=[];
- for(const [x,y] of walls){
-  const start=`${x},${y}`;if(seen.has(start))continue;
-  const group=[],queue=[[x,y]];seen.add(start);
-  for(let i=0;i<queue.length;i++){
-   const [a,b]=queue[i];group.push([a,b]);
-   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
-    const key=`${a+dx},${b+dy}`;
-    if(all.has(key)&&!seen.has(key)){seen.add(key);queue.push([a+dx,b+dy]);}
-   }
-  }
-  groups.push(group);
- }
- return groups;
-}
-/** Paint one natural mass per connected component. Artwork is clipped to the
- * exact member tiles, with only a small decorative overhang; collision remains
- * the authoritative engine's state.roomWalls. */
-export function paintPremiumGiantWallGroups(ctx,s,roomId='q3r1',walls=[]){
- if(!premiumGiantReady(roomId)||s.iso)return false;
- const c=s.cell,groups=giantWallGroups(walls);
- for(const group of groups){
-  if(group.length===1){paintPremiumGiantWall(ctx,s,group[0][0],group[0][1],roomId,walls);continue;}
-  const xs=group.map(p=>p[0]),ys=group.map(p=>p[1]);
-  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const bw=(maxX-minX+1)*c,bh=(maxY-minY+1)*c;
-  const ox=s.originX+minX*c,oy=s.originY+minY*c;
-  const horizontal=bw>=bh*1.33;
-  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  // Bound the single organic object to the actual solid footprint, with a small
-  // art-only overhang. DO NOT fill opaque cell rectangles or paste photo plates.
-  ctx.beginPath();
-  for(const [x,y] of group){const px=s.originX+x*c,py=s.originY+y*c;
-    ctx.roundRect(px-c*.08,py-c*.08,c*1.16,c*1.16,c*.17);}
-  ctx.clip();
-  ctx.shadowColor='rgba(2,11,6,.65)';ctx.shadowBlur=c*.20;ctx.shadowOffsetY=c*.13;
-  // One seamless rock/root outcrop instead of N repeats of a masonry tile.
-  ctx.drawImage(art.wholeOutcrop,ox-c*.19,oy-c*.16,bw+c*.38,bh+c*.36);
-  if(horizontal&&group.length>=3){
-   // One WHOLE fallen tree, with transparent cutout edges, per long formation.
-   const tw=bw+c*.40,th=Math.max(c*1.14,Math.min(bh+c*.08,tw*.34));
-   ctx.drawImage(art.continuousTrunk,ox-c*.20,oy+bh*.45-th*.53,tw,th);
-  }
-  ctx.restore();
- }
- return true;
-}
 /** Connected blocked tiles share illustrated masonry/root formations. No new walls are invented. */
 export function paintPremiumGiantWall(ctx,s,x,y,roomId='q3r1',walls=[]){
  if(!premiumGiantReady(roomId)||s.iso)return false;
@@ -161,6 +109,49 @@ export function paintPremiumGiantWall(ctx,s,x,y,roomId='q3r1',walls=[]){
  ctx.drawImage(img,pt.x-width*.5,pt.y-height*.53,width,height);
  ctx.restore();return true;
 }
+/** Returns natural continuous-trunk spans where there are three or more
+ * genuinely blocked squares. Everything else uses the proven R2 individual
+ * obstacle renderer. Never clip a photographic texture to a grid-cell mask. */
+export function giantTreeRuns(roomId,walls=[]){
+ if(roomId!=='q3r4')return [];
+ const cells=new Set(walls.map(([x,y])=>`${x},${y}`)),runs=[];
+ for(let y=0;y<7;y++){
+  for(let x=0;x<9;){
+   if(!cells.has(`${x},${y}`)){x++;continue;}
+   const x0=x;while(x<9&&cells.has(`${x},${y}`))x++;
+   if(x-x0>=3)runs.push({x:x0,y,length:x-x0});
+  }
+ }
+ // For a dense island of walls, paint one full fallen tree, not two stacked logs.
+ runs.sort((a,b)=>b.length-a.length||a.y-b.y||a.x-b.x);
+ return runs.slice(0,1);
+}
+/** This is a conservative R2 enhancement: R2 walls for every other cell,
+ * plus ONE whole, transparent, natural tree for Hollow Tree's main formation.
+ * Collision, enemies, doors and floor images remain exactly as before. */
+export function paintPremiumGiantWalls(ctx,s,roomId='q3r1',walls=[]){
+ if(!premiumGiantReady(roomId)||s.iso)return false;
+ const runs=giantTreeRuns(roomId,walls);
+ const treeCells=new Set(runs.flatMap(run=>Array.from({length:run.length},(_,i)=>`${run.x+i},${run.y}`)));
+ // Draw all non-tree walls exactly as R2 did, with unchanged collision placement.
+ for(const [x,y] of walls){if(!treeCells.has(`${x},${y}`))paintPremiumGiantWall(ctx,s,x,y,roomId,walls)}
+ if(!runs.length)return true;
+ if(!ready('wholeTree')){
+  // Safe fallback: no absent/cropped wall graphics if the optional file fails.
+  for(const [x,y] of walls){if(treeCells.has(`${x},${y}`))paintPremiumGiantWall(ctx,s,x,y,roomId,walls)}
+  return true;
+ }
+ for(const run of runs){
+  const c=s.cell,w=(run.length+.18)*c,h=Math.min(1.40*c,w*.35);
+  const x=s.originX+run.x*c-c*.09,y=s.originY+(run.y+.5)*c-h*.52;
+  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  // No background plates and no grid-shaped clipping. Image alpha owns its outline.
+  ctx.shadowColor='rgba(7,17,9,.58)';ctx.shadowBlur=c*.10;ctx.shadowOffsetY=c*.08;
+  ctx.drawImage(art.wholeTree,x,y,w,h);ctx.restore();
+ }
+ return true;
+}
+
 export function paintPremiumGiantLighting(ctx,s,walls=[],roomId='q3r1'){
  if(!premiumGiantReady(roomId)||s.iso)return false;
  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,index=roomIndex(roomId),palette=floorPalette[index];

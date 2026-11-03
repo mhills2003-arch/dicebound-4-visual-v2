@@ -633,3 +633,8 @@ body.hud-board-focus .cin-hotkey-help p{margin:9px 0}
 body.hud-board-focus .cin-hotkey-help kbd{display:inline-block;font:bold 11px system-ui;background:#243741;border:1px solid #b89e65;border-radius:4px;color:#ffe7b9;padding:2px 5px;margin:1px 2px}
 body.hud-board-focus .cin-hotkey-note{font:11px/1.45 system-ui;color:#b9c9cc}
 @media(max-width:800px){body.hud-board-focus .cin-search{top:66px;left:7px;width:min(288px,calc(100% - 14px))}body.hud-board-focus .cin-search-toggle{padding:6px 10px;font-size:12px;min-width:110px}body.hud-board-focus .cin-search-panel{max-height:40dvh}body.hud-board-focus .cin-hotkey-help:not([hidden]){top:63px}}
+
+/* Quest 3: obvious current level alongside real HP and XP. Never clipped by character-name column. */
+.q3-current-level{display:inline-flex;align-items:center;padding:2px 7px;margin-left:5px;font:800 12px Georgia,serif;letter-spacing:.045em;white-space:nowrap;color:#ffe9ab!important;background:linear-gradient(180deg,#313119,#161c1e);border:1px solid #d2a950;border-radius:5px;box-shadow:0 0 6px #deaa4866}
+body.hud-board-focus .q3-current-level{font-size:13px;padding:2px 7px;color:#ffeab7!important}
+@media(max-width:760px){.q3-current-level,body.hud-board-focus .q3-current-level{font-size:10px;padding:2px 5px;margin-left:2px}}

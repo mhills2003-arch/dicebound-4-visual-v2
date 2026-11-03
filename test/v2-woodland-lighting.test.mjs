@@ -41,7 +41,7 @@ test('premium lighting only runs when premium tactical scene is active',()=>{
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
  assert.match(app,/paintPremiumWoodlandGroundLighting\(ctx,s,state\.roomWalls\?\.\[me\.room\]\|\|\[\],me\.room\)/);
- assert.match(app,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a\.p\);else if\(premiumGiantActive\(\)\)paintPremiumGiantContactShadow\(ctx,s,a\.p\);else paintPremiumWoodlandContactShadow/);
+ assert.match(app,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a\.p\);else if\(premiumGiantActive\(\)\)paintPremiumGiantContactShadow\(ctx,s,a\.p\);else if\(premiumQuarryActive\(\)\)paintPremiumQuarryContactShadow\(ctx,s,a\.p\);else paintPremiumWoodlandContactShadow/);
  assert.match(app,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
  assert.match(app,/const woodlandLightActive=\(\)=>anyPremiumActive\(\)&&woodlandLightingEnabled/);
  assert.match(app,/woodlandLightingToggle\.addEventListener\('click'/);

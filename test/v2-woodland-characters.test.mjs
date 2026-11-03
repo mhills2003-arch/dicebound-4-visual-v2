@@ -53,7 +53,7 @@ test('V2 integrates in-world sprites only for premium Woodland Path and keeps to
  assert.match(app,/premiumActive=\(\)=>artActive\(\)&&isPremiumWoodlandRoom\(me\?\.room\)&&view==='tactical'&&premiumWoodlandReady\(\)/);
  assert.match(app,/woodlandCharactersToggle\.addEventListener\('click'/);
  assert.match(app,/if\(!drew\)iconAt\(/);
- assert.match(app,/premiumMineActive\(\)\?paintPremiumMineActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\):premiumGiantActive\(\)\?paintPremiumGiantActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\):paintPremiumWoodlandActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\)/);
+ assert.match(app,/premiumMineActive\(\)\?paintPremiumMineActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\):premiumGiantActive\(\)\?paintPremiumGiantActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\):premiumQuarryActive\(\)\?paintPremiumQuarryActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\):paintPremiumWoodlandActor\(ctx,s,a\.p,a\.kind,baseSprite,visualOptions\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|WebSocket\(|localStorage\.|\baddEventListener\(/);
 });

@@ -70,8 +70,8 @@ test('Quest 2 is frontend-only, with unique cache-busting and no networking or i
  const mod=readFileSync(new URL('../public/v2-premium-mine.mjs',import.meta.url),'utf8');
  assert.match(app,/premiumMineActive=\(\)=>artActive\(\)&&isPremiumMineRoom\(me\?\.room\)&&view==='tactical'&&premiumMineReady\(me\?\.room\)/);
  assert.match(app,/paintPremiumMineActor\(ctx,s,a.p,a.kind,baseSprite,visualOptions\)/);
- assert.match(html,/app\.js\?build=v2-quest1-watchpost-20261102-r1&mine=v2-quest2-mine-cinematic-20261102-r2/);
- assert.match(app,/v2-premium-mine\.mjs\?build=v2-quest2-mine-cinematic-20261102-r2/);
+ assert.match(html,/app\.js\?build=v2-quest1-watchpost-20261102-r1&mine=v2-quest2-mine-creatures-20261102-r3/);
+ assert.match(app,/v2-premium-mine\.mjs\?build=v2-quest2-mine-creatures-20261102-r3/);
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);
 });
 
@@ -86,4 +86,25 @@ test('each premium mine room has two distinct environment frames, not a recolour
    assert.equal(mineFrameImage(side,id).src,MINE_FRAMES[key]);
   }
  }
+});
+
+test('upgraded Quest 2 creatures are detailed RGBA art, not flat geometric placeholders',()=>{
+ for(const key of ['normalD4','normalD6','shinyD4','shinyD6','bossD12']){
+  const file=new URL('../public/'+MINE_FILES[key].slice(2),import.meta.url);
+  const png=readFileSync(file);
+  assert(png.length>80000,`${key} is unexpectedly a simple drawing`);
+  assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a');
+  assert.equal(png.readUInt32BE(16),420);
+  assert.equal(png.readUInt32BE(20),420);
+  assert.equal(png[25],6,`${key} must preserve transparency`);
+ }
+ const source=readFileSync(new URL('../public/v2-premium-mine.mjs',import.meta.url),'utf8');
+ assert.doesNotMatch(source,/sh\*\.115|sh\*\.76/, 'no legacy dice-sprite cropping');
+ assert.match(source,/ctx\.drawImage\(sprite,pt\.x-imageSize\*\.50,pt\.y-imageSize\*\.58\+bob,imageSize,imageSize\)/);
+});
+
+test('Quest 1 woodland original monster artwork remains in place',()=>{
+ const q1=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
+ assert.match(q1,/premium-woodland/);
+ assert(statSync(new URL('../public/assets/premium-woodland/d6-training.png',import.meta.url)).size>1000);
 });

@@ -42,7 +42,7 @@ test('Quest 1 premium stays scoped to woodland rooms even when Quest 2 premium i
  assert.match(js,/if\(premiumActive\(\)\)\{paintPremiumWoodlandFloor\(ctx,s,me.room\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandWall\(ctx,s,x,y,me.room\)/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
- assert.match(js,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a\.p\);else paintPremiumWoodlandContactShadow/);
+ assert.match(js,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a\.p\);else if\(premiumGiantActive\(\)\)paintPremiumGiantContactShadow\(ctx,s,a\.p\);else paintPremiumWoodlandContactShadow/);
  assert.match(js,/if\(!premium\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);

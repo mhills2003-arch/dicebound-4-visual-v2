@@ -1,6 +1,6 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
 import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4';
-import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r1';
+import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r2';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
@@ -926,7 +926,7 @@ function render(){if(!state||!me)return;
   for(const [x,y] of state.roomWalls?.[me.room]||[]){
     if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
     else if(premiumMineActive())paintPremiumMineWall(ctx,s,x,y,me.room);
-    else if(premiumGiantActive())paintPremiumGiantWall(ctx,s,x,y,me.room);
+    else if(premiumGiantActive())paintPremiumGiantWall(ctx,s,x,y,me.room,state.roomWalls?.[me.room]||[]);
     else if(s.iso)drawStoneIso(s,x,y,terrain);
     else drawStoneTile(s,x,y,terrain);
   }
@@ -939,13 +939,15 @@ function render(){if(!state||!me)return;
   // rendered below all actors/targets, leaving the full battle state untouched.
   if(premiumActive()&&woodlandDepthEnabled)
     paintPremiumWoodlandUnderbrush(ctx,s,state.roomWalls?.[me.room]||[],performance.now(),!reducedMotion);
-  // Draw four real occupied squares for each 2×2 Large enemy, including tablets.
+  // Large enemies still occupy 2×2 collision squares. Premium artwork uses creature silhouette and contact shadow, NOT four conspicuous tinted grid tiles.
+  if(!anyPremiumActive()){
   const footprint=state.rooms[me.room].battle.enemies.filter(e=>e.hp>0&&(e.variant==='large'||e.variant==='large-shiny'));
   ctx.save();ctx.strokeStyle='#f1b475';ctx.fillStyle='#f1b47526';ctx.lineWidth=3;
   for(const enemy of footprint)for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++){const pt=s.at(enemy.x+dx,enemy.y+dy);
     if(s.iso){const hw=42*s.scale,hh=23*s.scale;ctx.beginPath();ctx.moveTo(pt.x,pt.y-hh);ctx.lineTo(pt.x+hw,pt.y);ctx.lineTo(pt.x,pt.y+hh);ctx.lineTo(pt.x-hw,pt.y);ctx.closePath();ctx.fill();ctx.stroke();}
     else{const x=s.originX+(enemy.x+dx)*s.cell,y=s.originY+(enemy.y+dy)*s.cell;ctx.fillRect(x,y,s.cell,s.cell);ctx.strokeRect(x+2,y+2,s.cell-4,s.cell-4)}
   }ctx.restore();
+  }
   const battle=state.rooms[me.room].battle;
   for(const nest of battle.nests||[]){
     const pt=s.at(nest.x,nest.y);ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';

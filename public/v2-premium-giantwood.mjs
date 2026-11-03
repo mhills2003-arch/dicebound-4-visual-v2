@@ -1,5 +1,5 @@
 /**
- * DICEBOUND 4.0 V2 — Quest 2 All That Glitters, five illustrated mine rooms.
+ * DICEBOUND 4.0 V2 — Quest 3 A Big Deal, five illustrated giant-forest rooms.
  * Purely visual: no room definitions, collision, item/loot, combat, quests,
  * network, player positions, RNG or server authority are changed here.
  */
@@ -21,9 +21,15 @@ export const GIANT_FILES = Object.freeze({
   shinyD4:'./assets/premium-giantwood/d4-shiny-q3r1.png',
   shinyD6:'./assets/premium-giantwood/d6-shiny-q3r1.png',
   bossD12:'./assets/premium-giantwood/boss-d12-q3r1.png',
-  largeD4:'./assets/premium-giantwood/large-d4-q3r1.png',
-  largeD6:'./assets/premium-giantwood/large-d6-q3r1.png',
+  largeD4:'./assets/premium-giantwood/large-d4-q3r2.png',
+  largeD6:'./assets/premium-giantwood/large-d6-q3r2.png',
   largeD8:'./assets/premium-giantwood/large-d8-q3r1.png',
+  stoneWallH:'./assets/premium-giantwood/stone-wall-horizontal-q3r2.png',
+  stoneWallV:'./assets/premium-giantwood/stone-wall-vertical-q3r2.png',
+  stoneWallCorner:'./assets/premium-giantwood/stone-wall-corner-q3r2.png',
+  giantLog:'./assets/premium-giantwood/giant-fallen-log-q3r2.png',
+  premiumBoulder:'./assets/premium-giantwood/premium-moss-boulder-q3r2.png',
+  premiumBush:'./assets/premium-giantwood/premium-forest-bush-q3r2.png',
   left:'./assets/premium-giantwood/trampled-trail-frame-left.jpg',
   right:'./assets/premium-giantwood/trampled-trail-frame-right.jpg'
 });
@@ -41,7 +47,7 @@ export function initPremiumGiant(ImageCtor=typeof Image!=='undefined'?Image:null
 }
 const ready=key=>!!art[key]?.complete&&art[key].naturalWidth>0;
 export function premiumGiantReady(roomId='q3r1'){
- return isPremiumGiantRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst');
+ return isPremiumGiantRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst')&&ready('stoneWallH')&&ready('stoneWallV')&&ready('stoneWallCorner')&&ready('giantLog')&&ready('premiumBoulder')&&ready('premiumBush');
 }
 const roomIndex=id=>GIANT_ROOMS.indexOf(id);
 const floorPalette=[
@@ -78,17 +84,28 @@ export function giantWallArt(roomId,x,y){
   if(roomId==='q3r4')return code<5?'cyan':code<8?'timber':'rubble';
   return code<5?'amber':code<8?'timber':'rubble';
 }
-export function paintPremiumGiantWall(ctx,s,x,y,roomId='q3r1'){
+/** Connected blocked tiles share illustrated masonry/root formations. No new walls are invented. */
+export function paintPremiumGiantWall(ctx,s,x,y,roomId='q3r1',walls=[]){
  if(!premiumGiantReady(roomId)||s.iso)return false;
- const pt=s.at(x,y),c=s.cell,key=giantWallArt(roomId,x,y),img=ready(key)?art[key]:art.rubble;
- const sz=c*(key==='timber'?1.36:key==='rubble'?1.43:1.49);
+ const pt=s.at(x,y),c=s.cell;
+ const has=(dx,dy)=>walls.some(([wx,wy])=>wx===x+dx&&wy===y+dy);
+ const left=has(-1,0),right=has(1,0),up=has(0,-1),down=has(0,1);
+ const joinsHorizontal=left||right,joinsVertical=up||down,connected=joinsHorizontal||joinsVertical;
+ let key=giantWallArt(roomId,x,y),img=ready(key)?art[key]:art.rubble;
+ // Continuous ruined stone walls; adjoining squares receive overlapping stone segments.
+ // Obstacle sprites are visually joined but only server-approved coordinates are solid.
+ if(connected){
+   if(joinsHorizontal&&joinsVertical)img=art.stoneWallCorner;
+   else if(joinsHorizontal)img=art.stoneWallH;
+   else img=art.stoneWallCorner;
+ }
+ if(connected&&joinsHorizontal&&(roomId==='q3r2'||roomId==='q3r3')&&((x+y)%3===1))img=art.giantLog;
+ if(!connected){img=key==='timber'||key==='cyan'?art.premiumBush:art.premiumBoulder;}
+ const width=c*(connected?(joinsHorizontal?1.42:1.20):1.4);
+ const height=c*(connected?(joinsVertical&&!joinsHorizontal?1.42:1.28):1.42);
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.shadowColor='rgba(2,4,12,.84)';ctx.shadowBlur=c*.18;ctx.shadowOffsetY=c*.10;
- ctx.drawImage(img,pt.x-sz*.5,pt.y-sz*.53,sz,sz);
- ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
- ctx.strokeStyle=roomId==='q3r5'?'rgba(212,189,99,.34)':'rgba(163,202,133,.31)';
- ctx.lineWidth=Math.max(.8,c*.013);
- ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
+ ctx.shadowColor='rgba(2,12,7,.74)';ctx.shadowBlur=c*.18;ctx.shadowOffsetY=c*.12;
+ ctx.drawImage(img,pt.x-width*.5,pt.y-height*.53,width,height);
  ctx.restore();return true;
 }
 export function paintPremiumGiantLighting(ctx,s,walls=[],roomId='q3r1'){

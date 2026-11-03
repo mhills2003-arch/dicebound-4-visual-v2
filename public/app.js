@@ -1,12 +1,12 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
-import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261102-r3';
+import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 MINE CINEMATIC ART · CINEMATIC HUD';
+const CLIENT_BUILD='VISUAL V2 · QUEST 1 COMPLETE · OLD WATCHPOST GUARDIAN · QUEST 2 PREMIUM CREATURES R4 · CINEMATIC HUD';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 initPremiumMine();

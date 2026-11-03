@@ -16,11 +16,11 @@ export const MINE_FILES = Object.freeze({
   cyan:'./assets/premium-mine/mine-crystal-cyan.png',
   amber:'./assets/premium-mine/mine-crystal-amber.png',
   amethyst:'./assets/premium-mine/mine-crystal-amethyst.png',
-  normalD4:'./assets/premium-mine/normal-d4.png',
-  normalD6:'./assets/premium-mine/normal-d6.png',
-  shinyD4:'./assets/premium-mine/shiny-d4.png',
-  shinyD6:'./assets/premium-mine/shiny-d6.png',
-  bossD12:'./assets/premium-mine/boss-d12.png',
+  normalD4:'./assets/premium-mine/normal-d4-q2r4.png',
+  normalD6:'./assets/premium-mine/normal-d6-q2r4.png',
+  shinyD4:'./assets/premium-mine/shiny-d4-q2r4.png',
+  shinyD6:'./assets/premium-mine/shiny-d6-q2r4.png',
+  bossD12:'./assets/premium-mine/boss-d12-q2r4.png',
   left:'./assets/premium-mine/mine-frame-left.jpg',
   right:'./assets/premium-mine/mine-frame-right.jpg'
 });

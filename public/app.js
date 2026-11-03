@@ -1,5 +1,5 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
-import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4';
+import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4-objects-r1';
 import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r6-walljoins';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
@@ -923,8 +923,9 @@ function render(){if(!state||!me)return;
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
+  const mineConnectedPainted=premiumMineActive()&&paintPremiumMineConnectedWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   if(premiumGiantActive())paintPremiumGiantWalls(ctx,s,me.room,state.roomWalls?.[me.room]||[]);
-  else for(const [x,y] of state.roomWalls?.[me.room]||[]){
+  else if(!mineConnectedPainted)for(const [x,y] of state.roomWalls?.[me.room]||[]){
     if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
     else if(premiumMineActive())paintPremiumMineWall(ctx,s,x,y,me.room);
 

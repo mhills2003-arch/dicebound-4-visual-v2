@@ -21,6 +21,11 @@ export const MINE_FILES = Object.freeze({
   shinyD4:'./assets/premium-mine/shiny-d4-q2r4.png',
   shinyD6:'./assets/premium-mine/shiny-d6-q2r4.png',
   bossD12:'./assets/premium-mine/boss-d12-q2r4.png',
+  q2r1Obstacles:'./assets/premium-mine/q2r1-connected-obstacles-q2r1.png',
+  q2r2Obstacles:'./assets/premium-mine/q2r2-connected-obstacles-q2r1.png',
+  q2r3Obstacles:'./assets/premium-mine/q2r3-connected-obstacles-q2r1.png',
+  q2r4Obstacles:'./assets/premium-mine/q2r4-connected-obstacles-q2r1.png',
+  q2r5Obstacles:'./assets/premium-mine/q2r5-connected-obstacles-q2r1.png',
   left:'./assets/premium-mine/mine-frame-left.jpg',
   right:'./assets/premium-mine/mine-frame-right.jpg'
 });
@@ -86,6 +91,20 @@ export function paintPremiumMineWall(ctx,s,x,y,roomId='q2r1'){
  ctx.strokeStyle=roomId==='q2r5'?'rgba(207,160,255,.42)':'rgba(197,207,216,.35)';
  ctx.lineWidth=Math.max(.8,c*.013);
  ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
+ ctx.restore();return true;
+}
+/** A room-wide, transparent illustration built ONLY over the original blocked cells.
+ * A live wall-set signature guards against drawing obstacles over a changed map.
+ * If an image is unavailable, the previous per-tile renderer remains the fallback.
+ */
+export const MINE_WALL_BLUEPRINTS = Object.freeze({"q2r1":[".........",".##....#.","..#....#.",".........",".....#...",".#...#.#.","........."],"q2r2":[".........","......#..","...##....",".........","...##....",".........","........."],"q2r3":[".........","...#.....","...#.....","...#..#..","...#..#..","......#..","........."],"q2r4":[".........","..###....","......#..","......#..","......#..","..###....","........."],"q2r5":[".........","...#.#...","...#.#...",".........","...#.#...","...#.#...","........."]});
+export function paintPremiumMineConnectedWalls(ctx,s,walls=[],roomId='q2r1'){
+ if(!premiumMineReady(roomId)||s.iso||!ready(roomId+'Obstacles'))return false;
+ const blueprint=MINE_WALL_BLUEPRINTS[roomId];if(!blueprint)return false;
+ const expected=new Set();for(let y=0;y<7;y++)for(let x=0;x<9;x++)if(blueprint[y][x]==='#')expected.add(`${x},${y}`);
+ if(walls.length!==expected.size||walls.some(([x,y])=>!expected.has(`${x},${y}`)))return false;
+ const c=s.cell;ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ ctx.drawImage(art[roomId+'Obstacles'],s.originX,s.originY,9*c,7*c);
  ctx.restore();return true;
 }
 export function paintPremiumMineLighting(ctx,s,walls=[],roomId='q2r1'){

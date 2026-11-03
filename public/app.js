@@ -1,5 +1,5 @@
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-watchpost-20261102-r1';
-import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-cinematic-20261102-r2';
+import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261102-r3';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
  * canvas, palette, isometric projection and ORIGINAL bundled character assets.

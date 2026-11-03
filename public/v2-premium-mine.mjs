@@ -170,10 +170,9 @@ export function paintPremiumMineActor(ctx,s,p,kind,sprite,{label='',selected=fal
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
  ctx.shadowColor=boss?'rgba(146,83,213,.67)':shiny?'rgba(51,155,188,.62)':'rgba(1,3,10,.80)';
  ctx.shadowBlur=c*(shiny||boss?.25:.11);ctx.shadowOffsetY=c*.055;
- if(kind==='enemy'&&!shiny&&!boss&&sprite.naturalHeight){
-  const sh=sprite.naturalHeight,sw=sprite.naturalWidth;
-  ctx.drawImage(sprite,0,sh*.115,sw,sh*.76,pt.x-imageSize*.50,pt.y-imageSize*.60+bob,imageSize,imageSize);
- }else ctx.drawImage(sprite,pt.x-imageSize*.50,pt.y-imageSize*.58+bob,imageSize,imageSize);
+ // Every upgraded dice creature is a transparent, square art asset.
+ // Never crop their upper crystals or feet as we did for the old placeholders.
+ ctx.drawImage(sprite,pt.x-imageSize*.50,pt.y-imageSize*.58+bob,imageSize,imageSize);
  ctx.restore();
  const y=pt.y+c*(giant?.78:.48),text=label|| (kind==='enemy'?`D${p.faces||8}`:p.name||'Player');
  const fs=Math.max(9,c*(giant?.235:.215));ctx.textAlign='center';ctx.textBaseline='alphabetic';

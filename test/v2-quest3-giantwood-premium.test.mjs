@@ -59,7 +59,7 @@ test('Q3 Level N is read clearly in character XP/HP dock; existing XP unchanged'
  assert.match(app,/heroXpFill/);assert.match(app,/heroHpFill/);
  assert.match(app,/paintPremiumGiantFloor/);assert.match(app,/paintPremiumGiantWall/);
  assert.match(app,/paintPremiumGiantActor/);
- assert.match(html,/q3=v2-quest3-giantwood-r1/);
+ assert.match(html,/q3=v2-quest3-giantwood-r2/);
 });
 test('All five Q3 rooms spawn their original enemies safely on the denser maps',async()=>{
  const {freshState,ensurePlayer,enterQuest,move,ROOM_WALLS}=await import('../src/engine.mjs');
@@ -80,4 +80,16 @@ test('All five Q3 rooms spawn their original enemies safely on the denser maps',
    assert.equal(s.players.one.room,`q3r${i+1}`);
   }
  }
+});
+
+test('Q3 R2 uses connected masonry and removes four-square highlighted Large footprint in premium display',()=>{
+ const app=load('../public/app.js');const art=load('../public/v2-premium-giantwood.mjs');
+ assert.match(app,/if\(!anyPremiumActive\(\)\)\{/);
+ assert.match(app,/paintPremiumGiantWall\(ctx,s,x,y,me.room,state.roomWalls/);
+ assert.match(art,/joinsHorizontal=left\|\|right/);
+ assert.match(art,/joinsVertical=up\|\|down/);
+ assert.match(art,/stone-wall-horizontal-q3r2/);
+ assert.match(art,/stone-wall-corner-q3r2/);
+ assert.match(art,/large-d4-q3r2\.png/);
+ assert.match(art,/large-d6-q3r2\.png/);
 });

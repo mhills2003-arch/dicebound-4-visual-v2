@@ -55,9 +55,9 @@ test('Q4 wall overlays are conditional on live collision map being identical',()
  for(const id of QUARRY_ROOMS){
   const before=ctx.count;
   assert.equal(paintPremiumQuarryConnectedWalls(ctx,s,wallsFor(QUARRY_WALL_BLUEPRINTS[id]),id),true);
-  assert.equal(ctx.count,before+(id==='q4r1'?0:1));
+  assert.equal(ctx.count,before);
   assert.equal(paintPremiumQuarryConnectedWalls(ctx,s,[[0,0]],id),false);
-  assert.equal(ctx.count,before+(id==='q4r1'?0:1));
+  assert.equal(ctx.count,before);
  }
 });
 test('Q4 app integration is visual only and does not alter network/quest rules',()=>{
@@ -73,7 +73,7 @@ test('Q4 app integration is visual only and does not alter network/quest rules',
 test('Quarry Entrance single-board scene is exact-geometry and only used on matched walls',()=>{
  const mod=readFileSync(new URL('../public/v2-premium-quarry.mjs',import.meta.url),'utf8');
  assert.match(mod,/q4r1Scene/);
- assert.match(mod,/fullScene=id==='q4r1'&&quarryWallsMatch\(walls,id\)/);
+ assert.match(mod,/fullScene=quarryWallsMatch\(walls,id\)&&ready\(sceneKey\)/);
  assert.match(app,/paintPremiumQuarryFloor\(ctx,s,me.room,state.roomWalls\?\.\[me.room\]\|\|\[\]\)/);
  assert(existsSync(filename(QUARRY_FILES.q4r1Scene)));
 });

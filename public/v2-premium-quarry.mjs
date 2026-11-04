@@ -16,6 +16,10 @@ export const QUARRY_FILES=Object.freeze({
   [id+'-right',`${PREFIX}${roomName[id]}-frame-right.jpg`]
  ])),
  q4r1Scene:`${PREFIX}quarry-entrance-cinematic-scene-q4-grade-a-r2.jpg`,
+ q4r2Scene:`${PREFIX}golden-passage-battlefield-q4-grade-a-r3.jpg`,
+ q4r3Scene:`${PREFIX}crystal-pit-battlefield-q4-grade-a-r3.jpg`,
+ q4r4Scene:`${PREFIX}abandoned-workings-battlefield-q4-grade-a-r3.jpg`,
+ q4r5Scene:`${PREFIX}kings-excavation-battlefield-q4-grade-a-r3.jpg`,
  normalD4:`${PREFIX}d4-q4r1.png`,normalD6:`${PREFIX}d6-q4r1.png`,
  normalD8:`${PREFIX}d8-q4r1.png`,shinyD4:`${PREFIX}shiny-d4-q4r1.png`,
  largeD4:`${PREFIX}large-d4-q4r1.png`,largeShinyD4:`${PREFIX}large-shiny-d4-q4r1.png`,
@@ -23,11 +27,11 @@ export const QUARRY_FILES=Object.freeze({
 });
 // Exactly the authoritative walls in src/engine.mjs; do not 'improve' the collision map here.
 export const QUARRY_WALL_BLUEPRINTS=Object.freeze({
- q4r1:['.........','.###.#.#.','.#.#.#.#.','.........','..#####..','.........','.........'],
- q4r2:['...#.....','...#.....','.........','.........','.....#...','.....#...','.....#...'],
- q4r3:['.........','.#.......','...###...','...###...','...###...','.........','.........'],
- q4r4:['.........','..#....#.','..#......','..#..#...','.....#...','.....#...','.........'],
- q4r5:['.........','...###...','..#......','.........','.........','...###...','.........']
+ q4r1:[".........",".###.#.#.",".#.#.#.#.",".........","..#####..",".........","........."],
+ q4r2:[".........",".###...#.",".#####.#.",".........","......###","##..####.","........."],
+ q4r3:[".........",".......#.","....###..","......#..",".##.###..","...####..","...####.."],
+ q4r4:[".........","###..###.","...#.....",".###..##.",".........","...####..","........."],
+ q4r5:[".........",".#.....#.",".........","..#...#..","..#...#..",".........","........."]
 });
 const art=Object.create(null);let started=false;
 export function initPremiumQuarry(ImageCtor=typeof Image!=='undefined'?Image:null){
@@ -53,8 +57,9 @@ export function paintPremiumQuarryFloor(ctx,s,id='q4r1',walls=[]){
  if(!premiumQuarryReady(id)||s.iso)return false;
  const {originX:x,originY:y,cell:c}=s;
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- const fullScene=id==='q4r1'&&quarryWallsMatch(walls,id)&&ready('q4r1Scene');
- ctx.drawImage(fullScene?art.q4r1Scene:art[id],x,y,9*c,7*c);
+ const sceneKey=id+'Scene';
+ const fullScene=quarryWallsMatch(walls,id)&&ready(sceneKey);
+ ctx.drawImage(fullScene?art[sceneKey]:art[id],x,y,9*c,7*c);
  ctx.strokeStyle=id==='q4r3'?'rgba(236,205,244,.20)':'rgba(244,220,169,.17)';
  ctx.lineWidth=Math.max(.6,c*.009);
  for(let i=1;i<9;i++){ctx.beginPath();ctx.moveTo(x+i*c,y);ctx.lineTo(x+i*c,y+7*c);ctx.stroke();}
@@ -70,7 +75,7 @@ export function paintPremiumQuarryConnectedWalls(ctx,s,walls=[],id='q4r1'){
  if(!premiumQuarryReady(id)||s.iso||!quarryWallsMatch(walls,id))return false;
  // When the room-specific battlefield has already rendered its real fixed walls,
  // do not paint a second wall layer. Missing scene image uses the former overlay.
- if(id==='q4r1')return ready('q4r1Scene');
+ if(ready(id+'Scene'))return true;
  if(!ready(id+'Obstacles'))return false;
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
  ctx.drawImage(art[id+'Obstacles'],s.originX,s.originY,9*s.cell,7*s.cell);

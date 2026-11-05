@@ -19,9 +19,39 @@ export const PREMIUM_FILES = Object.freeze({
   fernTreeA: './assets/premium-woodland/fern-tree-a.png',
   fernTreeB: './assets/premium-woodland/fern-tree-b.png',
   canopyA: './assets/premium-woodland/canopy-a.png',
-  canopyB: './assets/premium-woodland/canopy-b.png'
+  canopyB: './assets/premium-woodland/canopy-b.png',
+  pathFloor: './assets/premium-woodland/woodland-path-q1-r2.webp',
+  clearingFloor: './assets/premium-woodland/training-clearing-q1-r2.webp',
+  watchpostFloor: './assets/premium-woodland/old-watchpost-q1-r2.webp',
+  polishedRock: './assets/premium-woodland/moss-boulders-q1-r2.webp',
+  polishedStump: './assets/premium-woodland/oak-stump-q1-r2.webp',
+  ruinVertical: './assets/premium-woodland/ruin-vertical-q1-r2.webp',
+  ruinCorner: './assets/premium-woodland/ruin-corner-q1-r2.webp',
+  woodlandD6: './assets/premium-woodland/woodland-d6-q1-r2.webp',
+  guardianD8: './assets/premium-woodland/watchpost-d8-q1-r2.webp'
 });
 const art = Object.create(null);
+const ready = key => !!art[key]?.complete && art[key].naturalWidth > 0;
+const floorKey = roomId => roomId==='watchpost'?'watchpostFloor':roomId==='clearing'?'clearingFloor':'pathFloor';
+// Static light/scenery layers are cached; moving actors and foliage remain live.
+// Bounded to six surfaces, and rebuilt when scale, assets or wall geometry change.
+const staticLayers = new Map();
+function cachedLayer(ctx,s,key,paint){
+  if(typeof OffscreenCanvas==='undefined'||!ctx.getTransform)return false;
+  const ratio=Math.min(2,Math.max(1,Math.abs(ctx.getTransform().a)||1));
+  const cacheKey=`${key}:${s.cell}:${ratio}`;
+  let layer=staticLayers.get(cacheKey);
+  if(!layer){
+    layer=new OffscreenCanvas(Math.ceil(9*s.cell*ratio),Math.ceil(7*s.cell*ratio));
+    const c=layer.getContext('2d');if(!c)return false;
+    c.scale(ratio,ratio);
+    const local={...s,originX:0,originY:0,at:(x,y)=>({x:(x+.5)*s.cell,y:(y+.5)*s.cell})};
+    paint(c,local);staticLayers.set(cacheKey,layer);
+    if(staticLayers.size>6)staticLayers.delete(staticLayers.keys().next().value);
+  }
+  ctx.drawImage(layer,s.originX,s.originY,layer.width/ratio,layer.height/ratio);
+  return true;
+}
 let loaded = false;
 export function initPremiumWoodland(ImageCtor = typeof Image !== 'undefined' ? Image : null) {
   if (!ImageCtor || loaded) return;
@@ -47,7 +77,7 @@ export function paintPremiumWoodlandFloor(ctx,s,roomId='woodland') {
   const {originX:x, originY:y, cell:c} = s;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   const groundName=roomId==='watchpost'?'watchpost':roomId==='clearing'?'clearing':'ground';
-  const floorImg=art[groundName]?.complete&&art[groundName]?.naturalWidth?art[groundName]:art.ground;
+  const floorImg=ready(floorKey(roomId))?art[floorKey(roomId)]:ready(groundName)?art[groundName]:art.ground;
   ctx.drawImage(floorImg,x,y,9*c,7*c);
   // Training Clearing is open woodland, with distinct painted ground but no invented walls.
   // All actors, barriers and interaction remain separate authoritative layers.
@@ -58,24 +88,82 @@ export function paintPremiumWoodlandFloor(ctx,s,roomId='woodland') {
   for(let i=1;i<7;i++){ctx.beginPath();ctx.moveTo(x,y+i*c);ctx.lineTo(x+9*c,y+i*c);ctx.stroke()}
   ctx.restore();return true;
 }
-export function paintPremiumWoodlandWall(ctx,s,x,y,roomId='woodland') {
+export function paintPremiumWoodlandWall(ctx,s,x,y,roomId='woodland',outline=true) {
   if (!premiumWoodlandReady() || s.iso) return false;
   const {cell:c} = s,pt=s.at(x,y);
   const name=roomId==='watchpost'?((x*7+y*11)%2?'watchpostRuinA':'watchpostRuinB'):
     woodlandObstacleArt(x+(roomId==='clearing'?11:0),y+(roomId==='clearing'?7:0));
-  const img=art[name]?.complete&&art[name]?.naturalWidth?art[name]:art.boulderA;
+  const polished=roomId!=='watchpost'&&ready('polishedRock')&&ready('polishedStump');
+  const key=polished?(name.startsWith('boulder')?'polishedRock':'polishedStump'):name;
+  const img=ready(key)?art[key]:art.boulderA;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   // The visual silhouette may exceed a cell; its authoritative footprint never does.
-  const r=c*(roomId==='watchpost'?1.55:name.startsWith('boulder')?1.36:1.65);
-  const px=pt.x-r/2,py=pt.y-r/2-c*.09;
+  const r=c*(polished?1.01:roomId==='watchpost'?1.55:name.startsWith('boulder')?1.36:1.65);
+  const px=pt.x-r/2,py=pt.y-r/2-(polished?0:c*.09);
   ctx.shadowColor='rgba(4,12,8,.76)';ctx.shadowBlur=c*.17;
   ctx.shadowOffsetY=c*.08;
   ctx.drawImage(img,px,py,r,r);
   ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
   // Clear, thin occupied-square outline independent of the illustrated silhouette.
-  ctx.strokeStyle='rgba(216,194,135,.57)';ctx.lineWidth=Math.max(1,c*.024);
-  ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
+  if(outline){ctx.strokeStyle='rgba(216,194,135,.40)';ctx.lineWidth=Math.max(1,c*.015);
+    ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);}
   ctx.restore();return true;
+}
+
+/** Connected shapes derive only from the authoritative input, never painted pixels. */
+export function woodlandWallGroups(walls){
+  const unseen=new Set(walls.map(([x,y])=>`${x},${y}`)),groups=[];
+  while(unseen.size){
+    const queue=[unseen.values().next().value],cells=[];unseen.delete(queue[0]);
+    for(let i=0;i<queue.length;i++){
+      const [x,y]=queue[i].split(',').map(Number);cells.push([x,y]);
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+        const k=`${x+dx},${y+dy}`;if(unseen.delete(k))queue.push(k);
+      }
+    }
+    const x=Math.min(...cells.map(p=>p[0])),y=Math.min(...cells.map(p=>p[1]));
+    groups.push({cells,x,y,width:Math.max(...cells.map(p=>p[0]))-x+1,height:Math.max(...cells.map(p=>p[1]))-y+1});
+  }
+  return groups;
+}
+export function paintPremiumWoodlandWalls(ctx,s,walls=[],roomId='woodland',direct=false){
+  if(!premiumWoodlandReady()||s.iso)return false;
+  const signature=walls.map(p=>p.join(',')).join(';');
+  const assets=['polishedRock','polishedStump','ruinVertical','ruinCorner'].map(ready).join(',');
+  if(!direct&&cachedLayer(ctx,s,`walls:${roomId}:${signature}:${assets}`,
+    (c,local)=>paintPremiumWoodlandWalls(c,local,walls,roomId,true)))return true;
+  const c=s.cell,set=new Set(walls.map(p=>p.join(',')));
+  ctx.save();ctx.beginPath();ctx.rect(s.originX,s.originY,9*c,7*c);ctx.clip();
+  ctx.fillStyle='rgba(16,30,17,.16)';
+  for(const [x,y] of walls)ctx.fillRect(s.originX+x*c,s.originY+y*c,c,c);
+  for(const group of woodlandWallGroups(walls)){
+    let key=null;
+    if(roomId==='watchpost'&&group.width===1&&group.height===2&&group.cells.length===2)key='ruinVertical';
+    if(roomId==='watchpost'&&group.width===2&&group.height===2&&group.cells.length===3&&!set.has(`${group.x},${group.y}`))key='ruinCorner';
+    if(key&&ready(key)){
+      ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+      ctx.shadowColor='rgba(5,15,10,.6)';ctx.shadowBlur=c*.07;ctx.shadowOffsetY=c*.035;
+      // Clip only to real blocked cells: the open corner can never be painted shut.
+      ctx.beginPath();for(const [x,y] of group.cells)ctx.rect(s.originX+x*c,s.originY+y*c,c,c);ctx.clip();
+      const img=art[key];
+      if(key==='ruinVertical'){
+        // The source has intentional transparent side padding; retain its detailed masonry.
+        ctx.drawImage(img,img.naturalWidth*.17,0,img.naturalWidth*.66,img.naturalHeight,
+          s.originX+group.x*c,s.originY+group.y*c,c,2*c);
+      }else ctx.drawImage(img,s.originX+group.x*c,s.originY+group.y*c,2*c,2*c);
+      ctx.restore();
+    }else for(const [x,y] of group.cells)paintPremiumWoodlandWall(ctx,s,x,y,roomId,false);
+  }
+  // A quiet, exact boundary survives texture detail; shared edges remain subtle.
+  ctx.lineWidth=Math.max(1,c*.012);ctx.strokeStyle='rgba(239,218,164,.44)';ctx.beginPath();
+  for(const [x,y] of walls){
+    const X=s.originX+x*c,Y=s.originY+y*c;
+    if(!set.has(`${x},${y-1}`)){ctx.moveTo(X,Y);ctx.lineTo(X+c,Y);}
+    if(!set.has(`${x+1},${y}`)){ctx.moveTo(X+c,Y);ctx.lineTo(X+c,Y+c);}
+    if(!set.has(`${x},${y+1}`)){ctx.moveTo(X+c,Y+c);ctx.lineTo(X,Y+c);}
+    if(!set.has(`${x-1},${y}`)){ctx.moveTo(X,Y+c);ctx.lineTo(X,Y);}
+  }
+  ctx.stroke();ctx.restore();return true;
 }
 
 /**
@@ -103,10 +191,13 @@ const CANOPY_SHADOWS=Object.freeze([
   [.88,.51,.23,.18],[.14,.99,.20,.17],[.57,.98,.27,.17],
   [.98,.95,.25,.23]
 ]);
-export function paintPremiumWoodlandGroundLighting(ctx,s,walls=[],roomId='woodland'){
+export function paintPremiumWoodlandGroundLighting(ctx,s,walls=[],roomId='woodland',direct=false){
   if(!premiumWoodlandReady() || s.iso) return false;
+  if(!direct&&cachedLayer(ctx,s,`light:${roomId}:${walls.map(p=>p.join(',')).join(';')}:${ready(floorKey(roomId))}`,
+    (c,local)=>paintPremiumWoodlandGroundLighting(c,local,walls,roomId,true)))return true;
   const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  if(ready(floorKey(roomId)))ctx.globalAlpha=.52;
   // A unified ambient grade replaces the old weak diffuse radial colour wash.
   const ambient=ctx.createLinearGradient(x,y,x+w*.72,y+h);
   ambient.addColorStop(0,'rgba(255,221,152,.065)');
@@ -152,10 +243,13 @@ export function paintPremiumWoodlandContactShadow(ctx,s,p,kind='one'){
  * Allows comparison with the approved 7/10 asset-based baseline.
  * The OFF state reproduces the existing, subtle pre-lighting overlay.
  */
-export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true,roomId='woodland'){
+export function paintPremiumWoodlandAtmosphere(ctx,s,sunlight=true,roomId='woodland',direct=false){
   if(!premiumWoodlandReady() || s.iso) return false;
+  if(!direct&&cachedLayer(ctx,s,`atmosphere:${roomId}:${sunlight}:${ready(floorKey(roomId))}`,
+    (c,local)=>paintPremiumWoodlandAtmosphere(c,local,sunlight,roomId,true)))return true;
   const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  if(ready(floorKey(roomId)))ctx.globalAlpha=.60;
   if(!sunlight){
     const vignette=ctx.createRadialGradient(x+w*.50,y+h*.43,w*.27,x+w*.50,y+h*.43,w*.71);
     vignette.addColorStop(0,'rgba(6,17,7,0)');vignette.addColorStop(1,'rgba(4,12,7,.32)');
@@ -225,6 +319,8 @@ function alphaForNearbyActors(nx,ny,actors){
  */
 export function paintPremiumWoodlandUnderbrush(ctx,s,walls=[],timeMs=0,motion=true){
   if(!premiumWoodlandReady()||s.iso)return false;
+  // New sprites already contain finely cut foliage; avoid stamping old polygonal leaves over them.
+  if(ready('polishedRock')&&ready('polishedStump'))return true;
   const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
   for(let i=0;i<walls.length;i++){
@@ -328,16 +424,18 @@ export function paintPremiumWoodlandActor(ctx,s,p,kind,sprite,{label='',selected
     '5,13,9',light?.75:.53);
   // Larger hero silhouettes bring the original illustrated art up to the same
   // readable visual scale as the full-size D6 creatures at tablet resolution.
-  const clearing=roomId==='clearing'||roomId==='watchpost';
+  const clearing=isPremiumWoodlandRoom(roomId);
   const watchpostBoss=roomId==='watchpost'&&kind==='enemy'&&p.variant==='boss';
-  if(watchpostBoss&&art.watchpostBoss?.complete&&art.watchpostBoss.naturalWidth)sprite=art.watchpostBoss;
-  const imageSize=c*(watchpostBoss?1.83:clearing?(kind==='enemy'?1.26:1.42):1.14)*scale;
-  const left=pt.x-imageSize*(watchpostBoss?.50:clearing&&kind!=='enemy'?.50:.59),top=pt.y-imageSize*(watchpostBoss?.58:clearing?.59:.56)+blink;
+  const cleanEnemySprite=kind==='enemy'&&((watchpostBoss&&ready('guardianD8'))||(p.faces===6&&ready('woodlandD6')));
+  if(watchpostBoss)sprite=ready('guardianD8')?art.guardianD8:ready('watchpostBoss')?art.watchpostBoss:sprite;
+  else if(kind==='enemy'&&p.faces===6&&ready('woodlandD6'))sprite=art.woodlandD6;
+  const imageSize=c*(watchpostBoss?(cleanEnemySprite?1.42:1.83):kind==='enemy'?(cleanEnemySprite?1.15:1.26):1.28)*scale;
+  const left=pt.x-imageSize*(cleanEnemySprite||watchpostBoss||clearing&&kind!=='enemy'?.50:.59),top=pt.y-imageSize*(cleanEnemySprite?.65:watchpostBoss?.58:clearing?.59:.56)+blink;
   ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
   // Two subtle effects: environmental cast shadow and warm/cool edge scattering.
   ctx.shadowColor='rgba(6,16,10,.82)';ctx.shadowBlur=c*.13;
   ctx.shadowOffsetX=c*.065;ctx.shadowOffsetY=c*.09;
-  if(clearing&&kind==='enemy'&&!watchpostBoss&&sprite.naturalHeight>0){
+  if(clearing&&kind==='enemy'&&!watchpostBoss&&!cleanEnemySprite&&sprite.naturalHeight>0){
     // Original dice PNG contains old red/green HUD slivers at its top/bottom.
     // Crop those from the *drawn image* and let this renderer supply the live HP.
     const sh=sprite.naturalHeight,sw=sprite.naturalWidth;

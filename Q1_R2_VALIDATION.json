@@ -1,0 +1,40 @@
+{
+  "base": "DICEBOUND_V2_QUEST4_ROOMS_2_TO_5_PREMIUM_PLAYABLE_R3.zip",
+  "build": "v2-quest1-cohesion-20261105-r2",
+  "automated_tests": {
+    "passed": 404,
+    "failed": 0
+  },
+  "changed_existing_files": [
+    "public/app.js",
+    "public/index.html",
+    "public/v2-premium-woodland.mjs",
+    "test/v2-board-focus-hud.test.mjs",
+    "test/v2-cinematic-hud.test.mjs",
+    "test/v2-complete-art.test.mjs",
+    "test/v2-premium-woodland.test.mjs",
+    "test/v2-quest2-mine-connected-obstacles.test.mjs",
+    "test/v2-quest2-mine-premium.test.mjs",
+    "test/v2-room-art.test.mjs",
+    "test/v2-search-hotkeys.test.mjs",
+    "test/v2-training-clearing-premium.test.mjs",
+    "test/v2-watchpost-premium.test.mjs",
+    "test/v2-woodland-depth.test.mjs"
+  ],
+  "new_files": [
+    "START_HERE_QUEST1_R2.md",
+    "Q1_ART_DIRECTION_R2.md",
+    "test/v2-quest1-cohesion.test.mjs",
+    "public/assets/premium-woodland/woodland-d6-q1-r2.webp",
+    "public/assets/premium-woodland/oak-stump-q1-r2.webp",
+    "public/assets/premium-woodland/ruin-vertical-q1-r2.webp",
+    "public/assets/premium-woodland/old-watchpost-q1-r2.webp",
+    "public/assets/premium-woodland/watchpost-d8-q1-r2.webp",
+    "public/assets/premium-woodland/ruin-corner-q1-r2.webp",
+    "public/assets/premium-woodland/woodland-path-q1-r2.webp",
+    "public/assets/premium-woodland/training-clearing-q1-r2.webp",
+    "public/assets/premium-woodland/moss-boulders-q1-r2.webp"
+  ],
+  "gameplay_source_unchanged": true,
+  "other_quest_assets_unchanged": true
+}

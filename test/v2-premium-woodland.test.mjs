@@ -13,7 +13,7 @@ function mockCtx(){const operations=[];const ctx={
 const s={cell:60,originX:12,originY:14,iso:false,at(x,y){return{x:12+(x+.5)*60,y:14+(y+.5)*60}}};
 test('premium floor consists of independent image assets, not a baked image with UI and enemies',()=>{
  assert.equal(PREMIUM_ROOM,'woodland');
- assert.equal(Object.keys(PREMIUM_FILES).length,12);
+ assert.equal(Object.keys(PREMIUM_FILES).length,21);
  for(const path of Object.values(PREMIUM_FILES)){
   assert.match(path,/^\.\/assets\/premium-woodland\//);
   const file=new URL('../public/'+path.slice(2),import.meta.url);
@@ -32,7 +32,7 @@ test('premium room renderer derives props only from the canonical wall coordinat
  assert(paintPremiumWoodlandAtmosphere(ctx,s));
  assert(paintPremiumWoodlandContactShadow(ctx,s,{x:1,y:3},'one'));
  assert.equal(operations.filter(x=>Array.isArray(x)&&x[0]==='asset').length,1+walls.length);
- assert.equal(operations.filter(x=>x==='outline').length,walls.length);
+ assert.equal(operations.filter(x=>x==='outline').length,0);
  assert.equal(JSON.stringify(walls),snapshot);
  assert.deepEqual([...new Set(walls.map(([x,y])=>woodlandObstacleArt(x,y)))].sort(),[...new Set(walls.map(([x,y])=>woodlandObstacleArt(x,y)))].sort());
 });
@@ -42,7 +42,7 @@ test('Quest 1 premium stays scoped to woodland rooms even when Quest 2 premium i
  assert.match(js,/if\(premiumActive\(\)\)\{paintPremiumWoodlandFloor\(ctx,s,me.room\);if\(woodlandLightActive\(\)\)paintPremiumWoodlandGroundLighting/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandWall\(ctx,s,x,y,me.room\)/);
  assert.match(js,/if\(premiumActive\(\)\)paintPremiumWoodlandAtmosphere/);
- assert.match(js,/if\(woodlandLightActive\(\)&&!integrated\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a\.p\);else if\(premiumGiantActive\(\)\)paintPremiumGiantContactShadow\(ctx,s,a\.p\);else if\(premiumQuarryActive\(\)\)paintPremiumQuarryContactShadow\(ctx,s,a\.p\);else paintPremiumWoodlandContactShadow/);
+ assert.match(js,/if\(woodlandLightActive\(\)&&!integrated&&!premiumDesertActive\(\)\)\{if\(premiumMineActive\(\)\)paintPremiumMineContactShadow\(ctx,s,a\.p\);else if\(premiumGiantActive\(\)\)paintPremiumGiantContactShadow\(ctx,s,a\.p\);else if\(premiumQuarryActive\(\)\)paintPremiumQuarryContactShadow\(ctx,s,a\.p\);else paintPremiumWoodlandContactShadow/);
  assert.match(js,/if\(!premium\)/);
  const mod=readFileSync(new URL('../public/v2-premium-woodland.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);

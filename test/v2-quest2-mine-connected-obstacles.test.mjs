@@ -16,7 +16,7 @@ test('all five Q2 scenes retain exact server-authoritative collision coordinates
 test('rendering isolated and only changes the Quest 2 mine module and import wiring',()=>{
  const source=fs.readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  assert.match(source,/paintPremiumMineConnectedWalls/);
- assert.match(source,/if\(!mineConnectedPainted&&!quarryConnectedPainted\)for/);
+ assert.match(source,/if\(!desertConnectedPainted&&!woodlandConnectedPainted&&!mineConnectedPainted&&!quarryConnectedPainted\)for/);
  assert.equal(typeof paintPremiumMineConnectedWalls,'function');
 });
 

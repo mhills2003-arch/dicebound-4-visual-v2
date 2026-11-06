@@ -29,7 +29,7 @@ test('underbrush uses only real walls, no new room geometry or actor changes',()
   assert.equal(paintPremiumWoodlandUnderbrush(a.ctx,s,walls,12345,true),true);
   assert.equal(paintPremiumWoodlandUnderbrush(b.ctx,s,walls,12345,true),true);
   assert.deepEqual(a.log,b.log);
-  assert(a.log.filter(v=>Array.isArray(v)).length>=3);
+  assert.equal(a.log.filter(v=>Array.isArray(v)).length,0,'new foliage is integrated into the obstacle sprites, not stamped over them twice');
   assert.equal(JSON.stringify({walls,actors}),snapshot);
 });
 test('foreground fades near actors, keeps every Canvas save/restore balanced',()=>{

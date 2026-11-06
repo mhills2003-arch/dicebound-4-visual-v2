@@ -32,7 +32,7 @@ test('Watchpost paints unique forest floor and true blocked-square masonry, unch
   assert(premiumWoodlandReady());
   const before=JSON.stringify(ROOM_WALLS.watchpost),c=ctx();
   assert(paintPremiumWoodlandFloor(c,s,'watchpost'));
-  assert(c.draw.some(x=>x[0]===PREMIUM_FILES.watchpost));
+  assert(c.draw.some(x=>x[0]===PREMIUM_FILES.watchpostFloor));
   for(const [x,y] of ROOM_WALLS.watchpost)assert(paintPremiumWoodlandWall(c,s,x,y,'watchpost'));
   assert.equal(c.draw.length,ROOM_WALLS.watchpost.length+1);
   assert(c.draw.slice(1).every(x=>[PREMIUM_FILES.watchpostRuinA,PREMIUM_FILES.watchpostRuinB].includes(x[0])));
@@ -42,14 +42,14 @@ test('live boss shows a D8 sprite, label, HP without changing combat properties'
   const p={id:'watchpost-e1',variant:'boss',faces:8,x:7,y:3,hp:6,maxHp:8};
   const before=JSON.stringify(p),c=ctx();
   assert(paintPremiumWoodlandActor(c,s,p,'enemy',new ImageStub(),{label:'Boss D8',roomId:'watchpost',motion:false}));
-  assert(c.draw.some(x=>x[0]===PREMIUM_FILES.watchpostBoss));
+  assert(c.draw.some(x=>x[0]===PREMIUM_FILES.guardianD8));
   assert(c.labels.includes('Boss D8'));
   assert.equal(JSON.stringify(p),before);
 });
 test('new app and renderer receive unique cache-busting URLs without changing existing styles',()=>{
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
- assert.match(html,/app\.js\?build=v2-quest1-watchpost-20261102-r1/);
- assert.match(app,/v2-premium-woodland\.mjs\?build=v2-quest1-watchpost-20261102-r1/);
+ assert.match(html,/app\.js\?build=v2-quest1-soft-edges-q5-caravan-r1/);
+ assert.match(app,/v2-premium-woodland\.mjs\?build=v2-quest1-soft-edges-q5-caravan-r1/);
  assert.match(html,/styles\.css\?build=v2-cinematic-search-keys-20261102-r1/);
 });

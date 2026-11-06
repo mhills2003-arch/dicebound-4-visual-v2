@@ -73,7 +73,7 @@ test('all Medium room encounters spawn their scripted roles with bounded enemy c
  }
 });
 test('a Swift enemy advances two squares in a single shared enemy phase when path is open',()=>{
- const {s,b}=fight('q5r1',[en('swift',{x:7,y:6})],{x:4,y:6});const before=b.enemies[0].x;
+ const {s,b}=fight('q5r1',[en('swift',{x:7,y:3})],{x:4,y:3});const before=b.enemies[0].x;
  next(s,'q5r1');assert.equal(before-b.enemies[0].x,2);
 });
 test('ranged enemies strike from two squares while ordinary enemies must close to one',()=>{

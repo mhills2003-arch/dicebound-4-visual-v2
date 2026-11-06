@@ -37,12 +37,12 @@ test('1-2 displays independent painted clearing ground and the real obstacle sil
  const orig=JSON.stringify(walls),{ctx,calls}=spy();
  assert(paintPremiumWoodlandFloor(ctx,s,'clearing'));
  assert(calls[0]==='save');
- assert(calls.some(x=>Array.isArray(x)&&x[1]===PREMIUM_FILES.clearing));
+ assert(calls.some(x=>Array.isArray(x)&&x[1]===PREMIUM_FILES.clearingFloor));
  assert(paintPremiumWoodlandGroundLighting(ctx,s,walls,'clearing'));
  const beforeWallAssets=calls.filter(x=>Array.isArray(x)&&x[0]==='image').length;
  for(const [x,y] of walls)assert(paintPremiumWoodlandWall(ctx,s,x,y,'clearing'));
  assert.equal(calls.filter(x=>Array.isArray(x)&&x[0]==='image').length-beforeWallAssets,walls.length);
- assert.equal(calls.filter(x=>x==='wall-outline').length,walls.length);
+ assert.equal(calls.filter(x=>x==='wall-outline').length,0);
  assert(paintPremiumWoodlandAtmosphere(ctx,s,true,'clearing'));
  assert.equal(JSON.stringify(walls),orig);
  assert.equal(calls.filter(x=>x==='save').length,calls.filter(x=>x==='restore').length);
@@ -51,7 +51,7 @@ test('D6 encounter units draw independent real-position sprites and live labels,
  const p={id:'clearing-e1',x:5,y:3,name:'D6',faces:6,hp:3,maxHp:6,variant:'normal'};
  const snapshot=JSON.stringify(p),{ctx,calls}=spy();
  assert(paintPremiumWoodlandActor(ctx,s,p,'enemy',new ImageStub(),{label:'D6',selected:true,timeMs:0,roomId:'clearing'}));
- assert(calls.some(x=>x[0]==='image'&&x.length===10),'source crop excludes old embedded HUD');
+ assert(calls.some(x=>x[0]==='image'&&x.length===6&&x[1]===PREMIUM_FILES.woodlandD6),'clean transparent creature uses the whole sprite');
  assert(calls.some(x=>x[0]==='label'&&x[1]==='D6'));
  assert.equal(JSON.stringify(p),snapshot);
 });

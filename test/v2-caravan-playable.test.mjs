@@ -81,11 +81,11 @@ test('authenticated Caravan trial is routed to its own persistent world, separat
  const env={INVITE_TOKEN_1:'A'.repeat(36),INVITE_TOKEN_2:'B'.repeat(36),COOKIE_SECRET:'C'.repeat(48),V2_GAME_ROOM:{idFromName(n){names.push(n);return n},get(){return{fetch(r){headers.push(r.headers.get('x-dicebound-trial'));return new Response('OK')}}}}};
  const login=await sandbox.worker.fetch(new Request('https://test.example/dicebound-v2/api/login',{method:'POST',headers:{Origin:'https://test.example','content-type':'application/x-www-form-urlencoded'},body:'code='+env.INVITE_TOKEN_1}),env);
  const cookie=login.headers.get('set-cookie').split(';')[0];
- for(const suffix of ['','?trial=balance-v9','?trial=caravan-q5-r1']){
+ for(const suffix of ['','?trial=balance-v9','?trial=caravan-q5-r1','?trial=rushing-dunes-q5-r2','?trial=unrecognised']){
   const r=await sandbox.worker.fetch(new Request('https://test.example/dicebound-v2/api/ws'+suffix,{headers:{cookie,Upgrade:'websocket','x-dicebound-trial':'caravan-q5-r1'}}),env);assert.equal(r.status,200);
  }
- assert.deepEqual(names,['quest-01-two-player-prototype','quest-v9-balance-trial','quest-v2-caravan-q5-r1']);
- assert.deepEqual(headers,[null,'balance-v9','caravan-q5-r1']);
+ assert.deepEqual(names,['quest-01-two-player-prototype','quest-v9-balance-trial','quest-v2-caravan-q5-r1','quest-v2-rushing-dunes-q5-r2','quest-01-two-player-prototype']);
+ assert.deepEqual(headers,[null,'balance-v9','caravan-q5-r1','rushing-dunes-q5-r2',null]);
  const denied=await sandbox.worker.fetch(new Request('https://test.example/dicebound-v2/api/ws?trial=caravan-q5-r1',{headers:{Upgrade:'websocket'}}),env);
- assert.equal(denied.status,401);assert.equal(names.length,3);
+ assert.equal(denied.status,401);assert.equal(names.length,5);
 });

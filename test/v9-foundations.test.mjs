@@ -164,8 +164,9 @@ test('new shop data is client-visible, teammates private inventory stays redacte
 });
 test('separate balance-test Durable Object and authenticated base live world remain distinct in worker routing',async()=>{
  const fs=await import('node:fs');const worker=fs.readFileSync(new URL('../src/worker.mjs',import.meta.url),'utf8');
- assert(worker.includes("isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'"));
- assert(worker.includes("headers.set('x-dicebound-trial','balance-v9')"));
+ assert(worker.includes("['balance-v9', 'quest-v9-balance-trial']"));
+ assert(worker.includes("trialWorld || 'quest-01-two-player-prototype'"));
+ assert(worker.includes("if(trialWorld)headers.set('x-dicebound-trial',requestedTrial)"));
  assert(worker.includes("packet.type==='roll-move'"));
 });
 

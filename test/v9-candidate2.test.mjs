@@ -139,7 +139,8 @@ test('the worker routes player actions through sequential authorization and End 
  assert(worker.includes('submitSequentialAction(this.game,id,packet.action)'));
  assert(worker.includes("packet.type==='end-turn'"));
  assert(worker.includes("packet.type==='return-camp'"));
- assert(worker.includes("isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'"));
+ assert(worker.includes("['balance-v9', 'quest-v9-balance-trial']"));
+ assert(worker.includes("trialWorld || 'quest-01-two-player-prototype'"));
 });
 
 test('all eighteen campaign rooms have increasing real wall density without trapping single-tile players', async()=>{

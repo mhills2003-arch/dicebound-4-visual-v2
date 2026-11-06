@@ -6,6 +6,11 @@ import {freshState,ensurePlayer,markDisconnected,move,submitAction,claimLoot,res
 
 const ROOT='/dicebound-v2';
 const COOKIE='db4_v2_session';
+const trialWorlds = new Map([
+  ['balance-v9', 'quest-v9-balance-trial'],
+  ['caravan-q5-r1', 'quest-v2-caravan-q5-r1'],
+  ['rushing-dunes-q5-r2', 'quest-v2-rushing-dunes-q5-r2']
+]);
 const encoder=new TextEncoder();
 const reply=(value,status=200,headers={})=>new Response(typeof value==='string'?value:JSON.stringify(value),{status,headers:{'cache-control':'no-store',...headers,'content-type':typeof value==='string'?'text/html; charset=utf-8':'application/json; charset=utf-8'}});
 function b64url(bytes){let out='';for(const b of bytes)out+=String.fromCharCode(b);return btoa(out).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
@@ -63,18 +68,18 @@ export default {
     // Worker and its bound static files belong to the same cinematic V2 build.
     if(req.method==='GET'&&u.pathname===ROOT+'/version'){
       const checks=await Promise.all(
-        ['/index.html','/app.js','/styles.css','/assets/premium-woodland/training-clearing-ground.jpg','/assets/premium-desert/caravan-ground-q5-r1.webp'].map(async path=>{
+        ['/index.html','/app.js','/styles.css','/assets/premium-woodland/training-clearing-ground.jpg','/assets/premium-desert/caravan-ground-q5-r1.webp','/assets/premium-desert/rushing-dunes-ground-r1.webp'].map(async path=>{
           try{const r=await env.ASSETS.fetch(new Request(u.origin+path));
             return {status:r.status,body:r.ok&&!path.startsWith('/assets/')?await r.text():''};
           }catch{return {status:0,body:''}}
         })
       );
-      const ready=checks[0].status===200&&checks[0].body.includes('id="cinematicCaravanTest"')&&checks[0].body.includes('v2-quest1-soft-edges-q5-caravan-r1')
+      const ready=checks[0].status===200&&checks[0].body.includes('id="cinematicDunesTest"')&&checks[0].body.includes('v2-q5-rushing-dunes-20261106-r1')
         &&checks[1].status===200&&checks[1].body.includes('initPremiumDesert')
         &&checks[2].status===200&&checks[2].body.includes('.cin-room')
-        &&checks[3].status===200&&checks[4].status===200;
-      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2',build:'v2-quest1-soft-edges-q5-caravan-r1',cinematicAssetsReady:ready,
-        checks:{html:checks[0].status,js:checks[1].status,css:checks[2].status,woodlandArt:checks[3].status,caravanArt:checks[4].status}}),
+        &&checks[3].status===200&&checks[4].status===200&&checks[5].status===200;
+      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2',build:'v2-q5-rushing-dunes-20261106-r1',cinematicAssetsReady:ready,
+        checks:{html:checks[0].status,js:checks[1].status,css:checks[2].status,woodlandArt:checks[3].status,caravanArt:checks[4].status,dunesArt:checks[5].status}}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
@@ -87,15 +92,15 @@ export default {
     }
     if(req.method==='GET'&&u.pathname===ROOT+'/api/ws'){
       if(req.headers.get('upgrade')?.toLowerCase()!=='websocket')return reply('Upgrade required',426);
-      const isTrial=u.searchParams.get('trial')==='balance-v9';
-      const isCaravanTrial=u.searchParams.get('trial')==='caravan-q5-r1';
-      const object=env.V2_GAME_ROOM.get(env.V2_GAME_ROOM.idFromName(isCaravanTrial?'quest-v2-caravan-q5-r1':isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'));
+      const requestedTrial = u.searchParams.get('trial');
+      const trialWorld = trialWorlds.get(requestedTrial);
+      const world = trialWorld || 'quest-01-two-player-prototype';
+      const object = env.V2_GAME_ROOM.get(env.V2_GAME_ROOM.idFromName(world));
       const headers=new Headers(req.headers);
       headers.delete('x-dicebound-trial');
       headers.set('x-dicebound-player',identity.id);
       headers.set('x-dicebound-name',identity.name);
-      if(isCaravanTrial)headers.set('x-dicebound-trial','caravan-q5-r1');
-      else if(isTrial)headers.set('x-dicebound-trial','balance-v9');
+      if(trialWorld)headers.set('x-dicebound-trial',requestedTrial);
       return object.fetch(new Request('https://game-internal/connect',{headers}));
     }
     if(req.method!=='GET'&&req.method!=='HEAD')return reply('Method not allowed',405);
@@ -129,7 +134,11 @@ export class GameRoom extends DurableObject {
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({id});
     if(req.headers.get('x-dicebound-trial')==='balance-v9')this.game.balanceTrial=true;
-    if(req.headers.get('x-dicebound-trial')==='caravan-q5-r1')ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'));
+    const trial = req.headers.get('x-dicebound-trial');
+    if(trial==='caravan-q5-r1'||trial==='rushing-dunes-q5-r2'){
+      const startRoom=trial==='rushing-dunes-q5-r2'?'q5r2':'q5r1';
+      ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),startRoom);
+    }
     else ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);
     resumeMazeClock(this.game,id);
     this.announce(`${this.game.players[id].name} joined the adventure.`);
@@ -222,10 +231,12 @@ export class GameRoom extends DurableObject {
       else if(packet.type==='reset-lab'){
         if(id!=='one')throw new Error('Only Player One can reset this technical test adventure');
         const caravanTrial=this.game.caravanTrial;
+        const startRoom=this.game.caravanTrialRoom||'q5r1';
         this.game=resetTestAdventure(this.game);
         if(caravanTrial){
           this.game.caravanTrial=true;
-          for(const player of Object.values(this.game.players))if(player.connected)ensureCaravanTrialPlayer(this.game,player.id,player.name);
+          this.game.caravanTrialRoom=startRoom;
+          for(const player of Object.values(this.game.players))if(player.connected)ensureCaravanTrialPlayer(this.game,player.id,player.name,startRoom);
         }
         result={saved:'lab-reset'};
       }

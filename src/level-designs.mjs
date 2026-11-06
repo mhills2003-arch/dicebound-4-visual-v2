@@ -1,3 +1,4 @@
+import {DUNE_ROWS, DUNE_SPAWNS} from '../public/v2-rushing-dunes-layout.mjs';
 import {CARAVAN_ROWS,CARAVAN_SPAWNS} from '../public/v2-caravan-layout.mjs';
 // DICEBOUND 4.0: 39 room-specific, deterministic tactical blueprints.
 // # = solid obstruction; . = playable floor. One-square and 2×2 routes are validated.
@@ -135,17 +136,7 @@ export const ROOM_BLUEPRINTS = {
     ".........",
     "........."
   ],  "q5r1": CARAVAN_ROWS,
-  "q5r2": [
-    "..........#..",
-    "...#......#..",
-    "...#......#..",
-    "...#...#.....",
-    "...#...#.....",
-    "...#...#.....",
-    ".......#.....",
-    ".......#.....",
-    "............."
-  ],
+  "q5r2": DUNE_ROWS,
   "q5r3": [
     "......#......",
     "......#......",
@@ -456,7 +447,8 @@ export const ROOM_CHALLENGES = {
     "formation": "gate"
   },
   "q5r2": {
-    "challenge": "Three shifting dune ridges force a winding chase against Swift enemies.",
+    "challenge": "Offset dune walls give Swift dice winding approaches through the sand.",
+    "spawnPositions": DUNE_SPAWNS,
     "formation": "rush"
   },
   "q5r3": {

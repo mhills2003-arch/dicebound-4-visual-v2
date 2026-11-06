@@ -1,3 +1,4 @@
+import {DUNE_FOES} from '../public/v2-rushing-dunes-layout.mjs';
 import {PLAYABLE_QUESTS} from './campaign.mjs';
 import {HARD_ENCOUNTERS} from './hard-encounters.mjs';
 import {HARD_BLUEPRINTS} from './hard-rooms.mjs';
@@ -362,7 +363,7 @@ export const ROOM_DATA = {
   }
 ,
   "q5r1": {"name":"Caravan Gate","subtitle":"Caravan guards at the desert entrance","left":null,"right":"q5r2","encounter":[6,6],"foes":[{"faces":6,"variant":"normal","role":"swift"},{"faces":6,"variant":"normal","role":"normal"}],"quest":5,"final":false,"stageTwo":false},
-  "q5r2": {"name":"Rushing Dunes","subtitle":"Swift D6 moves twice as far as an ordinary foe","left":"q5r1","right":"q5r3","encounter":[6,6,8],"foes":[{"faces":6,"variant":"normal","role":"swift"},{"faces":6,"variant":"normal","role":"swift"},{"faces":8,"variant":"normal","role":"normal"}],"quest":5,"final":false,"stageTwo":false},
+  "q5r2": {"name":"Rushing Dunes","subtitle":"Swift D6 moves twice as far as an ordinary foe","left":"q5r1","right":"q5r3","encounter":DUNE_FOES.map(foe=>foe.faces),"foes":DUNE_FOES,"quest":5,"final":false,"stageTwo":false},
   "q5r3": {"name":"Archers’ Ridge","subtitle":"Ranged D6 can shoot up to two tiles","left":"q5r2","right":"q5r4","encounter":[6,8,6],"foes":[{"faces":6,"variant":"normal","role":"ranged"},{"faces":8,"variant":"normal","role":"normal"},{"faces":6,"variant":"normal","role":"ranged"}],"quest":5,"final":false,"stageTwo":false},
   "q5r4": {"name":"Iron Caravan","subtitle":"Armoured D8 absorbs part of each hit","left":"q5r3","right":"q5r5","encounter":[8,8,6],"foes":[{"faces":8,"variant":"normal","role":"armoured"},{"faces":8,"variant":"normal","role":"normal"},{"faces":6,"variant":"normal","role":"normal"}],"quest":5,"final":false,"stageTwo":false},
   "q5r5": {"name":"The Broken Crossing","subtitle":"Swift and Ranged defenders combine","left":"q5r4","right":"q5r6","encounter":[8,6,8],"foes":[{"faces":8,"variant":"normal","role":"swift"},{"faces":6,"variant":"normal","role":"ranged"},{"faces":8,"variant":"normal","role":"normal"}],"quest":5,"final":false,"stageTwo":false},
@@ -394,13 +395,14 @@ Object.assign(ROOM_DATA, {"q8r1": {"name": "Broken Assembly", "subtitle": "Enter
 // but upgrade the arena encounters to purposeful, mixed groups. The new roster is
 // server-authoritative, not a client-side cosmetic multiplier.
 const MEDIUM_REINFORCEMENTS = {
-  5: ["normal:8 normal:8 swift:8 normal:6 normal:6", "swift:8 normal:8 normal:10", "ranged:10 normal:8 swift:8", "armoured:10 swift:8 armoured:8", "swift:10 ranged:8 armoured:10", "armoured:10 ranged:8 normal:10", "ranged:10 armoured:10 swift:10", "armoured:12 ranged:10 swift:10"],
+  5: ["normal:8 normal:8 swift:8 normal:6 normal:6", null, "ranged:10 normal:8 swift:8", "armoured:10 swift:8 armoured:8", "swift:10 ranged:8 armoured:10", "armoured:10 ranged:8 normal:10", "ranged:10 armoured:10 swift:10", "armoured:12 ranged:10 swift:10"],
   6: ["zombie:8 normal:10 zombie:8 normal:8", "zombie:10 normal:10 zombie:8", "ghost:10 zombie:10 ghost:8", "teleporter:10 ghost:8 normal:10", "zombie:10 ghost:10 teleporter:10 normal:10", "teleporter:10 ghost:10 zombie:10 normal:10", "ghost:12 zombie:10 teleporter:10", "ghost:12 teleporter:12 zombie:12 normal:10"],
   7: ["ninja:12 normal:10 ninja:10 normal:12 normal:10", "ninja:12 normal:12 ninja:10 normal:10", "cloner:12 ninja:12 normal:10 normal:12", "healer:12 ninja:12 armoured:12 normal:10", "ninja:12 healer:12 ninja:10 normal:12", "cloner:12 ninja:12 normal:12 healer:10", "ninja:12 cloner:10 healer:12 armoured:12", "ninja:14 armoured:12 healer:12 normal:12"]
 };
 Object.assign(ROOM_DATA,HARD_ENCOUNTERS,EXTREME_ENCOUNTERS);
 for(const [quest,rosters] of Object.entries(MEDIUM_REINFORCEMENTS))for(const [index,roster] of rosters.entries()){
   const room=ROOM_DATA[`q${quest}r${index+1}`];
+  if(!roster)continue; // Rushing Dunes already has its full roster on the approved grid.
   const extra=roster.split(' ').map(entry=>{const [role,faces]=entry.split(':');return {faces:Number(faces),variant:'normal',role};});
   room.foes.push(...extra);room.encounter=room.foes.map(enemy=>enemy.faces);
 }

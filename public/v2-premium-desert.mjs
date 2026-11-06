@@ -1,3 +1,4 @@
+import {DUNE_SCENERY} from './v2-rushing-dunes-layout.mjs';
 import {CARAVAN_SCENERY} from './v2-caravan-layout.mjs';
 export const DESERT_FILES=Object.freeze({
  ground:'./assets/premium-desert/caravan-ground-q5-r1.webp',
@@ -10,14 +11,47 @@ export const DESERT_FILES=Object.freeze({
  d6:'./assets/premium-desert/desert-d6-q5-r1.webp',
  d8:'./assets/premium-desert/desert-d8-q5-r1.webp'
 });
-const art={},layers=new Map();let initialized=false;
-const ready=key=>art[key]?.complete&&art[key].naturalWidth>0;
-export const isPremiumDesertRoom=id=>id==='q5r1';
-export function initPremiumDesert(ImageCtor=typeof Image!=='undefined'?Image:null){
- if(initialized||!ImageCtor)return;initialized=true;
- for(const [name,path] of Object.entries(DESERT_FILES)){const img=new ImageCtor();img.decoding='async';img.src=path;art[name]=img;}
+const duneAsset = name => './assets/premium-desert/rushing-dunes-' + name + '-r1.webp';
+export const DUNE_FILES = Object.freeze({
+  duneGround: duneAsset('ground'),
+  knife: duneAsset('knife'),
+  fluted: duneAsset('fluted'),
+  capped: duneAsset('capped'),
+  westBank: duneAsset('west-bank'),
+  eastBank: duneAsset('east-bank'),
+  hook: duneAsset('hook'),
+  swift: duneAsset('swift-d6'),
+  d6: DESERT_FILES.d6,
+  d8: DESERT_FILES.d8
+});
+const desertRooms = new Map([
+  ['q5r1', {ground: 'ground', scenery: CARAVAN_SCENERY, files: DESERT_FILES}],
+  ['q5r2', {ground: 'duneGround', scenery: DUNE_SCENERY, files: DUNE_FILES}]
+]);
+const art = {};
+const layers = new Map();
+const requestedRooms = new Set();
+const ready = key => art[key]?.complete && art[key].naturalWidth > 0;
+export const isPremiumDesertRoom = roomId => desertRooms.has(roomId);
+
+export function initPremiumDesert(ImageCtor = globalThis.Image, roomId = 'q5r1') {
+  const room = desertRooms.get(roomId);
+  if (!ImageCtor || !room || requestedRooms.has(roomId)) return;
+  requestedRooms.add(roomId);
+  for (const [key, path] of Object.entries(room.files)) {
+    if (art[key]) continue;
+    const sprite = new ImageCtor();
+    sprite.decoding = 'async';
+    sprite.src = path;
+    art[key] = sprite;
+  }
 }
-export const premiumDesertReady=roomId=>isPremiumDesertRoom(roomId)&&Object.keys(DESERT_FILES).every(ready);
+
+export function premiumDesertReady(roomId) {
+  const room = desertRooms.get(roomId);
+  return Boolean(room && Object.keys(room.files).every(ready));
+}
+
 const clipBoard=(ctx,s)=>{ctx.beginPath();ctx.rect(s.originX,s.originY,13*s.cell,9*s.cell);ctx.clip();};
 function oval(ctx,x,y,rx,ry,alpha){
  ctx.save();ctx.translate(x,y);ctx.scale(1,ry/rx);
@@ -28,7 +62,7 @@ function oval(ctx,x,y,rx,ry,alpha){
 export function paintPremiumDesertFloor(ctx,s,roomId){
  if(!premiumDesertReady(roomId)||s.iso)return false;
  const c=s.cell,x=s.originX,y=s.originY;
- ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(art.ground,x,y,13*c,9*c);
+ ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(art[desertRooms.get(roomId).ground],x,y,13*c,9*c);
  // One subordinate movement grid; no second outline around occupied squares.
  ctx.strokeStyle='rgba(101,69,36,.16)';ctx.lineWidth=Math.max(.5,c*.009);ctx.beginPath();
  for(let i=1;i<13;i++){ctx.moveTo(x+i*c,y);ctx.lineTo(x+i*c,y+9*c);}
@@ -37,37 +71,51 @@ export function paintPremiumDesertFloor(ctx,s,roomId){
 }
 export function paintPremiumDesertSurround(ctx,s,w,h,roomId){
  if(!premiumDesertReady(roomId)||s.iso)return false;
- ctx.save();ctx.drawImage(art.ground,0,0,w,h);
+ ctx.save();ctx.drawImage(art[desertRooms.get(roomId).ground],0,0,w,h);
  const shade=ctx.createLinearGradient(0,0,0,h);shade.addColorStop(0,'rgba(62,42,29,.46)');shade.addColorStop(.65,'rgba(64,40,25,.40)');shade.addColorStop(1,'rgba(35,28,23,.85)');
  ctx.fillStyle=shade;ctx.fillRect(0,0,w,h);ctx.restore();return true;
 }
-function drawScenery(ctx,s,walls){
+function drawScenery(ctx,s,walls,roomId){
  const set=new Set(walls.map(p=>p.join(','))),painted=new Set(),c=s.cell;
  ctx.save();clipBoard(ctx,s);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- for(const piece of CARAVAN_SCENERY){
+ for(const piece of desertRooms.get(roomId).scenery){
   const cells=piece.cells.filter(p=>set.has(p.join(',')));if(!cells.length)continue;
   // Clip to the current server footprint, including both open rock corners.
   ctx.save();ctx.beginPath();for(const [x,y] of cells){ctx.rect(s.originX+x*c,s.originY+y*c,c,c);painted.add(`${x},${y}`);}ctx.clip();
-  ctx.shadowColor='rgba(59,32,16,.40)';ctx.shadowBlur=c*.13;ctx.shadowOffsetX=c*.055;ctx.shadowOffsetY=c*.075;
+  if(roomId==='q5r1'){
+    ctx.shadowColor='rgba(59,32,16,.40)';ctx.shadowBlur=c*.13;ctx.shadowOffsetX=c*.055;ctx.shadowOffsetY=c*.075;
+  }
   if(piece.rotate){ctx.translate(s.originX+(piece.x+piece.w/2)*c,s.originY+(piece.y+piece.h/2)*c);ctx.rotate(piece.rotate);ctx.drawImage(art[piece.asset],-piece.w*c/2,-piece.h*c/2,piece.w*c,piece.h*c);}
   else ctx.drawImage(art[piece.asset],s.originX+piece.x*c,s.originY+piece.y*c,piece.w*c,piece.h*c);ctx.restore();
  }
  // A changed server layout cannot silently create invisible additional barriers.
  for(const [x,y] of walls)if(!painted.has(`${x},${y}`)){
   ctx.save();ctx.beginPath();ctx.rect(s.originX+x*c,s.originY+y*c,c,c);ctx.clip();
-  ctx.drawImage(art.crag,s.originX+x*c,s.originY+y*c,c,c);ctx.restore();
+  ctx.drawImage(roomId==='q5r2'?art.capped:art.crag,s.originX+x*c,s.originY+y*c,c,c);ctx.restore();
  }
  ctx.restore();
 }
 export function paintPremiumDesertWalls(ctx,s,walls,roomId){
  if(!premiumDesertReady(roomId)||s.iso)return false;
  const ratio=Math.min(2,Math.max(1,ctx.getTransform?.().a||1));
- const key=`${s.cell}:${ratio}:${walls.map(p=>p.join(',')).join(';')}`;
- if(typeof OffscreenCanvas==='undefined'){drawScenery(ctx,s,walls);return true;}
+ const key=`${roomId}:${s.cell}:${ratio}:${walls.map(p=>p.join(',')).join(';')}`;
+ if(typeof OffscreenCanvas==='undefined'){drawScenery(ctx,s,walls,roomId);return true;}
  let layer=layers.get(key);
  if(!layer){
   layer=new OffscreenCanvas(Math.ceil(13*s.cell*ratio),Math.ceil(9*s.cell*ratio));
-  const c=layer.getContext('2d');c.scale(ratio,ratio);drawScenery(c,{...s,originX:0,originY:0},walls);
+  const c=layer.getContext('2d');c.scale(ratio,ratio);drawScenery(c,{...s,originX:0,originY:0},walls,roomId);
+  if(roomId==='q5r2'){
+    // Cast the natural silhouette's shadow after masking the physical banks.
+    // Baking it into the cached board lets the soft shadow cross a cell boundary.
+    const shadowed=new OffscreenCanvas(layer.width,layer.height);
+    const brush=shadowed.getContext('2d');
+    brush.shadowColor='rgba(67,43,35,.38)';
+    brush.shadowBlur=s.cell*ratio*.08;
+    brush.shadowOffsetX=s.cell*ratio*.052;
+    brush.shadowOffsetY=s.cell*ratio*.055;
+    brush.drawImage(layer,0,0);
+    layer=shadowed;
+  }
   layers.set(key,layer);while(layers.size>3)layers.delete(layers.keys().next().value);
  }
  ctx.drawImage(layer,s.originX,s.originY,layer.width/ratio,layer.height/ratio);return true;
@@ -82,7 +130,10 @@ export function paintPremiumDesertAtmosphere(ctx,s,roomId,timeMs=0,motion=true,l
 }
 export function paintPremiumDesertActor(ctx,s,p,kind,sprite,{label='',selected=false,active=false,motion=true,timeMs=0,roomId='q5r1'}={}){
  if(!premiumDesertReady(roomId)||s.iso||!p)return false;
- if(kind==='enemy')sprite=art[p.faces===6?'d6':'d8'];
+ if(kind==='enemy'){
+  if(p.faces!==6&&p.faces!==8)return false;
+  sprite=roomId==='q5r2'&&p.faces===6&&p.role==='swift'?art.swift:art['d'+p.faces];
+ }
  if(!sprite?.complete||!sprite.naturalWidth)return false;
  const c=s.cell,pt=s.at(p.x,p.y),enemy=kind==='enemy',swift=enemy&&p.role==='swift';
  const size=c*(enemy?1.14:1.28),bob=motion?Math.sin(timeMs*.002+p.x*3+p.y)*c*.008:0;

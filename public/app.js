@@ -1,4 +1,4 @@
-import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-caravan-q5-r1';
+import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q5-rushing-dunes-20261106-r1';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
 import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4-objects-r1';
 import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r6-walljoins';
@@ -9,10 +9,9 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · Q5-1 CARAVAN GATE R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · Q5-2 RUSHING DUNES R1 · Q5-1 CARAVAN GATE R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
-initPremiumDesert();
 initPremiumMine();
 initPremiumGiant();
 initPremiumQuarry();
@@ -250,9 +249,20 @@ setBoardFocus(boardFocus);
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
-const caravanTrial=new URLSearchParams(location.search).get('trial')==='caravan-q5-r1';
-$('cinematicCaravanTest').textContent=caravanTrial?'↩ Return to campaign save':'🏜 Try 5-1 · separate test save';
-$('cinematicCaravanTest').addEventListener('click',()=>{location.href=caravanTrial?'./':'?trial=caravan-q5-r1';});
+const requestedTrial = new URLSearchParams(location.search).get('trial');
+const desertTrials = new Map([
+  ['caravan-q5-r1', 'cinematicCaravanTest'],
+  ['rushing-dunes-q5-r2', 'cinematicDunesTest']
+]);
+const desertTrial = desertTrials.has(requestedTrial) ? requestedTrial : null;
+for (const [trialId, buttonId] of desertTrials) {
+  const button = $(buttonId);
+  const playingThisTrial = desertTrial === trialId;
+  if (playingThisTrial) button.textContent = '↩ Return to campaign save';
+  button.addEventListener('click', () => {
+    location.href = playingThisTrial ? './' : '?trial=' + trialId;
+  });
+}
 const notices=[];let noticeTimer=null;
 function showNotice(title,body,kind='level'){
  const notice=$('milestoneNotice');const close=$('noticeClose');
@@ -371,9 +381,9 @@ function positionPortalArrows(projection,width,height){
  }
 }
 function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.origin);u.protocol=location.protocol==='https:'?'wss:':'ws:';
-  if(caravanTrial)u.searchParams.set('trial','caravan-q5-r1');
+  if(desertTrial)u.searchParams.set('trial',desertTrial);
   else if(trial)u.searchParams.set('trial','balance-v9');socket=new WebSocket(u);
-  socket.onopen=()=>setConnection(caravanTrial?'Live · separate Caravan test':'Live · shared adventure',true);
+  socket.onopen=()=>setConnection(desertTrial?'Live · separate test save':'Live · shared adventure',true);
   socket.onmessage=ev=>{let msg;try{msg=JSON.parse(ev.data)}catch{return};if(msg.type==='state'){state=msg.state;me=state.players[state.me];if(me)consumeEvents(state,me);syncUI();renderChatControls()}
     else if(msg.type==='chat-state'){chatData=msg;renderChat()}
     else if(msg.type==='error')toast(msg.message);};
@@ -382,6 +392,7 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
+ if(isPremiumDesertRoom(me.room))initPremiumDesert(undefined,me.room);
  if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=v2ArtEnabled?'✦ Scene art: ON':'◇ Scene art: OFF';v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
 
   // Prominent fixed-order turn strip visible even when no enemies are present.
@@ -406,7 +417,7 @@ function syncUI(){if(!state||!me)return;
   const hazardWarning=room.hazard?(room.hazard==='chaos'||room.hazard==='storm'?nextHazardPhase===0:room.hazard==='darkness'?nextHazardPhase===0:nextHazardPhase!==0)?(room.hazard==='storm'?' · 🌪 WIND NEXT ENEMY PHASE':room.hazard==='darkness'?' · 🌑 SHADOW STRIKE NEXT PHASE':' · ⚠ DANGER ON NEXT ENEMY PHASE'):' · Hazard rests this phase':'';
   tactical.textContent=room.challenge?'⚑ ROOM CHALLENGE · '+room.challenge+hazardWarning:'';
   $('currentQuestLabel').textContent=me.room==='camp'?'CAMP · BETWEEN QUESTS':`QUEST ${room.quest||1} · ${(campaign?.quests?.find(q=>q.number===(room.quest||1))?.name||'ADVENTURE').toUpperCase()}`;
-  $('cinematicQuest').textContent=(caravanTrial?'SEPARATE TEST · ':'')+$('currentQuestLabel').textContent.replace(' · ',' — ');
+  $('cinematicQuest').textContent=(desertTrial?'SEPARATE TEST · ':'')+$('currentQuestLabel').textContent.replace(' · ',' — ');
   $('roomSub').textContent=me.room==='camp'?'ADVENTURERS’ CAMP · Merchant, quests and resting place':
     `QUEST ${room.quest||1} · ${room.challenge||room.subtitle||'Explore the adventure'}${room.quest>=5?' · '+roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · '+battle.enemies.filter(e=>e.hp>0).length+' foes remaining':''}`;
   const help=document.querySelector('.canvas-help');
@@ -932,7 +943,10 @@ function render(){if(!state||!me)return;
     woodlandCharactersToggle.setAttribute('aria-pressed',String(woodlandCharactersEnabled));
     woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
   }
-  if(v2ArtToggle&&isPremiumDesertRoom(me.room)){v2ArtToggle.textContent=v2ArtEnabled?(premiumDesertReady(me.room)?'🏜 Caravan Gate premium: ON':'🏜 Loading Caravan Gate…'):'◇ Caravan Gate premium: OFF';}
+  if(v2ArtToggle&&isPremiumDesertRoom(me.room)){
+    const name=roomDef(me.room).name;
+    v2ArtToggle.textContent=v2ArtEnabled?(premiumDesertReady(me.room)?'🏜 '+name+' premium: ON':'🏜 Loading '+name+'…'):'◇ '+name+' premium: OFF';
+  }
   if(v2ArtToggle&&(isPremiumWoodlandRoom(me.room)||isPremiumMineRoom(me.room)||isPremiumGiantRoom(me.room)||isPremiumQuarryRoom(me.room))){
     const label=isPremiumQuarryRoom(me.room)?(v2ArtEnabled?(premiumQuarryReady(me.room)?'⛏ Quest 4 quarry premium: ON':'⛏ Loading quarry artwork…'):'◇ Quest 4 quarry premium: OFF'):isPremiumGiantRoom(me.room)?(v2ArtEnabled?(premiumGiantReady(me.room)?'🌳 Quest 3 giant forest premium: ON':'🌳 Loading giantwood artwork…'):'◇ Quest 3 giantwood premium: OFF'):isPremiumMineRoom(me.room)?(v2ArtEnabled?(premiumMineReady(me.room)?'💎 Quest 2 mine premium: ON':'💎 Loading mine artwork…'):'◇ Quest 2 mine premium: OFF'):(v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF');
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;

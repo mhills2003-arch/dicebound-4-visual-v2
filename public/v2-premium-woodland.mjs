@@ -88,7 +88,7 @@ export function paintPremiumWoodlandFloor(ctx,s,roomId='woodland') {
   for(let i=1;i<7;i++){ctx.beginPath();ctx.moveTo(x,y+i*c);ctx.lineTo(x+9*c,y+i*c);ctx.stroke()}
   ctx.restore();return true;
 }
-export function paintPremiumWoodlandWall(ctx,s,x,y,roomId='woodland',outline=true) {
+export function paintPremiumWoodlandWall(ctx,s,x,y,roomId='woodland',outline=false) {
   if (!premiumWoodlandReady() || s.iso) return false;
   const {cell:c} = s,pt=s.at(x,y);
   const name=roomId==='watchpost'?((x*7+y*11)%2?'watchpostRuinA':'watchpostRuinB'):
@@ -134,8 +134,6 @@ export function paintPremiumWoodlandWalls(ctx,s,walls=[],roomId='woodland',direc
     (c,local)=>paintPremiumWoodlandWalls(c,local,walls,roomId,true)))return true;
   const c=s.cell,set=new Set(walls.map(p=>p.join(',')));
   ctx.save();ctx.beginPath();ctx.rect(s.originX,s.originY,9*c,7*c);ctx.clip();
-  ctx.fillStyle='rgba(16,30,17,.16)';
-  for(const [x,y] of walls)ctx.fillRect(s.originX+x*c,s.originY+y*c,c,c);
   for(const group of woodlandWallGroups(walls)){
     let key=null;
     if(roomId==='watchpost'&&group.width===1&&group.height===2&&group.cells.length===2)key='ruinVertical';
@@ -154,16 +152,9 @@ export function paintPremiumWoodlandWalls(ctx,s,walls=[],roomId='woodland',direc
       ctx.restore();
     }else for(const [x,y] of group.cells)paintPremiumWoodlandWall(ctx,s,x,y,roomId,false);
   }
-  // A quiet, exact boundary survives texture detail; shared edges remain subtle.
-  ctx.lineWidth=Math.max(1,c*.012);ctx.strokeStyle='rgba(239,218,164,.44)';ctx.beginPath();
-  for(const [x,y] of walls){
-    const X=s.originX+x*c,Y=s.originY+y*c;
-    if(!set.has(`${x},${y-1}`)){ctx.moveTo(X,Y);ctx.lineTo(X+c,Y);}
-    if(!set.has(`${x+1},${y}`)){ctx.moveTo(X+c,Y);ctx.lineTo(X+c,Y+c);}
-    if(!set.has(`${x},${y+1}`)){ctx.moveTo(X+c,Y+c);ctx.lineTo(X,Y+c);}
-    if(!set.has(`${x-1},${y}`)){ctx.moveTo(X,Y+c);ctx.lineTo(X,Y);}
-  }
-  ctx.stroke();ctx.restore();return true;
+  // Silhouette and contact shadow integrate scenery without boxed footprints.
+  // The floor grid remains available for tactical positioning.
+  ctx.restore();return true;
 }
 
 /**

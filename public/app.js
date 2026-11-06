@@ -1,4 +1,5 @@
-import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-cohesion-20261105-r2';
+import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-caravan-q5-r1';
+import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
 import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4-objects-r1';
 import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r6-walljoins';
 import {initPremiumQuarry,isPremiumQuarryRoom,premiumQuarryReady,paintPremiumQuarryFloor,paintPremiumQuarryLighting,paintPremiumQuarryWall,paintPremiumQuarryConnectedWalls,paintPremiumQuarryAtmosphere,paintPremiumQuarryForeground,paintPremiumQuarryActor,paintPremiumQuarryContactShadow,quarryFrameImage} from './v2-premium-quarry.mjs?build=v2-quest4-five-premium-rooms-r3';
@@ -8,9 +9,10 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · Q5-1 CARAVAN GATE R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
+initPremiumDesert();
 initPremiumMine();
 initPremiumGiant();
 initPremiumQuarry();
@@ -92,7 +94,8 @@ const premiumActive=()=>artActive()&&isPremiumWoodlandRoom(me?.room)&&view==='ta
 const premiumMineActive=()=>artActive()&&isPremiumMineRoom(me?.room)&&view==='tactical'&&premiumMineReady(me?.room);
 const premiumGiantActive=()=>artActive()&&isPremiumGiantRoom(me?.room)&&view==='tactical'&&premiumGiantReady(me?.room);
 const premiumQuarryActive=()=>artActive()&&isPremiumQuarryRoom(me?.room)&&view==='tactical'&&premiumQuarryReady(me?.room);
-const anyPremiumActive=()=>premiumActive()||premiumMineActive()||premiumGiantActive()||premiumQuarryActive();
+const premiumDesertActive=()=>artActive()&&isPremiumDesertRoom(me?.room)&&view==='tactical'&&premiumDesertReady(me?.room);
+const anyPremiumActive=()=>premiumActive()||premiumMineActive()||premiumGiantActive()||premiumQuarryActive()||premiumDesertActive();
 let woodlandDepthEnabled=localStorage.getItem('db4_v2_woodland_depth')!=='off';
 const woodlandDepthToggle=document.createElement('button');
 woodlandDepthToggle.id='woodlandDepthToggle';
@@ -247,6 +250,9 @@ setBoardFocus(boardFocus);
 let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
+const caravanTrial=new URLSearchParams(location.search).get('trial')==='caravan-q5-r1';
+$('cinematicCaravanTest').textContent=caravanTrial?'↩ Return to campaign save':'🏜 Try 5-1 · separate test save';
+$('cinematicCaravanTest').addEventListener('click',()=>{location.href=caravanTrial?'./':'?trial=caravan-q5-r1';});
 const notices=[];let noticeTimer=null;
 function showNotice(title,body,kind='level'){
  const notice=$('milestoneNotice');const close=$('noticeClose');
@@ -365,8 +371,9 @@ function positionPortalArrows(projection,width,height){
  }
 }
 function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.origin);u.protocol=location.protocol==='https:'?'wss:':'ws:';
-  if(trial)u.searchParams.set('trial','balance-v9');socket=new WebSocket(u);
-  socket.onopen=()=>setConnection('Live · shared adventure',true);
+  if(caravanTrial)u.searchParams.set('trial','caravan-q5-r1');
+  else if(trial)u.searchParams.set('trial','balance-v9');socket=new WebSocket(u);
+  socket.onopen=()=>setConnection(caravanTrial?'Live · separate Caravan test':'Live · shared adventure',true);
   socket.onmessage=ev=>{let msg;try{msg=JSON.parse(ev.data)}catch{return};if(msg.type==='state'){state=msg.state;me=state.players[state.me];if(me)consumeEvents(state,me);syncUI();renderChatControls()}
     else if(msg.type==='chat-state'){chatData=msg;renderChat()}
     else if(msg.type==='error')toast(msg.message);};
@@ -399,7 +406,7 @@ function syncUI(){if(!state||!me)return;
   const hazardWarning=room.hazard?(room.hazard==='chaos'||room.hazard==='storm'?nextHazardPhase===0:room.hazard==='darkness'?nextHazardPhase===0:nextHazardPhase!==0)?(room.hazard==='storm'?' · 🌪 WIND NEXT ENEMY PHASE':room.hazard==='darkness'?' · 🌑 SHADOW STRIKE NEXT PHASE':' · ⚠ DANGER ON NEXT ENEMY PHASE'):' · Hazard rests this phase':'';
   tactical.textContent=room.challenge?'⚑ ROOM CHALLENGE · '+room.challenge+hazardWarning:'';
   $('currentQuestLabel').textContent=me.room==='camp'?'CAMP · BETWEEN QUESTS':`QUEST ${room.quest||1} · ${(campaign?.quests?.find(q=>q.number===(room.quest||1))?.name||'ADVENTURE').toUpperCase()}`;
-  $('cinematicQuest').textContent=$('currentQuestLabel').textContent.replace(' · ',' — ');
+  $('cinematicQuest').textContent=(caravanTrial?'SEPARATE TEST · ':'')+$('currentQuestLabel').textContent.replace(' · ',' — ');
   $('roomSub').textContent=me.room==='camp'?'ADVENTURERS’ CAMP · Merchant, quests and resting place':
     `QUEST ${room.quest||1} · ${room.challenge||room.subtitle||'Explore the adventure'}${room.quest>=5?' · '+roomSize(me.room).width+'×'+roomSize(me.room).height+' maze · '+battle.enemies.filter(e=>e.hp>0).length+' foes remaining':''}`;
   const help=document.querySelector('.canvas-help');
@@ -756,7 +763,8 @@ function sceneFloor(s){
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
     const cs=s.cell, premium=anyPremiumActive();
-    if(premiumActive()){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
+    if(premiumDesertActive())paintPremiumDesertFloor(ctx,s,me.room);
+    else if(premiumActive()){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     else if(premiumMineActive()){paintPremiumMineFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumMineLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     else if(premiumGiantActive()){paintPremiumGiantFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumGiantLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     else if(premiumQuarryActive()){paintPremiumQuarryFloor(ctx,s,me.room,state.roomWalls?.[me.room]||[]);if(woodlandLightActive())paintPremiumQuarryLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
@@ -924,6 +932,7 @@ function render(){if(!state||!me)return;
     woodlandCharactersToggle.setAttribute('aria-pressed',String(woodlandCharactersEnabled));
     woodlandCharactersToggle.title='Compare illustrated in-world figures against the original framed character tokens.';
   }
+  if(v2ArtToggle&&isPremiumDesertRoom(me.room)){v2ArtToggle.textContent=v2ArtEnabled?(premiumDesertReady(me.room)?'🏜 Caravan Gate premium: ON':'🏜 Loading Caravan Gate…'):'◇ Caravan Gate premium: OFF';}
   if(v2ArtToggle&&(isPremiumWoodlandRoom(me.room)||isPremiumMineRoom(me.room)||isPremiumGiantRoom(me.room)||isPremiumQuarryRoom(me.room))){
     const label=isPremiumQuarryRoom(me.room)?(v2ArtEnabled?(premiumQuarryReady(me.room)?'⛏ Quest 4 quarry premium: ON':'⛏ Loading quarry artwork…'):'◇ Quest 4 quarry premium: OFF'):isPremiumGiantRoom(me.room)?(v2ArtEnabled?(premiumGiantReady(me.room)?'🌳 Quest 3 giant forest premium: ON':'🌳 Loading giantwood artwork…'):'◇ Quest 3 giantwood premium: OFF'):isPremiumMineRoom(me.room)?(v2ArtEnabled?(premiumMineReady(me.room)?'💎 Quest 2 mine premium: ON':'💎 Loading mine artwork…'):'◇ Quest 2 mine premium: OFF'):(v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF');
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
@@ -934,7 +943,8 @@ function render(){if(!state||!me)return;
   ctx.clearRect(0,0,w,h);ctx.fillStyle='#08111e';ctx.fillRect(0,0,w,h);
   if(artActive())paintArtBackdrop(ctx,w,h,{theme:me.room});else {const mist=ctx.createRadialGradient(w*.5,h*.45,10,w*.5,h*.5,Math.max(w,h)*.8);mist.addColorStop(0,'#234457');mist.addColorStop(1,'#060d18');ctx.fillStyle=mist;ctx.fillRect(0,0,w,h);}
   const s=gridProjection(w,h);frameMetrics=s;
-  if(boardFocus&&premiumActive())paintCinematicWoodlandSurround(ctx,s,w,h);
+  if(boardFocus&&premiumDesertActive())paintPremiumDesertSurround(ctx,s,w,h,me.room);
+  else if(boardFocus&&premiumActive())paintCinematicWoodlandSurround(ctx,s,w,h);
   else if(boardFocus&&premiumMineActive())paintCinematicMineSurround(ctx,s,w,h);
   else if(boardFocus&&premiumGiantActive())paintCinematicGiantSurround(ctx,s,w,h);
   else if(boardFocus&&premiumQuarryActive())paintCinematicQuarrySurround(ctx,s,w,h);
@@ -942,11 +952,12 @@ function render(){if(!state||!me)return;
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
+  const desertConnectedPainted=premiumDesertActive()&&paintPremiumDesertWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const woodlandConnectedPainted=premiumActive()&&paintPremiumWoodlandWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const mineConnectedPainted=premiumMineActive()&&paintPremiumMineConnectedWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const quarryConnectedPainted=premiumQuarryActive()&&paintPremiumQuarryConnectedWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   if(premiumGiantActive())paintPremiumGiantWalls(ctx,s,me.room,state.roomWalls?.[me.room]||[]);
-  else if(!woodlandConnectedPainted&&!mineConnectedPainted&&!quarryConnectedPainted)for(const [x,y] of state.roomWalls?.[me.room]||[]){
+  else if(!desertConnectedPainted&&!woodlandConnectedPainted&&!mineConnectedPainted&&!quarryConnectedPainted)for(const [x,y] of state.roomWalls?.[me.room]||[]){
     if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
     else if(premiumMineActive())paintPremiumMineWall(ctx,s,x,y,me.room);
     else if(premiumQuarryActive())paintPremiumQuarryWall(ctx,s,x,y,me.room);
@@ -955,7 +966,8 @@ function render(){if(!state||!me)return;
     else drawStoneTile(s,x,y,terrain);
   }
   // Purely visual V2 scenery attaches to the real wall map; it creates no new walls.
-  if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled,me.room);
+  if(premiumDesertActive())paintPremiumDesertAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
+  else if(premiumActive())paintPremiumWoodlandAtmosphere(ctx,s,woodlandLightingEnabled,me.room);
   else if(premiumMineActive())paintPremiumMineAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
   else if(premiumGiantActive())paintPremiumGiantAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
   else if(premiumQuarryActive())paintPremiumQuarryAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
@@ -1000,7 +1012,7 @@ function render(){if(!state||!me)return;
   if(s.iso)actors.sort((a,b)=>(a.p.x+a.p.y)-(b.p.x+b.p.y));
   for(const a of actors){
     const integrated=anyPremiumActive()&&woodlandCharactersEnabled;
-    if(woodlandLightActive()&&!integrated){if(premiumMineActive())paintPremiumMineContactShadow(ctx,s,a.p);else if(premiumGiantActive())paintPremiumGiantContactShadow(ctx,s,a.p);else if(premiumQuarryActive())paintPremiumQuarryContactShadow(ctx,s,a.p);else paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);}
+    if(woodlandLightActive()&&!integrated&&!premiumDesertActive()){if(premiumMineActive())paintPremiumMineContactShadow(ctx,s,a.p);else if(premiumGiantActive())paintPremiumGiantContactShadow(ctx,s,a.p);else if(premiumQuarryActive())paintPremiumQuarryContactShadow(ctx,s,a.p);else paintPremiumWoodlandContactShadow(ctx,s,a.p,a.kind);}
     const medium=roomSize(me.room).width>9;
     const abbreviations={normal:'',swift:'S',ranged:'R',armoured:'A',zombie:'Z',ghost:'G',teleporter:'T',cloner:'C',healer:'H',ninja:'N'};
     const label=a.kind==='enemy'&&medium?`${abbreviations[a.p.role||'normal']||''}D${a.p.faces}`:a.kind==='enemy'?a.p.name:(a.p.name||'Player').slice(0,medium?4:8);
@@ -1010,12 +1022,12 @@ function render(){if(!state||!me)return;
       active:a.kind!=='enemy'&&state.turn?.activePlayer===a.p.id,
       motion:!reducedMotion,timeMs:performance.now(),light:woodlandLightingEnabled,roomId:me.room
     };
-    const drew=integrated&&(premiumMineActive()?paintPremiumMineActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumGiantActive()?paintPremiumGiantActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumQuarryActive()?paintPremiumQuarryActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):paintPremiumWoodlandActor(ctx,s,a.p,a.kind,baseSprite,visualOptions));
+    const drew=integrated&&(premiumDesertActive()?paintPremiumDesertActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumMineActive()?paintPremiumMineActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumGiantActive()?paintPremiumGiantActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumQuarryActive()?paintPremiumQuarryActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):paintPremiumWoodlandActor(ctx,s,a.p,a.kind,baseSprite,visualOptions));
     if(!drew)iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
   }
   // Foreground passes run AFTER the units. Painted canopy silhouettes sit at
   // the board rim; their opacity falls away near heroes/enemies and labels.
-  if(anyPremiumActive()){
+  if(anyPremiumActive()&&!premiumDesertActive()){
     if(woodlandDepthEnabled){
       const movement=!reducedMotion;
       const timestamp=performance.now();

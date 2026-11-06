@@ -1,3 +1,4 @@
+import {CARAVAN_ROWS,CARAVAN_SPAWNS} from '../public/v2-caravan-layout.mjs';
 // DICEBOUND 4.0: 39 room-specific, deterministic tactical blueprints.
 // # = solid obstruction; . = playable floor. One-square and 2×2 routes are validated.
 // Quest 1 remains unchanged as the introductory tutorial.
@@ -133,17 +134,7 @@ export const ROOM_BLUEPRINTS = {
     "..#...#..",
     ".........",
     "........."
-  ],  "q5r1": [
-    "...##........",
-    "...##...#....",
-    "...##...#....",
-    ".............",
-    ".............",
-    "........#....",
-    "...##...#....",
-    "...##...#....",
-    "...##........"
-  ],
+  ],  "q5r1": CARAVAN_ROWS,
   "q5r2": [
     "..........#..",
     "...#......#..",
@@ -460,7 +451,8 @@ export const ROOM_CHALLENGES = {
     "formation": "boss"
   },
   "q5r1": {
-    "challenge": "An open gate funnels caravans into a central ambush with side approaches.",
+    "challenge": "Gate ruins shelter the approach. Circle the well or take the longer outer flanks; Swift guards threaten both routes.",
+    "spawnPositions": CARAVAN_SPAWNS,
     "formation": "gate"
   },
   "q5r2": {

@@ -394,7 +394,7 @@ Object.assign(ROOM_DATA, {"q8r1": {"name": "Broken Assembly", "subtitle": "Enter
 // but upgrade the arena encounters to purposeful, mixed groups. The new roster is
 // server-authoritative, not a client-side cosmetic multiplier.
 const MEDIUM_REINFORCEMENTS = {
-  5: ["normal:8 normal:8 swift:8", "swift:8 normal:8 normal:10", "ranged:10 normal:8 swift:8", "armoured:10 swift:8 armoured:8", "swift:10 ranged:8 armoured:10", "armoured:10 ranged:8 normal:10", "ranged:10 armoured:10 swift:10", "armoured:12 ranged:10 swift:10"],
+  5: ["normal:8 normal:8 swift:8 normal:6 normal:6", "swift:8 normal:8 normal:10", "ranged:10 normal:8 swift:8", "armoured:10 swift:8 armoured:8", "swift:10 ranged:8 armoured:10", "armoured:10 ranged:8 normal:10", "ranged:10 armoured:10 swift:10", "armoured:12 ranged:10 swift:10"],
   6: ["zombie:8 normal:10 zombie:8 normal:8", "zombie:10 normal:10 zombie:8", "ghost:10 zombie:10 ghost:8", "teleporter:10 ghost:8 normal:10", "zombie:10 ghost:10 teleporter:10 normal:10", "teleporter:10 ghost:10 zombie:10 normal:10", "ghost:12 zombie:10 teleporter:10", "ghost:12 teleporter:12 zombie:12 normal:10"],
   7: ["ninja:12 normal:10 ninja:10 normal:12 normal:10", "ninja:12 normal:12 ninja:10 normal:10", "cloner:12 ninja:12 normal:10 normal:12", "healer:12 ninja:12 armoured:12 normal:10", "ninja:12 healer:12 ninja:10 normal:12", "cloner:12 ninja:12 normal:12 healer:10", "ninja:12 cloner:10 healer:12 armoured:12", "ninja:14 armoured:12 healer:12 normal:12"]
 };
@@ -1164,7 +1164,7 @@ function spawnFoes(s,roomId,foes,now){
       ghost:[[9,4],[10,6],[6,1],[8,7],[11,3],[5,5],[10,1],[7,3]]
     };
     const formation=ROOM_DATA[roomId].formation||'stagger';
-    const plan=positions[formation]||positions.stagger;
+    const plan=ROOM_DATA[roomId].spawnPositions||positions[formation]||positions.stagger;
     const [px,py]=plan[i%plan.length];
     const targetX=ROOM_DATA[roomId].quest>=10?Math.min(13,px+2):medium?px:Math.max(2,Math.round(px*8/12));
     const targetY=ROOM_DATA[roomId].quest>=10?py+1:medium?py:Math.min(5,Math.round(py*6/8));

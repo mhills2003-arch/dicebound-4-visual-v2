@@ -1,3 +1,4 @@
+import {ensureCaravanTrialPlayer} from './caravan-trial.mjs';
 import { DurableObject } from 'cloudflare:workers';
 import {createMaze,joinMaze,leaveMaze,mazeTravel,mazeSearch,mazeClaim,mazeBonus,mazeAction,mazeRetreat,mazeReward,mazeVoteAbandon,mazeTick,nextMazeDeadline,mazePublic,resumeMazeClock} from './maze-play.mjs';
 import {ensureChat,chatForViewer,postChat,togglePersonalMute,reportChat,toggleAdminMute} from './chat.mjs';
@@ -62,18 +63,18 @@ export default {
     // Worker and its bound static files belong to the same cinematic V2 build.
     if(req.method==='GET'&&u.pathname===ROOT+'/version'){
       const checks=await Promise.all(
-        ['/index.html','/app.js','/styles.css','/assets/premium-woodland/training-clearing-ground.jpg'].map(async path=>{
+        ['/index.html','/app.js','/styles.css','/assets/premium-woodland/training-clearing-ground.jpg','/assets/premium-desert/caravan-ground-q5-r1.webp'].map(async path=>{
           try{const r=await env.ASSETS.fetch(new Request(u.origin+path));
-            return {status:r.status,body:path.endsWith('.jpg')?'':r.ok?await r.text():''};
+            return {status:r.status,body:r.ok&&!path.startsWith('/assets/')?await r.text():''};
           }catch{return {status:0,body:''}}
         })
       );
-      const ready=checks[0].status===200&&checks[0].body.includes('id="cinematicRoom"')
-        &&checks[1].status===200&&checks[1].body.includes('cinematicRoom')
+      const ready=checks[0].status===200&&checks[0].body.includes('id="cinematicCaravanTest"')&&checks[0].body.includes('v2-quest1-soft-edges-q5-caravan-r1')
+        &&checks[1].status===200&&checks[1].body.includes('initPremiumDesert')
         &&checks[2].status===200&&checks[2].body.includes('.cin-room')
-        &&checks[3].status===200;
-      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2',build:'v2-cinematic-restoration-20261102-r1',cinematicAssetsReady:ready,
-        checks:{html:checks[0].status,js:checks[1].status,css:checks[2].status,woodlandArt:checks[3].status}}),
+        &&checks[3].status===200&&checks[4].status===200;
+      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2',build:'v2-quest1-soft-edges-q5-caravan-r1',cinematicAssetsReady:ready,
+        checks:{html:checks[0].status,js:checks[1].status,css:checks[2].status,woodlandArt:checks[3].status,caravanArt:checks[4].status}}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
@@ -87,11 +88,14 @@ export default {
     if(req.method==='GET'&&u.pathname===ROOT+'/api/ws'){
       if(req.headers.get('upgrade')?.toLowerCase()!=='websocket')return reply('Upgrade required',426);
       const isTrial=u.searchParams.get('trial')==='balance-v9';
-      const object=env.V2_GAME_ROOM.get(env.V2_GAME_ROOM.idFromName(isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'));
+      const isCaravanTrial=u.searchParams.get('trial')==='caravan-q5-r1';
+      const object=env.V2_GAME_ROOM.get(env.V2_GAME_ROOM.idFromName(isCaravanTrial?'quest-v2-caravan-q5-r1':isTrial?'quest-v9-balance-trial':'quest-01-two-player-prototype'));
       const headers=new Headers(req.headers);
+      headers.delete('x-dicebound-trial');
       headers.set('x-dicebound-player',identity.id);
       headers.set('x-dicebound-name',identity.name);
-      if(isTrial)headers.set('x-dicebound-trial','balance-v9');
+      if(isCaravanTrial)headers.set('x-dicebound-trial','caravan-q5-r1');
+      else if(isTrial)headers.set('x-dicebound-trial','balance-v9');
       return object.fetch(new Request('https://game-internal/connect',{headers}));
     }
     if(req.method!=='GET'&&req.method!=='HEAD')return reply('Method not allowed',405);
@@ -125,7 +129,9 @@ export class GameRoom extends DurableObject {
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({id});
     if(req.headers.get('x-dicebound-trial')==='balance-v9')this.game.balanceTrial=true;
-    ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);resumeMazeClock(this.game,id);
+    if(req.headers.get('x-dicebound-trial')==='caravan-q5-r1')ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'));
+    else ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);
+    resumeMazeClock(this.game,id);
     this.announce(`${this.game.players[id].name} joined the adventure.`);
     await this.persist(null);
     this.broadcast();
@@ -215,7 +221,12 @@ export class GameRoom extends DurableObject {
       else if(packet.type==='potion')result=this.game.rooms[this.game.players[id].room].battle.status==='active' ? submitSequentialAction(this.game,id,{type:'potion',target:packet.target||id}) : usePotion(this.game,id,packet.target);
       else if(packet.type==='reset-lab'){
         if(id!=='one')throw new Error('Only Player One can reset this technical test adventure');
+        const caravanTrial=this.game.caravanTrial;
         this.game=resetTestAdventure(this.game);
+        if(caravanTrial){
+          this.game.caravanTrial=true;
+          for(const player of Object.values(this.game.players))if(player.connected)ensureCaravanTrialPlayer(this.game,player.id,player.name);
+        }
         result={saved:'lab-reset'};
       }
       else if(packet.type==='ping'){ws.send(JSON.stringify({type:'pong'}));return}

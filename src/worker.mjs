@@ -9,7 +9,13 @@ const COOKIE='db4_v2_session';
 const trialWorlds = new Map([
   ['balance-v9', 'quest-v9-balance-trial'],
   ['caravan-q5-r1', 'quest-v2-caravan-q5-r1'],
-  ['rushing-dunes-q5-r2', 'quest-v2-rushing-dunes-q5-r2']
+  ['rushing-dunes-q5-r2', 'quest-v2-rushing-dunes-q5-r2'],
+  ['quest5-room3', 'quest-v2-complete-q5-r3'],
+  ['quest5-room4', 'quest-v2-complete-q5-r4'],
+  ['quest5-room5', 'quest-v2-complete-q5-r5'],
+  ['quest5-room6', 'quest-v2-complete-q5-r6'],
+  ['quest5-room7', 'quest-v2-complete-q5-r7'],
+  ['quest5-room8', 'quest-v2-complete-q5-r8']
 ]);
 const encoder=new TextEncoder();
 const reply=(value,status=200,headers={})=>new Response(typeof value==='string'?value:JSON.stringify(value),{status,headers:{'cache-control':'no-store',...headers,'content-type':typeof value==='string'?'text/html; charset=utf-8':'application/json; charset=utf-8'}});
@@ -67,19 +73,26 @@ export default {
     // Unauthenticated, non-sensitive deployment fingerprint. Verifies that the
     // Worker and its bound static files belong to the same cinematic V2 build.
     if(req.method==='GET'&&u.pathname===ROOT+'/version'){
-      const checks=await Promise.all(
-        ['/index.html','/app.js','/styles.css','/assets/premium-woodland/training-clearing-ground.jpg','/assets/premium-desert/caravan-ground-q5-r1.webp','/assets/premium-desert/rushing-dunes-ground-r1.webp'].map(async path=>{
-          try{const r=await env.ASSETS.fetch(new Request(u.origin+path));
-            return {status:r.status,body:r.ok&&!path.startsWith('/assets/')?await r.text():''};
-          }catch{return {status:0,body:''}}
-        })
-      );
-      const ready=checks[0].status===200&&checks[0].body.includes('id="cinematicDunesTest"')&&checks[0].body.includes('v2-q5-rushing-dunes-20261106-r1')
-        &&checks[1].status===200&&checks[1].body.includes('initPremiumDesert')
-        &&checks[2].status===200&&checks[2].body.includes('.cin-room')
-        &&checks[3].status===200&&checks[4].status===200&&checks[5].status===200;
-      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2',build:'v2-q5-rushing-dunes-20261106-r1',cinematicAssetsReady:ready,
-        checks:{html:checks[0].status,js:checks[1].status,css:checks[2].status,woodlandArt:checks[3].status,caravanArt:checks[4].status,dunesArt:checks[5].status}}),
+      const assets = [
+        ['html','/index.html'], ['js','/app.js'], ['css','/styles.css'],
+        ['woodlandArt','/assets/premium-woodland/training-clearing-ground.jpg'],
+        ['caravanArt','/assets/premium-desert/caravan-ground-q5-r1.webp'],
+        ['dunesArt','/assets/premium-desert/rushing-dunes-ground-r1.webp'],
+        ...['ridge-ground','caravan-ground','crossing-ground','shieldwall-ground','smuggler-ground','toll-ground','toll-boss-d16']
+          .map(name => [name, '/assets/premium-desert/q5-' + name + '-r1.webp'])
+      ];
+      const checks = await Promise.all(assets.map(async ([name, path]) => {
+        try {
+          const r = await env.ASSETS.fetch(new Request(u.origin + path));
+          return {name, status: r.status, body: r.ok && !path.startsWith('/assets/') ? await r.text() : ''};
+        } catch { return {name, status: 0, body: ''}; }
+      }));
+      const ready = checks.every(check => check.status === 200)
+        && checks[0].body.includes('id="cinematicQ5Room"')
+        && checks[0].body.includes('v2-q5-complete-20261112-r1')
+        && checks[1].body.includes('initPremiumDesert') && checks[2].body.includes('.cin-room');
+      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q5-complete-20261112-r1',
+        cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
@@ -135,8 +148,8 @@ export class GameRoom extends DurableObject {
     server.serializeAttachment({id});
     if(req.headers.get('x-dicebound-trial')==='balance-v9')this.game.balanceTrial=true;
     const trial = req.headers.get('x-dicebound-trial');
-    if(trial==='caravan-q5-r1'||trial==='rushing-dunes-q5-r2'){
-      const startRoom=trial==='rushing-dunes-q5-r2'?'q5r2':'q5r1';
+    if(trial==='caravan-q5-r1'||trial==='rushing-dunes-q5-r2'||/^quest5-room[3-8]$/.test(trial||'')){
+      const startRoom=trial==='caravan-q5-r1'?'q5r1':trial==='rushing-dunes-q5-r2'?'q5r2':'q5r'+trial.slice(-1);
       ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),startRoom);
     }
     else ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);

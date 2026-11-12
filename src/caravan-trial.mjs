@@ -2,6 +2,7 @@ import {ensurePlayer, effectiveStats, selectClass, buyFromShop, equipItem, enter
 
 // Each desert trial has its own world. Joining an existing trial resumes that character.
 export function ensureCaravanTrialPlayer(game, id, name, startRoom = 'q5r1') {
+  if (!/^q5r[1-8]$/.test(startRoom)) throw new Error('Unknown Quest 5 test room');
   game.caravanTrial = true;
   game.caravanTrialRoom = startRoom;
   game.unlockedQuest = Math.max(5, game.unlockedQuest || 1);
@@ -21,7 +22,7 @@ export function ensureCaravanTrialPlayer(game, id, name, startRoom = 'q5r1') {
     equipItem(game, id, item.id, item.category === 'Armour' ? 'armour' : 'weapon');
   }
   for (let i = 0; i < 3; i++) buyFromShop(game, id, 'potion');
-  if (startRoom === 'q5r2') {
+  if (startRoom !== 'q5r1') {
     player.questBookmarks ??= {};
     player.questBookmarks[5] = {room: startRoom, x: 0, y: 4};
   }

@@ -1,3 +1,4 @@
+import {Q5_ROOMS} from '../public/v2-quest5-layouts.mjs';
 import {DUNE_ROWS, DUNE_SPAWNS} from '../public/v2-rushing-dunes-layout.mjs';
 import {CARAVAN_ROWS,CARAVAN_SPAWNS} from '../public/v2-caravan-layout.mjs';
 // DICEBOUND 4.0: 39 room-specific, deterministic tactical blueprints.
@@ -137,72 +138,12 @@ export const ROOM_BLUEPRINTS = {
     "........."
   ],  "q5r1": CARAVAN_ROWS,
   "q5r2": DUNE_ROWS,
-  "q5r3": [
-    "......#......",
-    "......#......",
-    "......#..#...",
-    ".........#...",
-    ".............",
-    ".........#...",
-    "......#..#...",
-    "......#......",
-    "......#......"
-  ],
-  "q5r4": [
-    ".............",
-    "........##...",
-    "....##..##...",
-    "....##.......",
-    ".............",
-    "....##.......",
-    "....##..##...",
-    "........##...",
-    "............."
-  ],
-  "q5r5": [
-    "..###........",
-    "..###........",
-    "..###..###...",
-    ".......###...",
-    ".............",
-    ".......###...",
-    "..###..###...",
-    "..###........",
-    "..###........"
-  ],
-  "q5r6": [
-    "....#........",
-    "....#.....#..",
-    "....#..#..#..",
-    ".......#.....",
-    ".............",
-    "....#..#.....",
-    "....#..#..#..",
-    "....#.....#..",
-    "....#........"
-  ],
-  "q5r7": [
-    ".............",
-    "...##..#.....",
-    "...##..#.....",
-    ".......#.....",
-    ".......#..#..",
-    "...##..#..#..",
-    "...##.....#..",
-    "..........#..",
-    "............."
-  ],
-  "q5r8": [
-    ".......##....",
-    "....#..##....",
-    "....#........",
-    ".............",
-    "..........#..",
-    "....#.....#..",
-    "....#........",
-    "....#..##....",
-    ".......##...."
-  ],
+  "q5r3": Q5_ROOMS.q5r3.rows,
+  "q5r4": Q5_ROOMS.q5r4.rows,
+  "q5r5": Q5_ROOMS.q5r5.rows,
+  "q5r6": Q5_ROOMS.q5r6.rows,
+  "q5r7": Q5_ROOMS.q5r7.rows,
+  "q5r8": Q5_ROOMS.q5r8.rows,
   "q6r1": [
     "..##..####...",
     "..##..####...",
@@ -452,26 +393,32 @@ export const ROOM_CHALLENGES = {
     "formation": "rush"
   },
   "q5r3": {
+    "spawnPositions": Q5_ROOMS.q5r3.spawnPositions,
     "challenge": "An open firing lane is overlooked by a raised archer line and narrow side cover.",
     "formation": "archers"
   },
   "q5r4": {
+    "spawnPositions": Q5_ROOMS.q5r4.spawnPositions,
     "challenge": "Parked iron wagons form four islands for armoured defenders to hold.",
     "formation": "island"
   },
   "q5r5": {
+    "spawnPositions": Q5_ROOMS.q5r5.spawnPositions,
     "challenge": "A broken bridge squeezes the party into the middle as swift attackers flank.",
     "formation": "gate"
   },
   "q5r6": {
+    "spawnPositions": Q5_ROOMS.q5r6.spawnPositions,
     "challenge": "An armour screen protects archers behind staggered battlements.",
     "formation": "shield"
   },
   "q5r7": {
+    "spawnPositions": Q5_ROOMS.q5r7.spawnPositions,
     "challenge": "Smugglers hide behind crates; the side passage offers a route to the rear.",
     "formation": "flanks"
   },
   "q5r8": {
+    "spawnPositions": Q5_ROOMS.q5r8.spawnPositions,
     "challenge": "Two side lanes bypass the toll barriers, but a boss blocks the far gate.",
     "formation": "boss"
   },

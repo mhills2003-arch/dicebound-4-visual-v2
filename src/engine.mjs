@@ -1,3 +1,4 @@
+import {Q5_ROOMS} from '../public/v2-quest5-layouts.mjs';
 import {DUNE_FOES} from '../public/v2-rushing-dunes-layout.mjs';
 import {PLAYABLE_QUESTS} from './campaign.mjs';
 import {HARD_ENCOUNTERS} from './hard-encounters.mjs';
@@ -395,16 +396,20 @@ Object.assign(ROOM_DATA, {"q8r1": {"name": "Broken Assembly", "subtitle": "Enter
 // but upgrade the arena encounters to purposeful, mixed groups. The new roster is
 // server-authoritative, not a client-side cosmetic multiplier.
 const MEDIUM_REINFORCEMENTS = {
-  5: ["normal:8 normal:8 swift:8 normal:6 normal:6", null, "ranged:10 normal:8 swift:8", "armoured:10 swift:8 armoured:8", "swift:10 ranged:8 armoured:10", "armoured:10 ranged:8 normal:10", "ranged:10 armoured:10 swift:10", "armoured:12 ranged:10 swift:10"],
+  5: ["normal:8 normal:8 swift:8 normal:6 normal:6", null, null, null, null, null, null, null],
   6: ["zombie:8 normal:10 zombie:8 normal:8", "zombie:10 normal:10 zombie:8", "ghost:10 zombie:10 ghost:8", "teleporter:10 ghost:8 normal:10", "zombie:10 ghost:10 teleporter:10 normal:10", "teleporter:10 ghost:10 zombie:10 normal:10", "ghost:12 zombie:10 teleporter:10", "ghost:12 teleporter:12 zombie:12 normal:10"],
   7: ["ninja:12 normal:10 ninja:10 normal:12 normal:10", "ninja:12 normal:12 ninja:10 normal:10", "cloner:12 ninja:12 normal:10 normal:12", "healer:12 ninja:12 armoured:12 normal:10", "ninja:12 healer:12 ninja:10 normal:12", "cloner:12 ninja:12 normal:12 healer:10", "ninja:12 cloner:10 healer:12 armoured:12", "ninja:14 armoured:12 healer:12 normal:12"]
 };
 Object.assign(ROOM_DATA,HARD_ENCOUNTERS,EXTREME_ENCOUNTERS);
 for(const [quest,rosters] of Object.entries(MEDIUM_REINFORCEMENTS))for(const [index,roster] of rosters.entries()){
   const room=ROOM_DATA[`q${quest}r${index+1}`];
-  if(!roster)continue; // Rushing Dunes already has its full roster on the approved grid.
+  if(!roster)continue; // These rooms already use full rosters from the approved grids.
   const extra=roster.split(' ').map(entry=>{const [role,faces]=entry.split(':');return {faces:Number(faces),variant:'normal',role};});
   room.foes.push(...extra);room.encounter=room.foes.map(enemy=>enemy.faces);
+}
+for (const [id, plan] of Object.entries(Q5_ROOMS)) {
+  ROOM_DATA[id].foes = plan.foes;
+  ROOM_DATA[id].encounter = plan.foes.map(foe => foe.faces);
 }
 // Every post-tutorial room has its own terrain, encounter formation and tactical hook.
 for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHALLENGES}))Object.assign(ROOM_DATA[room],plan);

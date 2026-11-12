@@ -70,7 +70,7 @@ test('Quest 2 is frontend-only, with unique cache-busting and no networking or i
  const mod=readFileSync(new URL('../public/v2-premium-mine.mjs',import.meta.url),'utf8');
  assert.match(app,/premiumMineActive=\(\)=>artActive\(\)&&isPremiumMineRoom\(me\?\.room\)&&view==='tactical'&&premiumMineReady\(me\?\.room\)/);
  assert.match(app,/paintPremiumMineActor\(ctx,s,a.p,a.kind,baseSprite,visualOptions\)/);
- assert.match(html,/app\.js\?build=v2-q5-rushing-dunes-20261106-r1&mine=v2-quest2-mine-creatures-20261103-r4-objects-r1/);
+ assert.match(html,/app\.js\?build=v2-q5-complete-20261112-r1&mine=v2-quest2-mine-creatures-20261103-r4-objects-r1/);
  assert.match(app,/v2-premium-mine\.mjs\?build=v2-quest2-mine-creatures-20261103-r4-objects-r1/);
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);
 });

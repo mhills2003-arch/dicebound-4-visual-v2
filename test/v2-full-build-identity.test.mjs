@@ -8,7 +8,7 @@ test('full V2 source and assets have cinematic identity, not prior medium maze l
   const conf=read('wrangler.toml'),html=read('public/index.html'),js=read('public/app.js'),css=read('public/styles.css'),worker=read('src/worker.mjs');
   assert.match(conf,/name = "dicebound-4-visual-v2"/);
   assert.match(conf,/html_handling = "none"/);
-  assert.match(html,/dicebound-v2-build.*v2-q5-rushing-dunes-20261106-r1/);
+  assert.match(html,/dicebound-v2-build.*v2-q5-complete-20261112-r1/);
   assert.match(html,/id="cinematicRoom"/);
   assert.match(js,/cinematicRoom/);
   assert.match(css,/\.cin-room/);

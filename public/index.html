@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07101e"><meta name="dicebound-v2-build" content="v2-q5-rushing-dunes-20261106-r1"><title>DICEBOUND 4.0 V2 · Visual Lab</title><link rel="stylesheet" href="./styles.css?build=v2-cinematic-search-keys-20261102-r1"><style id="boardFocusCritical" data-version="v2-boardfocus-20261102b">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07101e"><meta name="dicebound-v2-build" content="v2-q5-complete-20261112-r1"><title>DICEBOUND 4.0 V2 · Visual Lab</title><link rel="stylesheet" href="./styles.css?build=v2-cinematic-search-keys-20261102-r1"><style id="boardFocusCritical" data-version="v2-boardfocus-20261102b">
 /* V2 HUD LAB: board-first presentation. These selectors only apply in
    .hud-board-focus; the complete previous HUD remains one click away. */
 .hud-main-switch{border-color:#f1d48b;background:#273e45;color:#ffe0a0;font-weight:850}
@@ -324,7 +324,19 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
     <button id="cinematicShop" title="Camp and shop" aria-label="Camp and shop"><span aria-hidden="true">⚒</span><span>Camp</span></button>
     <details class="cin-more"><summary title="More controls" aria-label="More controls"><span aria-hidden="true">⚙</span></summary>
       <div class="cin-more-menu">
-        <button id="cinematicCaravanTest">🏜 Try 5-1 · separate test save</button><button id="cinematicDunesTest">🏜 Try 5-2 · separate test save</button><button id="cinematicClassBtn" hidden>⚔ Choose class</button><button id="cinematicQuestBtn">🗺 Quest map</button><button id="cinematicLog">📜 Adventure log</button><button id="cinematicKeys" type="button">⌨ Keyboard shortcuts</button>
+        <label for="cinematicQ5Room" style="display:block;padding:8px 10px;color:#e9c77b">Quest 5 room test</label>
+        <select id="cinematicQ5Room" aria-label="Quest 5 test room" style="width:100%;padding:10px;border:1px solid #9f804a;border-radius:7px;background:#15252b;color:#fff0d1;font:inherit">
+          <option value="caravan-q5-r1">5-1 · Caravan Gate</option>
+          <option value="rushing-dunes-q5-r2">5-2 · Rushing Dunes</option>
+          <option value="quest5-room3" selected>5-3 · Archers’ Ridge</option>
+          <option value="quest5-room4">5-4 · Iron Caravan</option>
+          <option value="quest5-room5">5-5 · The Broken Crossing</option>
+          <option value="quest5-room6">5-6 · The Shieldwall</option>
+          <option value="quest5-room7">5-7 · Smuggler’s Station</option>
+          <option value="quest5-room8">5-8 · The High Roller’s Toll</option>
+        </select>
+        <button id="cinematicQ5Test">🏜 Open separate test save</button>
+        <button id="cinematicTrialReturn" hidden>↩ Return to campaign save</button><button id="cinematicClassBtn" hidden>⚔ Choose class</button><button id="cinematicQuestBtn">🗺 Quest map</button><button id="cinematicLog">📜 Adventure log</button><button id="cinematicKeys" type="button">⌨ Keyboard shortcuts</button>
         <button id="cinematicView">▦ Change view</button><button id="cinematicVisuals">✦ Artwork settings</button>
         <button id="cinematicClassic">▤ Classic HUD</button><button id="cinematicExit">Exit game</button>
       </div>
@@ -447,5 +459,5 @@ body.hud-board-focus .chat-drawer{bottom:199px!important;z-index:50}
   <section id="milestoneNotice" class="milestone-notice" role="alertdialog" aria-live="assertive" aria-label="Adventure achievement" hidden><button type="button" id="noticeClose" aria-label="Dismiss announcement">✕</button><div class="notice-icon">🎲</div><h2 id="noticeTitle"></h2><p id="noticeBody"></p></section>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </div>
-<script type="module" src="./app.js?build=v2-q5-rushing-dunes-20261106-r1&mine=v2-quest2-mine-creatures-20261103-r4-objects-r1&q3=v2-quest3-giantwood-r6-walljoins&q4=v2-quest4-glittering-giants-r1"></script>
+<script type="module" src="./app.js?build=v2-q5-complete-20261112-r1&mine=v2-quest2-mine-creatures-20261103-r4-objects-r1&q3=v2-quest3-giantwood-r6-walljoins&q4=v2-quest4-glittering-giants-r1"></script>
 </body></html>

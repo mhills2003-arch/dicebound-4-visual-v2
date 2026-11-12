@@ -1,4 +1,4 @@
-import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q5-rushing-dunes-20261106-r1';
+import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q5-complete-20261112-r1';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
 import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4-objects-r1';
 import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r6-walljoins';
@@ -9,7 +9,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · Q5-2 RUSHING DUNES R1 · Q5-1 CARAVAN GATE R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 initPremiumMine();
@@ -250,19 +250,16 @@ let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
 const requestedTrial = new URLSearchParams(location.search).get('trial');
-const desertTrials = new Map([
-  ['caravan-q5-r1', 'cinematicCaravanTest'],
-  ['rushing-dunes-q5-r2', 'cinematicDunesTest']
-]);
+const desertTrials = new Set(['caravan-q5-r1', 'rushing-dunes-q5-r2',
+  'quest5-room3', 'quest5-room4', 'quest5-room5', 'quest5-room6', 'quest5-room7', 'quest5-room8']);
 const desertTrial = desertTrials.has(requestedTrial) ? requestedTrial : null;
-for (const [trialId, buttonId] of desertTrials) {
-  const button = $(buttonId);
-  const playingThisTrial = desertTrial === trialId;
-  if (playingThisTrial) button.textContent = '↩ Return to campaign save';
-  button.addEventListener('click', () => {
-    location.href = playingThisTrial ? './' : '?trial=' + trialId;
-  });
-}
+if (desertTrial) $('cinematicQ5Room').value = desertTrial;
+$('cinematicQ5Test').addEventListener('click', () => {
+  const selected = $('cinematicQ5Room').value;
+  if (desertTrials.has(selected)) location.href = '?trial=' + selected;
+});
+$('cinematicTrialReturn').hidden = !desertTrial;
+$('cinematicTrialReturn').addEventListener('click', () => { location.href = './'; });
 const notices=[];let noticeTimer=null;
 function showNotice(title,body,kind='level'){
  const notice=$('milestoneNotice');const close=$('noticeClose');

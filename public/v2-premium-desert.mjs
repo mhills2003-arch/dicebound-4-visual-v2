@@ -1,3 +1,4 @@
+import {Q5_ROOMS} from './v2-quest5-layouts.mjs';
 import {DUNE_SCENERY} from './v2-rushing-dunes-layout.mjs';
 import {CARAVAN_SCENERY} from './v2-caravan-layout.mjs';
 export const DESERT_FILES=Object.freeze({
@@ -24,9 +25,31 @@ export const DUNE_FILES = Object.freeze({
   d6: DESERT_FILES.d6,
   d8: DESERT_FILES.d8
 });
+const questAsset = name => './assets/premium-desert/q5-' + name + '-r1.webp';
+const questSceneryFiles = {
+  ridgeSpine: questAsset('ridge-spine'), parapet: questAsset('parapet'), pillar: questAsset('pillar'),
+  ironWagon: questAsset('iron-wagon'), cargoIsland: questAsset('cargo-island'),
+  bridgeHead: questAsset('bridge-head'), bridgeAbutment: questAsset('bridge-abutment'),
+  shieldwall: questAsset('shieldwall'), cargoSpine: questAsset('cargo-spine'),
+  cargoTower: questAsset('cargo-tower'), smugglerStore: questAsset('smuggler-store'), tollKeep: questAsset('toll-keep')
+};
+const questActorFiles = {
+  d6: DESERT_FILES.d6, d8: DESERT_FILES.d8, swift: DUNE_FILES.swift,
+  ranged6: questAsset('ranged-d6'), ranged8: questAsset('ranged-d8'),
+  swift8: questAsset('swift-d8'), armoured8: questAsset('armoured-d8'), boss16: questAsset('toll-boss-d16')
+};
+const questGrounds = ['ridge-ground','caravan-ground','crossing-ground','shieldwall-ground','smuggler-ground','toll-ground'];
+const actorKey = p => p.variant === 'boss' ? 'boss' + p.faces : p.role === 'swift' && p.faces === 6 ? 'swift' : p.role && p.role !== 'normal' ? p.role + p.faces : 'd' + p.faces;
+export const QUEST5_FILES = Object.freeze(Object.fromEntries(Object.entries(Q5_ROOMS).map(([id, plan], i) => {
+  const files = {['q5Ground' + (i + 3)]: questAsset(questGrounds[i]), pillar: questSceneryFiles.pillar};
+  for (const piece of plan.scenery) files[piece.asset] = questSceneryFiles[piece.asset];
+  for (const foe of plan.foes) files[actorKey(foe)] = questActorFiles[actorKey(foe)];
+  return [id, Object.freeze(files)];
+})));
 const desertRooms = new Map([
   ['q5r1', {ground: 'ground', scenery: CARAVAN_SCENERY, files: DESERT_FILES}],
-  ['q5r2', {ground: 'duneGround', scenery: DUNE_SCENERY, files: DUNE_FILES}]
+  ['q5r2', {ground: 'duneGround', scenery: DUNE_SCENERY, files: DUNE_FILES}],
+  ...Object.entries(Q5_ROOMS).map(([id, plan]) => [id, {ground: 'q5Ground' + id.slice(-1), scenery: plan.scenery, files: QUEST5_FILES[id]}])
 ]);
 const art = {};
 const layers = new Map();
@@ -91,7 +114,7 @@ function drawScenery(ctx,s,walls,roomId){
  // A changed server layout cannot silently create invisible additional barriers.
  for(const [x,y] of walls)if(!painted.has(`${x},${y}`)){
   ctx.save();ctx.beginPath();ctx.rect(s.originX+x*c,s.originY+y*c,c,c);ctx.clip();
-  ctx.drawImage(roomId==='q5r2'?art.capped:art.crag,s.originX+x*c,s.originY+y*c,c,c);ctx.restore();
+  ctx.drawImage(roomId==='q5r1'?art.crag:roomId==='q5r2'?art.capped:art.pillar,s.originX+x*c,s.originY+y*c,c,c);ctx.restore();
  }
  ctx.restore();
 }
@@ -104,7 +127,7 @@ export function paintPremiumDesertWalls(ctx,s,walls,roomId){
  if(!layer){
   layer=new OffscreenCanvas(Math.ceil(13*s.cell*ratio),Math.ceil(9*s.cell*ratio));
   const c=layer.getContext('2d');c.scale(ratio,ratio);drawScenery(c,{...s,originX:0,originY:0},walls,roomId);
-  if(roomId==='q5r2'){
+  if(roomId!=='q5r1'){
     // Cast the natural silhouette's shadow after masking the physical banks.
     // Baking it into the cached board lets the soft shadow cross a cell boundary.
     const shadowed=new OffscreenCanvas(layer.width,layer.height);
@@ -131,20 +154,26 @@ export function paintPremiumDesertAtmosphere(ctx,s,roomId,timeMs=0,motion=true,l
 export function paintPremiumDesertActor(ctx,s,p,kind,sprite,{label='',selected=false,active=false,motion=true,timeMs=0,roomId='q5r1'}={}){
  if(!premiumDesertReady(roomId)||s.iso||!p)return false;
  if(kind==='enemy'){
-  if(p.faces!==6&&p.faces!==8)return false;
-  sprite=roomId==='q5r2'&&p.faces===6&&p.role==='swift'?art.swift:art['d'+p.faces];
+  if(Q5_ROOMS[roomId]) {
+    // Old encounters can retain different dice after an update; their original renderer remains available.
+    if(p.variant==='large'||p.variant==='large-shiny')return false;
+    sprite=art[actorKey(p)];
+  } else {
+    if(p.faces!==6&&p.faces!==8)return false;
+    sprite=roomId==='q5r2'&&p.faces===6&&p.role==='swift'?art.swift:art['d'+p.faces];
+  }
  }
  if(!sprite?.complete||!sprite.naturalWidth)return false;
  const c=s.cell,pt=s.at(p.x,p.y),enemy=kind==='enemy',swift=enemy&&p.role==='swift';
- const size=c*(enemy?1.14:1.28),bob=motion?Math.sin(timeMs*.002+p.x*3+p.y)*c*.008:0;
+ const size=c*(enemy?(p.variant==='boss'?1.36:1.14):1.28),bob=motion?Math.sin(timeMs*.002+p.x*3+p.y)*c*.008:0;
  ctx.save();oval(ctx,pt.x+c*.065,pt.y+c*.25,c*.44,c*.14,.58);
  if(selected||active){ctx.strokeStyle=selected?'#ffe8ac':'#ffd681';ctx.lineWidth=Math.max(1.5,c*.027);ctx.beginPath();ctx.ellipse(pt.x,pt.y+c*.25,c*.43,c*.16,0,0,Math.PI*2);ctx.stroke();}
  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.shadowColor='rgba(62,31,14,.44)';ctx.shadowBlur=c*.085;ctx.shadowOffsetX=c*.045;ctx.shadowOffsetY=c*.06;
  ctx.drawImage(sprite,pt.x-size*.5,pt.y-size*.65+bob,size,size);ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
- const fs=Math.max(9,c*.21),text=label||(enemy?`${swift?'S':''}D${p.faces}`:p.name||'Player'),y=pt.y+c*.48;
+ const fs=Math.max(9,c*.21),text=(enemy&&p.variant==='boss'?'Boss D'+p.faces:label)||(enemy?`${swift?'S':''}D${p.faces}`:p.name||'Player'),y=pt.y+c*.48;
  ctx.font=`700 ${fs}px system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='alphabetic';
  const width=Math.min(c*1.45,Math.max(c*.54,text.length*fs*.6+c*.13));
- ctx.fillStyle=swift?'rgba(29,74,69,.91)':'rgba(50,35,24,.88)';ctx.beginPath();ctx.roundRect(pt.x-width/2,y-fs, width,fs*1.3,fs*.27);ctx.fill();
+ ctx.fillStyle=swift?'rgba(29,74,69,.91)':p.role==='ranged'?'rgba(31,55,77,.92)':p.role==='armoured'?'rgba(92,47,30,.92)':'rgba(50,35,24,.88)';ctx.beginPath();ctx.roundRect(pt.x-width/2,y-fs, width,fs*1.3,fs*.27);ctx.fill();
  ctx.fillStyle=swift?'#bcf2df':'#fff0d1';ctx.fillText(text,pt.x,y);
  if(enemy){const hp=Math.max(0,Math.min(1,p.hp/(p.maxHp||1))),bar=c*.7,h=Math.max(4,c*.065);
   ctx.fillStyle='#342418';ctx.fillRect(pt.x-bar/2-1,y+c*.085-1,bar+2,h+2);ctx.fillStyle='#e5a36f';ctx.fillRect(pt.x-bar/2,y+c*.085,bar*hp,h);}

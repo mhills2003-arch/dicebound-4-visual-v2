@@ -1,3 +1,5 @@
+> Historical release notes. For the current build and room-test menu, see [START_HERE_Q5_COMPLETE.md](START_HERE_Q5_COMPLETE.md).
+
 # DICEBOUND V2 · Rushing Dunes
 
 ## Deploy and play

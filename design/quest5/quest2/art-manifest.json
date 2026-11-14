@@ -1,0 +1,192 @@
+[
+  {
+    "key": "entrance-ground",
+    "prompt": "Use case: stylized-concept. Production GROUND-ONLY texture illustration for DICEBOUND premium tactical fantasy game. Landscape 9:7 composition, detailed painterly realism, orthographic directly overhead, no horizon or perspective convergence. One continuous natural scene with unique organic texture; absolutely NO tile collage, patchwork squares, checkerboard, grid or repeated stamps. Entire image is flat WALKABLE FLOOR, edge to edge. No walls, boulders, props, crystals sticking upward, characters, dice, holes, borders, text or watermark. Rich tactile materials and restrained cinematic light; readable midtones, not black. Small gravel and shallow cracks only. Abandoned Mine entrance: worn slate and compacted warm grey grit, faint sunlit dust across the upper-left floor, old narrow cart-wheel grooves meandering from left to right, subtle copper and chalk dust, small damp seams. A believable worked mine floor, warm amber reflected lantern light mixing with cool grey stone. Keep the centre calm and broad.",
+    "output": "public/assets/premium-mine/q2-entrance-ground-r2.webp",
+    "width": 1422,
+    "height": 1106,
+    "bytes": 477238,
+    "sha256": "569063fc9916b15b536687bdf249af90811be2d5bb3cb2fbeb9e932d7121b4aa",
+    "transparent": false
+  },
+  {
+    "key": "hollow-ground",
+    "prompt": "Use case: stylized-concept. Production GROUND-ONLY texture illustration for DICEBOUND premium tactical fantasy game. Landscape 9:7 composition, detailed painterly realism, orthographic directly overhead, no horizon or perspective convergence. One continuous natural scene with unique organic texture; absolutely NO tile collage, patchwork squares, checkerboard, grid or repeated stamps. Entire image is flat WALKABLE FLOOR, edge to edge. No walls, boulders, props, crystals sticking upward, characters, dice, holes, borders, text or watermark. Rich tactile materials and restrained cinematic light; readable midtones, not black. Small gravel and shallow cracks only. Crystal Hollow: smooth worn blue-grey limestone with pale calcite swirls and a few very shallow damp patches reflecting soft turquoise light; an ancient mineral basin now level and walkable. Silver-blue natural stone with restrained cyan illumination, faint warmer amber at upper-left edge. Subtle smooth ripples and veins form a unique organic composition.",
+    "output": "public/assets/premium-mine/q2-hollow-ground-r2.webp",
+    "width": 1422,
+    "height": 1106,
+    "bytes": 365966,
+    "sha256": "d4cec5a982fcba91125b63c5acefb0b07a89aced18b0e71716a157ea3efe99c1",
+    "transparent": false
+  },
+  {
+    "key": "gallery-ground",
+    "prompt": "Use case: stylized-concept. Production GROUND-ONLY texture illustration for DICEBOUND premium tactical fantasy game. Landscape 9:7 composition, detailed painterly realism, orthographic directly overhead, no horizon or perspective convergence. One continuous natural scene with unique organic texture; absolutely NO tile collage, patchwork squares, checkerboard, grid or repeated stamps. Entire image is flat WALKABLE FLOOR, edge to edge. No walls, boulders, props, crystals sticking upward, characters, dice, holes, borders, text or watermark. Rich tactile materials and restrained cinematic light; readable midtones, not black. Small gravel and shallow cracks only. Glittering Gallery: elongated seams of gold-flecked dark brown and pewter shale embedded completely flush with the ground, gently winding worn miner footpaths, scattered pinhead-sized mica flakes, warm copper reflections and cool shadows. Intricate geology, low-contrast detail in centre, flowing strata with no grid or regular pattern.",
+    "output": "public/assets/premium-mine/q2-gallery-ground-r2.webp",
+    "width": 1422,
+    "height": 1106,
+    "bytes": 529280,
+    "sha256": "51e445c3cd284ade59fab3615498c8497ac565ad963eee8d4b2796cd981c082a",
+    "transparent": false
+  },
+  {
+    "key": "vault-ground",
+    "prompt": "Use case: stylized-concept. Production GROUND-ONLY texture illustration for DICEBOUND premium tactical fantasy game. Landscape 9:7 composition, detailed painterly realism, orthographic directly overhead, no horizon or perspective convergence. One continuous natural scene with unique organic texture; absolutely NO tile collage, patchwork squares, checkerboard, grid or repeated stamps. Entire image is flat WALKABLE FLOOR, edge to edge. No walls, boulders, props, crystals sticking upward, characters, dice, holes, borders, text or watermark. Rich tactile materials and restrained cinematic light; readable midtones, not black. Small gravel and shallow cracks only. Miners' Vault: worn rectangular charcoal-limestone floor slabs of varied large irregular sizes, aged bronze seams and a faint hammered circular surveyor seal flush with the paving slightly right of centre, sand and ochre dust gathering naturally in cracks. Restrained amber lantern illumination from upper left, slate-blue reflected fill. A distinctive old mining vault floor, no raised or impassable objects.",
+    "output": "public/assets/premium-mine/q2-vault-ground-r2.webp",
+    "width": 1422,
+    "height": 1106,
+    "bytes": 422992,
+    "sha256": "674a3012ba0508fdaf70549c64795c7add08abfdfe50949eafa8793770ad84a1",
+    "transparent": false
+  },
+  {
+    "key": "heart-ground",
+    "prompt": "Use case: stylized-concept. Production GROUND-ONLY texture illustration for DICEBOUND premium tactical fantasy game. Landscape 9:7 composition, detailed painterly realism, orthographic directly overhead, no horizon or perspective convergence. One continuous natural scene with unique organic texture; absolutely NO tile collage, patchwork squares, checkerboard, grid or repeated stamps. Entire image is flat WALKABLE FLOOR, edge to edge. No walls, boulders, props, crystals sticking upward, characters, dice, holes, borders, text or watermark. Rich tactile materials and restrained cinematic light; readable midtones, not black. Small gravel and shallow cracks only. Crystal Heart: an ancient broad chamber floor of deep slate and pale quartz veins, fine plum and silver mineral branching radiating subtly around a faint circular geological rosette right of centre. Soft lilac reflected light concentrated in veins, amber light from upper left; elegant restrained luminous geology, not neon purple everywhere. Flat continuous worn stone, every location walkable.",
+    "output": "public/assets/premium-mine/q2-heart-ground-r2.webp",
+    "width": 1422,
+    "height": 1106,
+    "bytes": 411670,
+    "sha256": "6903e5b3b6bbe0929f2167013eae4171671aa509abf22b15e8b4b32f12e39eb2",
+    "transparent": false
+  },
+  {
+    "key": "elbow",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Square canvas. One L-shaped connected low rockfall with aged broken mine timbers. Footprint occupies the TOP LEFT, TOP RIGHT and BOTTOM RIGHT quarters of an imagined 2 by 2 square; bottom left quadrant is empty transparent space. Two top rocks join the larger right-hand downward rock spur seamlessly. Dark slate stone, tiny rusty copper flecks. Natural irregular silhouette.",
+    "output": "public/assets/premium-mine/q2-elbow-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 265216,
+    "sha256": "3344986802bc4508f2a3657c5c7ad39360be2516a99e815c7df5e830e880dda4",
+    "transparent": true
+  },
+  {
+    "key": "timber",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Portrait 1:2 canvas. Long narrow vertical obstacle: two collapsed, weathered timber braces lodged among a low dark-grey rock outcrop. Dominant mass fills a single narrow vertical column. Old iron fastenings and subtle copper mineral flecks. No ground tile.",
+    "output": "public/assets/premium-mine/q2-timber-r2.webp",
+    "width": 512,
+    "height": 1024,
+    "bytes": 163882,
+    "sha256": "27cbc99122b41cf34a32795a633994ac2e4181d0696cf3285080070ad518f9bb",
+    "transparent": true
+  },
+  {
+    "key": "ore-cart",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Portrait 1:2 canvas. One narrow abandoned mine cart seen from above, its long axis vertical, loaded with rough slate and a few small dull aquamarine ore fragments; broken axle and rubble immediately at the lower end. Aged wood, iron hoops, worn wheels. Low grounded silhouette; no surrounding floor.",
+    "output": "public/assets/premium-mine/q2-ore-cart-r2.webp",
+    "width": 512,
+    "height": 1024,
+    "bytes": 182776,
+    "sha256": "981ccd77d0d5bdab7261c00967e8127bdca2e0868bd9539735c6a79295f2bd40",
+    "transparent": true
+  },
+  {
+    "key": "cyan",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Landscape 2:1 canvas. One connected horizontal bank of natural grey rock with a small cluster of irregular raw blue quartz crystals rising from its middle. Mainly stone, with translucent smoky turquoise mineral edges and delicate reflected light, not a luminous neon sculpture. Continuous low asymmetric silhouette.",
+    "output": "public/assets/premium-mine/q2-cyan-r2.webp",
+    "width": 1024,
+    "height": 512,
+    "bytes": 150288,
+    "sha256": "98494f932b03dcb23166aeecb5345273ecc5656b7141a4e2db6500b7ebf222ed",
+    "transparent": true
+  },
+  {
+    "key": "amber",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Portrait 1:4 canvas. One long narrow vertical natural ridge of layered dark slate, made of connected irregular outcrops. Several thin amber and pale golden quartz seams throughout, a few small raw crystals, predominantly weathered grey rock. All sections connected into one long mass, no separate piles, no repeated stamped segment. Clear overhead silhouette.",
+    "output": "public/assets/premium-mine/q2-amber-r2.webp",
+    "width": 341,
+    "height": 1024,
+    "bytes": 113464,
+    "sha256": "cd6033b0a82586b13a30e7df46e4a5bb5b856094e50ba6b804154f95ea6652df",
+    "transparent": true
+  },
+  {
+    "key": "cart-train",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Landscape 3:1 canvas. Long horizontal mine barrier made of an abandoned low ore wagon on the left, stacked weathered timber crate in the middle and collapsed slate ore with a short timber beam on the right; all touch and form ONE continuous low obstacle. Muted iron, aged wood, grey stone, tiny golden mineral fragments. No floor, no rails extending outside its narrow silhouette.",
+    "output": "public/assets/premium-mine/q2-cart-train-r2.webp",
+    "width": 1024,
+    "height": 341,
+    "bytes": 121920,
+    "sha256": "b328b399041c9246631a6cd08dd045fc8585745b99637de393a27d0f96ebab19",
+    "transparent": true
+  },
+  {
+    "key": "amethyst",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Portrait 1:2 canvas. One continuous narrow vertical quartz buttress: dark slate base with several raw pale lavender and smoky amethyst crystal points, tallest at upper end, tapering rough rock at lower end. Natural mineral formation, not magical spikes. Strong readable rough silhouette, restrained soft lilac reflections, predominantly weathered grey stone.",
+    "output": "public/assets/premium-mine/q2-amethyst-r2.webp",
+    "width": 512,
+    "height": 1024,
+    "bytes": 120742,
+    "sha256": "b9aa775ac2ef8426f3ffb52784f4eb24a0516f92f7c279fa3215a6f3d8e3508c",
+    "transparent": true
+  },
+  {
+    "key": "rubble",
+    "prompt": "Production game sprite for DICEBOUND, premium painterly fantasy mine scenery. Orthographic near-overhead view looking down at 70 degrees, consistent warm light from upper left, cool grey shadowed surfaces. Tactile weathered stone and natural rough mineral facets, restrained muted colors and subtle tiny reflected light. Match realistic illustrated woodland/desert game art, not shiny plastic or cartoon. Isolated on a fully TRANSPARENT background. A single self-contained obstacle, with natural irregular edges, no backdrop, no square floor tile, no border, no ground plane, no text, no icons, no characters. No huge glow, no neon. Fill the canvas with the object while leaving 6% transparent padding. Square canvas. One compact low roughly circular slate rockfall, angular weathered stones tightly piled with a few tiny blue-grey mineral veins, irregular silhouette, no scene or surrounding ground. Mostly grey rock with warm upper-left light.",
+    "output": "public/assets/premium-mine/q2-rubble-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 284008,
+    "sha256": "c574a34cbf24ec4273782cf5438ea261d03bf5e3dcc42595a58bb6ef143fd209",
+    "transparent": true
+  },
+  {
+    "key": "normal-d4",
+    "prompt": "Production transparent creature sprite for DICEBOUND tactical fantasy game. A living stone DICE GOLEM, built around a clearly recognizable polyhedral gaming die, with small rugged stone arms and two short sturdy feet, facing the viewer at a 3/4 angle and seen slightly from above. Premium painterly fantasy realism: rough weathered slate, tiny mineral veins, restrained eyes, rich detailed tactile material, consistent warm upper-left lighting and cool shadow. Small readable silhouette, entire body including feet visible, centered on square canvas with only 6% padding. Isolated on fully TRANSPARENT background; no ground base, no scenery, no frame, no labels or watermark. No cartoon plastic, no huge head, no humanoid torso hiding the die, no overblown magic aura. Core is a true FOUR-SIDED TETRAHEDRON, triangular pyramid of warm grey slate, broad front triangular face engraved with the single numeral 4 in muted brass. Narrow amber eyes are in lower front face. A few tiny pale quartz crystals at shoulders. Compact and rugged.",
+    "output": "public/assets/premium-mine/q2-normal-d4-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 277444,
+    "sha256": "5097bf5b1b7bae5f54b86a12d57521ef142898a8e55d95ae448d275385a2c92d",
+    "transparent": true
+  },
+  {
+    "key": "normal-d6",
+    "prompt": "Production transparent creature sprite for DICEBOUND tactical fantasy game. A living stone DICE GOLEM, built around a clearly recognizable polyhedral gaming die, with small rugged stone arms and two short sturdy feet, facing the viewer at a 3/4 angle and seen slightly from above. Premium painterly fantasy realism: rough weathered slate, tiny mineral veins, restrained eyes, rich detailed tactile material, consistent warm upper-left lighting and cool shadow. Small readable silhouette, entire body including feet visible, centered on square canvas with only 6% padding. Isolated on fully TRANSPARENT background; no ground base, no scenery, no frame, no labels or watermark. No cartoon plastic, no huge head, no humanoid torso hiding the die, no overblown magic aura. Core is a true SIX-SIDED CUBE of warm grey slate, top face clearly shows SIX small round dark pips, another cube face shows three pips. Narrow amber eyes are on the front face. Tiny pale quartz chips at shoulders. Compact and rugged.",
+    "output": "public/assets/premium-mine/q2-normal-d6-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 290970,
+    "sha256": "20fc7261a7156467c449af40d701ed339da7bd9e8feeb0dd3ebd7b7fd2d817cd",
+    "transparent": true
+  },
+  {
+    "key": "normal-d8",
+    "prompt": "Production transparent creature sprite for DICEBOUND tactical fantasy game. A living stone DICE GOLEM, built around a clearly recognizable polyhedral gaming die, with small rugged stone arms and two short sturdy feet, facing the viewer at a 3/4 angle and seen slightly from above. Premium painterly fantasy realism: rough weathered slate, tiny mineral veins, restrained eyes, rich detailed tactile material, consistent warm upper-left lighting and cool shadow. Small readable silhouette, entire body including feet visible, centered on square canvas with only 6% padding. Isolated on fully TRANSPARENT background; no ground base, no scenery, no frame, no labels or watermark. No cartoon plastic, no huge head, no humanoid torso hiding the die, no overblown magic aura. Core is a true EIGHT-SIDED OCTAHEDRON, a faceted pointed diamond made of TRIANGULAR faces, clearly NOT a cube. Prominent front triangular face engraved with a small muted brass numeral 8; narrow amber eyes below it. Dark grey slate with a few pale blue-grey quartz chips at shoulders. Compact and rugged.",
+    "output": "public/assets/premium-mine/q2-normal-d8-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 278442,
+    "sha256": "edb2b26f9051b7ecd2b7451ef57cde5f74fc86d9de91060cc61a229f8ff61245",
+    "transparent": true
+  },
+  {
+    "key": "shiny-d4",
+    "prompt": "Production transparent creature sprite for DICEBOUND tactical fantasy game. A living stone DICE GOLEM, built around a clearly recognizable polyhedral gaming die, with small rugged stone arms and two short sturdy feet, facing the viewer at a 3/4 angle and seen slightly from above. Premium painterly fantasy realism: rough weathered slate, tiny mineral veins, restrained eyes, rich detailed tactile material, consistent warm upper-left lighting and cool shadow. Small readable silhouette, entire body including feet visible, centered on square canvas with only 6% padding. Isolated on fully TRANSPARENT background; no ground base, no scenery, no frame, no labels or watermark. No cartoon plastic, no huge head, no humanoid torso hiding the die, no overblown magic aura. SHINY variant. Core is a true FOUR-SIDED TETRAHEDRON, triangular pyramid, of blue-grey stone with raw turquoise quartz facets and thin silver seams. Front triangular face has an engraved small silver numeral 4. Narrow soft turquoise eyes, small aqua crystal crown at upper point, silver mineral sheen and subtle delicate reflected blue light; predominantly stone, no aura cloud.",
+    "output": "public/assets/premium-mine/q2-shiny-d4-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 286498,
+    "sha256": "72baab9d8aa276b34f87134d6fc010eb564ea941fe40d316a7e99cad51d1404a",
+    "transparent": true
+  },
+  {
+    "key": "shiny-d6",
+    "prompt": "Production transparent creature sprite for DICEBOUND tactical fantasy game. A living stone DICE GOLEM, built around a clearly recognizable polyhedral gaming die, with small rugged stone arms and two short sturdy feet, facing the viewer at a 3/4 angle and seen slightly from above. Premium painterly fantasy realism: rough weathered slate, tiny mineral veins, restrained eyes, rich detailed tactile material, consistent warm upper-left lighting and cool shadow. Small readable silhouette, entire body including feet visible, centered on square canvas with only 6% padding. Isolated on fully TRANSPARENT background; no ground base, no scenery, no frame, no labels or watermark. No cartoon plastic, no huge head, no humanoid torso hiding the die, no overblown magic aura. SHINY variant. Core is a true SIX-SIDED CUBE of blue-grey stone with raw turquoise quartz facets and thin silver seams. Top face clearly has SIX small round dark pips. Narrow soft turquoise eyes on front face, a few small aqua crystals on shoulders and crown, silver mineral sheen and subtle delicate reflected blue light; predominantly stone, no aura cloud.",
+    "output": "public/assets/premium-mine/q2-shiny-d6-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 338690,
+    "sha256": "9d9a010da1317d8162258c098f84bd29fd7668c9c8e8e3e4850a72cdcac9d906",
+    "transparent": true
+  },
+  {
+    "key": "boss-d12",
+    "prompt": "Production transparent creature sprite for DICEBOUND tactical fantasy game. A living stone DICE GOLEM, built around a clearly recognizable polyhedral gaming die, with small rugged stone arms and two short sturdy feet, facing the viewer at a 3/4 angle and seen slightly from above. Premium painterly fantasy realism: rough weathered slate, tiny mineral veins, restrained eyes, rich detailed tactile material, consistent warm upper-left lighting and cool shadow. Small readable silhouette, entire body including feet visible, centered on square canvas with only 6% padding. Isolated on fully TRANSPARENT background; no ground base, no scenery, no frame, no labels or watermark. No cartoon plastic, no huge head, no humanoid torso hiding the die, no overblown magic aura. The CRYSTAL HEART BOSS. Larger powerful living dice golem centered on a true TWELVE-SIDED DODECAHEDRON with clearly visible PENTAGONAL faces and angular round polyhedral silhouette. NOT a cube, NOT a sphere, NOT an octahedron. Each visible face is a pentagon. Foremost upper pentagonal face engraved with a small numeral 12; subtle lavender eyes on the lower front pentagonal face. Black slate with branching silver mineral seams, raw amethyst crystals growing in a restrained crown, heavy low stone arms and feet. Regal threatening dark crystal guardian, readable and material, not neon.",
+    "output": "public/assets/premium-mine/q2-boss-d12-r2.webp",
+    "width": 1024,
+    "height": 1024,
+    "bytes": 319718,
+    "sha256": "e8d71eaac6d8ef6881ef808d7c53b24173b33b3d115cac4f261a6f477aa1c817",
+    "transparent": true
+  }
+]

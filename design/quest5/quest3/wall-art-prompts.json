@@ -1,0 +1,108 @@
+{
+  "method": "Built-in image generation; six transparent sprites. Original alpha preserved during cropping, downsampling and WebP encoding.",
+  "assets": {
+    "wallH2": {
+      "prompt": "Use case: stylized-concept. Asset type: a production transparent PNG obstacle sprite for a premium illustrated woodland tactical RPG, DICEBOUND. Paint one connected ancient ruined dry-stone wall, weathered rounded grey limestone blocks and lichen, thick rich green moss over the uneven top, a few small fern fronds rooted between stones, subtle exposed tree roots at the foot. Refined painterly realism, crisp readable stone texture, natural irregular silhouette, warm woodland light from upper left, restrained olive and grey palette. Fixed orthographic game camera looking down at 55 degrees, north is straight up on the image and east straight right: absolutely no diamond/isometric rotated footprint. Visible upper surface and short south-facing stone face. The wall is LOW, not a tower; continuous masonry courses, no separate pillars. Genuine transparent background around the entire object, no landscape or floor plane, no rectangular base, no grid, no text, no figures, no glow. Tiny contact shadow only; no large cast shadow. Place object comfortably inside the canvas with narrow transparent margins. The horizontal wall runs left to right in a straight line for TWO square game cells, its entire outer silhouette approximately twice as wide as tall. Two-cell long continuous ruin, equal thickness along the run, cohesive structure with organically broken ends. Landscape canvas.",
+      "source": "exec-a3e2fe58-5cf8-43a7-96d7-e3a744e1cfac.png",
+      "file": "ruin-horizontal-walls-r1.webp",
+      "crop": [
+        30,
+        225,
+        1756,
+        691
+      ],
+      "size": [
+        768,
+        207
+      ],
+      "bytes": 99436,
+      "source_sha256": "4456e16b8f34162c127847c038d27dd7606ddda7066ed4b653987980bd0db29c"
+    },
+    "wallV2": {
+      "prompt": "Use case: stylized-concept. Asset type: a production transparent PNG obstacle sprite for a premium illustrated woodland tactical RPG, DICEBOUND. Paint one connected ancient ruined dry-stone wall, weathered rounded grey limestone blocks and lichen, thick rich green moss over the uneven top, a few small fern fronds rooted between stones, subtle exposed tree roots at the foot. Refined painterly realism, crisp readable stone texture, natural irregular silhouette, warm woodland light from upper left, restrained olive and grey palette. Fixed orthographic game camera looking down at 55 degrees, north is straight up on the image and east straight right: absolutely no diamond/isometric rotated footprint. Visible upper surface and short south-facing stone face. The wall is LOW, not a tower; continuous masonry courses, no separate pillars. Genuine transparent background around the entire object, no landscape or floor plane, no rectangular base, no grid, no text, no figures, no glow. Tiny contact shadow only; no large cast shadow. Place object comfortably inside the canvas with narrow transparent margins. The wall runs NORTH TO SOUTH, straight UP TO DOWN on the page, for TWO square game cells. Outer footprint approximately twice as tall as wide. The far end is at the top, the near end at the bottom. Keep the masonry equally thick from top to bottom. One uninterrupted vertical stone wall, with one continuous long mossy coping surface, both long edges parallel to image sides. Absolutely no separate stacked wall chunks, no pillars, no ivy trail extending below. Portrait canvas.",
+      "source": "exec-b5c72629-d99b-4030-b824-e3b9779dc870.png",
+      "file": "ruin-vertical-walls-r1.webp",
+      "crop": [
+        230,
+        8,
+        656,
+        1664
+      ],
+      "size": [
+        198,
+        768
+      ],
+      "bytes": 99454,
+      "source_sha256": "b595167c22a6763e2bb8a4b197b62bd1d016794bf2e9903e7a28ab1557ba917d"
+    },
+    "rootBank": {
+      "prompt": "Use case: stylized-concept. Asset type: a production transparent PNG obstacle sprite for the Hollow Tree room of a premium illustrated woodland tactical RPG, DICEBOUND. One broad connected mass of ancient moss-covered gnarled tree roots wrapped tightly around dark weathered boulders, fern fronds and small russet shelf mushrooms. Refined painterly realism, crisp readable bark, warm soft woodland light upper left, deep green moss and brown bark, subdued natural stone. Fixed orthographic game camera looking down at 55 degrees, north straight up, east straight right, no diamond isometric footprint. Shape is a broad shallow T: a horizontal top band FOUR equal square units wide and ONE unit deep; underneath it only the central TWO units extend down for one additional unit. The bottom left and bottom right corners are fully transparent. Thus width:height 2:1. The upper edge is roughly flat behind the roots so a separate fallen tree can rest above it; do not draw a trunk or a standing tree. The lower central roots/boulders are chunky and dense, unmistakably impassable. Natural irregular silhouette, no grid-shaped base, no landscape, no floor plate, no text, no glow, no figures, no extended shadow. Real transparent background, narrow clear margins, landscape canvas.",
+      "source": "exec-a6dd9dd5-8efc-4c96-9765-489a8c4a0024.png",
+      "file": "hollow-root-bank-walls-r1.webp",
+      "crop": [
+        2,
+        80,
+        1774,
+        878
+      ],
+      "size": [
+        1024,
+        461
+      ],
+      "bytes": 251304,
+      "source_sha256": "e0a9459bd804f583b284c1530a19220bfb05efa556df29dca86d3f9fded61c8e"
+    },
+    "wallLDown": {
+      "prompt": "Use case: stylized-concept. Asset type: a production transparent PNG obstacle sprite for a premium illustrated woodland tactical RPG, DICEBOUND. Paint one connected ancient ruined dry-stone wall, weathered rounded grey limestone blocks and lichen, thick rich green moss over the uneven top, a few small fern fronds rooted between stones, subtle exposed tree roots at the foot. Refined painterly realism, crisp readable stone texture, natural irregular silhouette, warm woodland light from upper left, restrained olive and grey palette. Fixed orthographic game camera looking down at 55 degrees, north is straight up on the image and east straight right: absolutely no diamond/isometric rotated footprint. Visible upper surface and short south-facing stone face. The wall is LOW, not a tower; continuous masonry courses, no separate pillars. Genuine transparent background around the entire object, no landscape or floor plane, no rectangular base, no grid, no text, no figures, no glow. Tiny contact shadow only; no large cast shadow. Place object comfortably inside the canvas with narrow transparent margins. Footprint shape is an L occupying THREE of the four squares in a two-by-two square arrangement: TOP LEFT, BOTTOM LEFT, BOTTOM RIGHT are occupied. TOP RIGHT is completely empty transparent. Viewed on the page it resembles the letter L, with vertical stem on left and horizontal foot across bottom. One properly joined uninterrupted ruin around the bend, equal thickness about 40% of total width. No diagonal arms, no rotation of footprint, no detached parts. Square canvas. Both outer extents about equal.",
+      "source": "exec-9e1295da-e5d9-482d-92e8-48725c06ac35.png",
+      "file": "ruin-corner-south-walls-r1.webp",
+      "crop": [
+        27,
+        23,
+        1219,
+        1193
+      ],
+      "size": [
+        768,
+        754
+      ],
+      "bytes": 204334,
+      "source_sha256": "ed9f52fb51559f818b0edf4793ee89e437a0d93051120b718f28a34518a3790a"
+    },
+    "wallLUp": {
+      "prompt": "Use case: stylized-concept. Asset type: a production transparent PNG obstacle sprite for a premium illustrated woodland tactical RPG, DICEBOUND. Paint one connected ancient ruined dry-stone wall, weathered rounded grey limestone blocks and lichen, thick rich green moss over the uneven top, a few small fern fronds rooted between stones, subtle exposed tree roots at the foot. Refined painterly realism, crisp readable stone texture, natural irregular silhouette, warm woodland light from upper left, restrained olive and grey palette. Fixed orthographic game camera looking down at 55 degrees, north is straight up on the image and east straight right: absolutely no diamond/isometric rotated footprint. Visible upper surface and short south-facing stone face. The wall is LOW, not a tower; continuous masonry courses, no separate pillars. Genuine transparent background around the entire object, no landscape or floor plane, no rectangular base, no grid, no text, no figures, no glow. Tiny contact shadow only; no large cast shadow. Place object comfortably inside the canvas with narrow transparent margins. Footprint shape occupies THREE of four squares in a two-by-two arrangement: TOP LEFT, TOP RIGHT, BOTTOM LEFT are occupied. BOTTOM RIGHT is completely empty transparent. On the page the wall runs horizontally across the TOP and turns downward at the LEFT end. One properly joined uninterrupted ruin around the bend, equal thickness about 40% of total width. No diagonal arms, no rotation of footprint, no detached parts. Square canvas. Both outer extents about equal.",
+      "source": "exec-27d2f122-c2dc-4056-9082-6552d9020e1a.png",
+      "file": "ruin-corner-north-walls-r1.webp",
+      "crop": [
+        20,
+        144,
+        1232,
+        1135
+      ],
+      "size": [
+        768,
+        628
+      ],
+      "bytes": 165242,
+      "source_sha256": "4ffb5014f68d9f25648c217edfbbc5afe50a88b95bb40e30a91829e6524c699f"
+    },
+    "wallStep": {
+      "prompt": "Use case: stylized-concept. Asset type: a production transparent PNG obstacle sprite for a premium illustrated woodland tactical RPG, DICEBOUND. Paint one connected ancient ruined dry-stone wall, weathered rounded grey limestone blocks and lichen, thick rich green moss over the uneven top, a few small fern fronds rooted between stones, subtle exposed tree roots at the foot. Refined painterly realism, crisp readable stone texture, natural irregular silhouette, warm woodland light from upper left, restrained olive and grey palette. Fixed orthographic game camera looking down at 55 degrees, north is straight up on the image and east straight right: absolutely no diamond/isometric rotated footprint. Visible upper surface and short south-facing stone face. The wall is LOW, not a tower; continuous masonry courses, no separate pillars. Genuine transparent background around the entire object, no landscape or floor plane, no rectangular base, no grid, no text, no figures, no glow. Tiny contact shadow only; no large cast shadow. Place object comfortably inside the canvas with narrow transparent margins. Footprint is a shallow staircase occupying FOUR squares of a 3-column by 2-row rectangle: top row occupies LEFT and CENTRE cells; bottom row occupies CENTRE and RIGHT cells. Thus TOP RIGHT and BOTTOM LEFT corners are completely transparent. This makes a connected zigzag of masonry: a horizontal upper-left wall bends downward briefly at centre, then bends to the right along bottom-right. Equal thick masonry throughout, a continuous S-like stepped wall, no diagonal sections, no detached parts. The exact outer shape is 3 units wide by 2 units high, landscape canvas.",
+      "source": "exec-9f686299-b7e9-4e48-98a1-858ac264f9a5.png",
+      "file": "ruin-step-walls-r1.webp",
+      "refinement": "Use case: background-extraction. Edit this exact stepped mossy stone wall game sprite. Preserve the masonry, moss, ferns, roots, shape, camera, colors and lighting exactly. Remove ALL of the surrounding blurred green/brown haze and every backdrop pixel, including inside the concave bends. Return only the solid connected wall and its tiny fern/root silhouette on genuine clean transparency. No blurry glow or cast shadow, no scenery or ground. Keep generous transparent margin. Do not change wall geometry.",
+      "crop": [
+        5,
+        154,
+        1531,
+        803
+      ],
+      "size": [
+        768,
+        327
+      ],
+      "bytes": 90204,
+      "source_sha256": "9e4a9090c6dd9c16b011bd8593e1cd2141ae57832c5863dd443fd39173d449e9"
+    }
+  }
+}

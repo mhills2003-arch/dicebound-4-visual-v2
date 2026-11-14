@@ -1,0 +1,80 @@
+{
+  "build": "v2-q3-walls-20261114-r1",
+  "baseline": "DICEBOUND_V2_Q2_POLISH_R2_DEPLOY.zip",
+  "baseline_sha256": "2e3d47ecb6ad0b74ff0f074a0f2f29529b93dd16e12b6e4219ac714e301bc391",
+  "tests": {
+    "passed": 445,
+    "failed": 0
+  },
+  "reviewed_rooms": [
+    "q3r1",
+    "q3r2",
+    "q3r3",
+    "q3r4",
+    "q3r5"
+  ],
+  "wall_counts": [
+    8,
+    10,
+    10,
+    13,
+    11
+  ],
+  "browser_checks": [
+    "Five real-renderer room screenshots reviewed",
+    "Move from (0,3) to (2,3) using normal controls",
+    "Attempt north into wall (2,2): remained at (2,3), five movement steps retained",
+    "Move east along open route: four steps remained",
+    "No localhost browser console errors"
+  ],
+  "preserved": {
+    "original_asset_files_byte_identical": 228,
+    "engine_and_room_source_files_byte_identical": [
+      "src/campaign.mjs",
+      "src/caravan-trial.mjs",
+      "src/chat.mjs",
+      "src/endgame-maze.mjs",
+      "src/engine.mjs",
+      "src/extreme-encounters.mjs",
+      "src/extreme-rooms.mjs",
+      "src/hard-encounters.mjs",
+      "src/hard-rooms.mjs",
+      "src/level-designs.mjs",
+      "src/maze-boss-kits.mjs",
+      "src/maze-play.mjs",
+      "src/mine-trial.mjs"
+    ],
+    "styles_byte_identical": true,
+    "wrangler_config_byte_identical": true,
+    "floor_lighting_atmosphere_actor_and_frame_rendering_byte_identical": true,
+    "app_changes_only_q3_import_cache_and_build_label": true,
+    "worker_gameplay_auth_save_and_routing_byte_identical": true
+  },
+  "new_art": {
+    "ruin-horizontal-walls-r1.webp": {
+      "bytes": 99436,
+      "sha256": "d7c11f0f03db1250bf19c7cb7f67ba6ec178d19594bb49984a4d244fef30e9eb"
+    },
+    "ruin-vertical-walls-r1.webp": {
+      "bytes": 99454,
+      "sha256": "6f979ffacda8c27a4a50b6064e5466aaf091416d6707b5131a8a18255e3420b6"
+    },
+    "hollow-root-bank-walls-r1.webp": {
+      "bytes": 251304,
+      "sha256": "37a9a99a299725a32f636e691954b45a0bc3acf3863f5f99180b6270928b2a98"
+    },
+    "ruin-corner-south-walls-r1.webp": {
+      "bytes": 204334,
+      "sha256": "8f6f9d016a730b742433fb4fb989e0f901f198cdec98f88b6c8f1aa9872c49a0"
+    },
+    "ruin-corner-north-walls-r1.webp": {
+      "bytes": 165242,
+      "sha256": "c4226cefc1da44a1ffc23ac19538890cf42b012a61756c7fb776b6a4a788f593"
+    },
+    "ruin-step-walls-r1.webp": {
+      "bytes": 90204,
+      "sha256": "389f0e26a70988a15ee4555144520ba9e7040616fddfea9b78d573153e42e16d"
+    }
+  },
+  "deployment": "Prepared full ZIP; no live publication performed"
+}

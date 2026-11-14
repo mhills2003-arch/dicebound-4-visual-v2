@@ -1,0 +1,73 @@
+{
+  "build": "v2-q2-polish-20261113-r2",
+  "verified": "2026-11-14",
+  "base_archive": "DICEBOUND_V2_Q5_COMPLETE_R1_DEPLOY.zip",
+  "regression_tests": {
+    "passed": 439,
+    "failed": 0
+  },
+  "room_definitions_and_collision_maps": {
+    "count": 134,
+    "identical_to_base": true
+  },
+  "all_previous_art_preserved_byte_for_byte": true,
+  "quest2": {
+    "rooms": 5,
+    "board": [
+      9,
+      7
+    ],
+    "obstacle_counts": [
+      9,
+      5,
+      7,
+      9,
+      8
+    ],
+    "enemy_counts": [
+      2,
+      1,
+      2,
+      2,
+      2
+    ],
+    "all_floor_cells_reachable": true,
+    "engine_playthrough_seeds": [
+      101,
+      203,
+      509
+    ],
+    "completion_and_replay": true,
+    "browser_review_all_rooms": true,
+    "browser_auto_target_hit": "13 main vs D8 defence 2: 11 damage to Boss D12 (1/12 HP)",
+    "application_console_errors": []
+  },
+  "quest5_regression": {
+    "rooms": 8,
+    "seed": 101,
+    "completion_and_replay": true
+  },
+  "new_art_assets": 19,
+  "combat_repair": "Preserve a null attack/special target for nearest-enemy selection; retain self default for other action types.",
+  "changed_base_files": [
+    "README.md",
+    "public/app.js",
+    "public/index.html",
+    "public/styles.css",
+    "public/v2-premium-mine.mjs",
+    "src/engine.mjs",
+    "src/worker.mjs",
+    "test/v2-board-focus-hud.test.mjs",
+    "test/v2-caravan-playable.test.mjs",
+    "test/v2-cinematic-hud.test.mjs",
+    "test/v2-full-build-identity.test.mjs",
+    "test/v2-quest2-mine-connected-obstacles.test.mjs",
+    "test/v2-quest2-mine-premium.test.mjs",
+    "test/v2-quest2-r4-creature-assets.test.mjs",
+    "test/v2-search-hotkeys.test.mjs",
+    "test/v2-version-check.test.mjs",
+    "test/v2-watchpost-premium.test.mjs"
+  ],
+  "deployment_status": "Packaged; not deployed to the live Worker.",
+  "browser_test_method": "Shipping canvas renderer and UI with a local transport backed by the real engine. Local transport and copied QA modules are excluded from the release."
+}

@@ -1,0 +1,128 @@
+[
+  {
+    "seed": 101,
+    "rooms": [
+      {
+        "room": "q2r1",
+        "turns": 4,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r2",
+        "turns": 3,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r3",
+        "turns": 7,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r4",
+        "turns": 5,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r5",
+        "turns": 4,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      }
+    ],
+    "completed": true,
+    "replay": true
+  },
+  {
+    "seed": 203,
+    "rooms": [
+      {
+        "room": "q2r1",
+        "turns": 4,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r2",
+        "turns": 4,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r3",
+        "turns": 6,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r4",
+        "turns": 9,
+        "hp": 71,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r5",
+        "turns": 8,
+        "hp": 71,
+        "level": 3,
+        "potions": 2
+      }
+    ],
+    "completed": true,
+    "replay": true
+  },
+  {
+    "seed": 509,
+    "rooms": [
+      {
+        "room": "q2r1",
+        "turns": 6,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r2",
+        "turns": 3,
+        "hp": 71,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r3",
+        "turns": 5,
+        "hp": 72,
+        "level": 3,
+        "potions": 2
+      },
+      {
+        "room": "q2r4",
+        "turns": 3,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      },
+      {
+        "room": "q2r5",
+        "turns": 4,
+        "hp": 72,
+        "level": 3,
+        "potions": 3
+      }
+    ],
+    "completed": true,
+    "replay": true
+  }
+]

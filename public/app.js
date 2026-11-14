@@ -1,6 +1,6 @@
-import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q5-complete-20261112-r1';
+import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
-import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-quest2-mine-creatures-20261103-r4-objects-r1';
+import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r6-walljoins';
 import {initPremiumQuarry,isPremiumQuarryRoom,premiumQuarryReady,paintPremiumQuarryFloor,paintPremiumQuarryLighting,paintPremiumQuarryWall,paintPremiumQuarryConnectedWalls,paintPremiumQuarryAtmosphere,paintPremiumQuarryForeground,paintPremiumQuarryActor,paintPremiumQuarryContactShadow,quarryFrameImage} from './v2-premium-quarry.mjs?build=v2-quest4-five-premium-rooms-r3';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
@@ -9,10 +9,10 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 2 PREMIUM CREATURES R4 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
-initPremiumMine();
+
 initPremiumGiant();
 initPremiumQuarry();
 const canvas = $('gameCanvas');
@@ -45,7 +45,11 @@ function paintCinematicMineSurround(ctx,s,w,h){
  const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#111b24');bg.addColorStop(1,'#231a32');
  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
  for(const [side,x,width] of [['left',0,leftW+2],['right',rightX-2,rightW+2]]){
-  const img=mineFrameImage(side,me?.room);if(img?.complete&&img.naturalWidth&&width>1)ctx.drawImage(img,x,0,width,h);
+  const img=mineFrameImage(side,me?.room);if(img?.complete&&img.naturalWidth&&width>1){
+   ctx.drawImage(img,x,0,width,h);
+   const tint={q2r2:'rgba(14,54,72,.18)',q2r3:'rgba(107,66,18,.07)',q2r4:'rgba(29,32,49,.12)',q2r5:'rgba(58,33,78,.20)'}[me?.room];
+   if(tint){ctx.fillStyle=tint;ctx.fillRect(x,0,width,h);}
+  }
  }
  ctx.save();const edge=ctx.createLinearGradient(s.originX-24,0,s.originX+15,0);
  edge.addColorStop(0,'#020712d8');edge.addColorStop(1,'#02071200');ctx.fillStyle=edge;ctx.fillRect(s.originX-24,0,39,h);
@@ -250,7 +254,7 @@ let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
 const requestedTrial = new URLSearchParams(location.search).get('trial');
-const desertTrials = new Set(['caravan-q5-r1', 'rushing-dunes-q5-r2',
+const desertTrials = new Set(['mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
   'quest5-room3', 'quest5-room4', 'quest5-room5', 'quest5-room6', 'quest5-room7', 'quest5-room8']);
 const desertTrial = desertTrials.has(requestedTrial) ? requestedTrial : null;
 if (desertTrial) $('cinematicQ5Room').value = desertTrial;
@@ -389,6 +393,7 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
+ if(isPremiumMineRoom(me.room))initPremiumMine(undefined,me.room);
  if(isPremiumDesertRoom(me.room))initPremiumDesert(undefined,me.room);
  if(v2ArtToggle){v2ArtToggle.hidden=!isV2ArtRoom(me.room);v2ArtToggle.textContent=v2ArtEnabled?'✦ Scene art: ON':'◇ Scene art: OFF';v2ArtToggle.setAttribute('aria-pressed',String(v2ArtEnabled));}
 

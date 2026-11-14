@@ -465,7 +465,7 @@ body.hud-board-focus .cin-nav button span:first-child,body.hud-board-focus .cin-
 body.hud-board-focus .cin-nav button:hover,body.hud-board-focus .cin-more summary:hover{border-color:#f2c678;background:#223b48}
 body.hud-board-focus .cin-more{position:relative}
 body.hud-board-focus .cin-more summary{list-style:none;min-width:43px;font-size:21px}body.hud-board-focus .cin-more summary::-webkit-details-marker{display:none}
-body.hud-board-focus .cin-more-menu{position:absolute;right:0;top:calc(100% + 12px);width:215px;display:grid;gap:6px;padding:10px;background:#0b1c28;border:2px solid #bda06b;border-radius:9px;box-shadow:0 15px 36px #000c}
+body.hud-board-focus .cin-more-menu{position:absolute;right:0;top:calc(100% + 12px);width:245px;max-height:calc(100dvh - 120px);overflow:auto;display:grid;gap:6px;padding:10px;background:#0b1c28;border:2px solid #bda06b;border-radius:9px;box-shadow:0 15px 36px #000c}
 body.hud-board-focus .cin-more-menu button{width:100%;display:block;text-align:left;font:600 13px system-ui;min-height:40px}
 body.hud-board-focus .workspace{display:block!important;max-width:none!important;width:100%;height:calc(100dvh - 68px);min-height:0!important;padding:0!important;margin:0!important;overflow:hidden}
 body.hud-board-focus .main-area{position:relative;display:block!important;width:100%;height:100%;max-width:none!important;overflow:hidden}
@@ -638,3 +638,6 @@ body.hud-board-focus .cin-hotkey-note{font:11px/1.45 system-ui;color:#b9c9cc}
 .q3-current-level{display:inline-flex;align-items:center;padding:2px 7px;margin-left:5px;font:800 12px Georgia,serif;letter-spacing:.045em;white-space:nowrap;color:#ffe9ab!important;background:linear-gradient(180deg,#313119,#161c1e);border:1px solid #d2a950;border-radius:5px;box-shadow:0 0 6px #deaa4866}
 body.hud-board-focus .q3-current-level{font-size:13px;padding:2px 7px;color:#ffeab7!important}
 @media(max-width:760px){.q3-current-level,body.hud-board-focus .q3-current-level{font-size:10px;padding:2px 5px;margin-left:2px}}
+
+/* Hidden menu actions must not be restored by the custom button display rule. */
+body.hud-board-focus .cin-more-menu button[hidden]{display:none}

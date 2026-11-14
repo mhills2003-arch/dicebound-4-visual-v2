@@ -3,47 +3,39 @@
  * Purely visual: no room definitions, collision, item/loot, combat, quests,
  * network, player positions, RNG or server authority are changed here.
  */
+import {MINE_WALL_BLUEPRINTS,MINE_SCENERY,MINE_ACTORS} from './v2-mine-scenes.mjs';
+export {MINE_WALL_BLUEPRINTS,MINE_SCENERY} from './v2-mine-scenes.mjs';
+const asset=name=>'./assets/premium-mine/q2-'+name+'-r2.webp';
 export const MINE_ROOMS = Object.freeze(['q2r1','q2r2','q2r3','q2r4','q2r5']);
 export const isPremiumMineRoom = id => MINE_ROOMS.includes(id);
 export const MINE_FILES = Object.freeze({
-  q2r1:'./assets/premium-mine/abandoned-mine-ground.jpg',
-  q2r2:'./assets/premium-mine/crystal-hollow-ground.jpg',
-  q2r3:'./assets/premium-mine/glittering-gallery-ground.jpg',
-  q2r4:'./assets/premium-mine/miners-vault-ground.jpg',
-  q2r5:'./assets/premium-mine/crystal-heart-ground.jpg',
-  rubble:'./assets/premium-mine/mine-rubble.png',
-  timber:'./assets/premium-mine/mine-timber.png',
-  cyan:'./assets/premium-mine/mine-crystal-cyan.png',
-  amber:'./assets/premium-mine/mine-crystal-amber.png',
-  amethyst:'./assets/premium-mine/mine-crystal-amethyst.png',
-  normalD4:'./assets/premium-mine/normal-d4-q2r4.png',
-  normalD6:'./assets/premium-mine/normal-d6-q2r4.png',
-  shinyD4:'./assets/premium-mine/shiny-d4-q2r4.png',
-  shinyD6:'./assets/premium-mine/shiny-d6-q2r4.png',
-  bossD12:'./assets/premium-mine/boss-d12-q2r4.png',
-  q2r1Obstacles:'./assets/premium-mine/q2r1-connected-obstacles-q2r1.png',
-  q2r2Obstacles:'./assets/premium-mine/q2r2-connected-obstacles-q2r1.png',
-  q2r3Obstacles:'./assets/premium-mine/q2r3-connected-obstacles-q2r1.png',
-  q2r4Obstacles:'./assets/premium-mine/q2r4-connected-obstacles-q2r1.png',
-  q2r5Obstacles:'./assets/premium-mine/q2r5-connected-obstacles-q2r1.png',
-  left:'./assets/premium-mine/mine-frame-left.jpg',
-  right:'./assets/premium-mine/mine-frame-right.jpg'
+ q2r1:asset('entrance-ground'),q2r2:asset('hollow-ground'),q2r3:asset('gallery-ground'),
+ q2r4:asset('vault-ground'),q2r5:asset('heart-ground'),
+ rubble:asset('rubble'),elbow:asset('elbow'),timber:asset('timber'),oreCart:asset('ore-cart'),
+ cyan:asset('cyan'),amber:asset('amber'),cartTrain:asset('cart-train'),amethyst:asset('amethyst'),
+ normalD4:asset('normal-d4'),normalD6:asset('normal-d6'),normalD8:asset('normal-d8'),
+ shinyD4:asset('shiny-d4'),shinyD6:asset('shiny-d6'),bossD12:asset('boss-d12'),
+ left:'./assets/premium-mine/abandoned-mine-frame-left.jpg',right:'./assets/premium-mine/abandoned-mine-frame-right.jpg'
 });
-// Independent per-room side scenery; never baked into game coordinates.
+// Crisp shared mine architecture; room identity comes from its floor and lighting.
+// The previous room variants were blurred double exposures.
 export const MINE_FRAMES=Object.freeze(Object.fromEntries(
- MINE_ROOMS.flatMap(room=>['left','right'].map(side=>[room+'-'+side,
-  `./assets/premium-mine/${({q2r1:'abandoned-mine',q2r2:'crystal-hollow',q2r3:'glittering-gallery',q2r4:'miners-vault',q2r5:'crystal-heart'})[room]}-frame-${side}.jpg`]))
+ MINE_ROOMS.flatMap(room=>['left','right'].map(side=>[room+'-'+side,MINE_FILES[side]]))
 ));
-const art=Object.create(null);let initiated=false;
-export function initPremiumMine(ImageCtor=typeof Image!=='undefined'?Image:null){
- if(!ImageCtor||initiated)return;initiated=true;
- for(const [name,path] of Object.entries({...MINE_FILES,...MINE_FRAMES})){
-  const image=new ImageCtor();image.decoding='async';image.src=path;art[name]=image;
+const art=Object.create(null),layers=new Map(),imagePaths=new Map();
+const roomKeys=roomId=>[roomId,'rubble',...new Set(MINE_SCENERY[roomId].map(p=>p.asset)),...MINE_ACTORS[roomId],roomId+'-left',roomId+'-right'];
+export function initPremiumMine(ImageCtor=globalThis.Image,roomId='q2r1'){
+ if(!ImageCtor||!isPremiumMineRoom(roomId))return;
+ for(const key of roomKeys(roomId)){
+  if(art[key])continue;
+  const path=MINE_FILES[key]||MINE_FRAMES[key];let image=imagePaths.get(path);
+  if(!image){image=new ImageCtor();image.decoding='async';image.src=path;imagePaths.set(path,image);}
+  art[key]=image;
  }
 }
 const ready=key=>!!art[key]?.complete&&art[key].naturalWidth>0;
 export function premiumMineReady(roomId='q2r1'){
- return isPremiumMineRoom(roomId)&&ready(roomId)&&ready('rubble')&&ready('timber')&&ready('cyan')&&ready('amethyst');
+ return isPremiumMineRoom(roomId)&&roomKeys(roomId).every(ready);
 }
 const roomIndex=id=>MINE_ROOMS.indexOf(id);
 const floorPalette=[
@@ -67,7 +59,7 @@ export function paintPremiumMineFloor(ctx,s,roomId='q2r1'){
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
  ctx.drawImage(art[roomId],x,y,9*c,7*c);
  ctx.lineWidth=Math.max(.75,c*.011);
- ctx.strokeStyle=roomId==='q2r5'?'rgba(191,151,226,.25)':'rgba(196,202,205,.17)';
+ ctx.strokeStyle='rgba(208,211,218,.13)';
  for(let i=1;i<9;i++){ctx.beginPath();ctx.moveTo(x+i*c,y);ctx.lineTo(x+i*c,y+7*c);ctx.stroke()}
  for(let i=1;i<7;i++){ctx.beginPath();ctx.moveTo(x,y+i*c);ctx.lineTo(x+9*c,y+i*c);ctx.stroke()}
  ctx.restore();return true;
@@ -83,47 +75,60 @@ export function mineWallArt(roomId,x,y){
 export function paintPremiumMineWall(ctx,s,x,y,roomId='q2r1'){
  if(!premiumMineReady(roomId)||s.iso)return false;
  const pt=s.at(x,y),c=s.cell,key=mineWallArt(roomId,x,y),img=ready(key)?art[key]:art.rubble;
- const sz=c*(key==='timber'?1.36:key==='rubble'?1.43:1.49);
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.shadowColor='rgba(2,4,12,.84)';ctx.shadowBlur=c*.18;ctx.shadowOffsetY=c*.10;
- ctx.drawImage(img,pt.x-sz*.5,pt.y-sz*.53,sz,sz);
- ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
- ctx.strokeStyle=roomId==='q2r5'?'rgba(207,160,255,.42)':'rgba(197,207,216,.35)';
- ctx.lineWidth=Math.max(.8,c*.013);
- ctx.strokeRect(s.originX+x*c+2,s.originY+y*c+2,c-4,c-4);
+ ctx.beginPath();ctx.rect(s.originX+x*c,s.originY+y*c,c,c);ctx.clip();
+ ctx.drawImage(img,pt.x-c*.5,pt.y-c*.5,c,c);
  ctx.restore();return true;
 }
-/** A room-wide, transparent illustration built ONLY over the original blocked cells.
- * A live wall-set signature guards against drawing obstacles over a changed map.
- * If an image is unavailable, the previous per-tile renderer remains the fallback.
- */
-export const MINE_WALL_BLUEPRINTS = Object.freeze({"q2r1":[".........",".##....#.","..#....#.",".........",".....#...",".#...#.#.","........."],"q2r2":[".........","......#..","...##....",".........","...##....",".........","........."],"q2r3":[".........","...#.....","...#.....","...#..#..","...#..#..","......#..","........."],"q2r4":[".........","..###....","......#..","......#..","......#..","..###....","........."],"q2r5":[".........","...#.#...","...#.#...",".........","...#.#...","...#.#...","........."]});
+function drawConnectedScenery(ctx,s,roomId){
+ const c=s.cell;ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ for(const piece of MINE_SCENERY[roomId]){
+  ctx.save();ctx.beginPath();
+  for(const [x,y] of piece.cells)ctx.rect(s.originX+x*c,s.originY+y*c,c,c);
+  ctx.clip();
+  ctx.drawImage(art[piece.asset],s.originX+piece.x*c,s.originY+piece.y*c,piece.w*c,piece.h*c);
+  ctx.restore();
+ }
+ ctx.restore();
+}
+/** Physical scenery occupies only verified blocked cells. Its soft cast shadow
+ * is composited afterwards so natural edges do not acquire square outlines. */
 export function paintPremiumMineConnectedWalls(ctx,s,walls=[],roomId='q2r1'){
- if(!premiumMineReady(roomId)||s.iso||!ready(roomId+'Obstacles'))return false;
+ if(!premiumMineReady(roomId)||s.iso)return false;
  const blueprint=MINE_WALL_BLUEPRINTS[roomId];if(!blueprint)return false;
  const expected=new Set();for(let y=0;y<7;y++)for(let x=0;x<9;x++)if(blueprint[y][x]==='#')expected.add(`${x},${y}`);
- if(walls.length!==expected.size||walls.some(([x,y])=>!expected.has(`${x},${y}`)))return false;
- const c=s.cell;ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.drawImage(art[roomId+'Obstacles'],s.originX,s.originY,9*c,7*c);
- ctx.restore();return true;
+ const actual=new Set(walls.map(([x,y])=>`${x},${y}`));
+ if(walls.length!==expected.size||actual.size!==expected.size||[...actual].some(cell=>!expected.has(cell)))return false;
+ if(typeof OffscreenCanvas==='undefined'){drawConnectedScenery(ctx,s,roomId);return true;}
+ const ratio=Math.min(2,Math.max(1,ctx.getTransform?.().a||1)),key=`${roomId}:${s.cell}:${ratio}`;
+ let layer=layers.get(key);
+ if(!layer){
+  const physical=new OffscreenCanvas(Math.ceil(9*s.cell*ratio),Math.ceil(7*s.cell*ratio));
+  const brush=physical.getContext('2d');brush.scale(ratio,ratio);
+  drawConnectedScenery(brush,{...s,originX:0,originY:0},roomId);
+  layer=new OffscreenCanvas(physical.width,physical.height);
+  const shadow=layer.getContext('2d');shadow.shadowColor='rgba(5,8,15,.48)';
+  shadow.shadowBlur=s.cell*ratio*.085;shadow.shadowOffsetX=s.cell*ratio*.045;shadow.shadowOffsetY=s.cell*ratio*.065;
+  shadow.drawImage(physical,0,0);layers.set(key,layer);
+  while(layers.size>3)layers.delete(layers.keys().next().value);
+ }
+ ctx.drawImage(layer,s.originX,s.originY,layer.width/ratio,layer.height/ratio);return true;
 }
 export function paintPremiumMineLighting(ctx,s,walls=[],roomId='q2r1'){
  if(!premiumMineReady(roomId)||s.iso)return false;
  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,index=roomIndex(roomId),palette=floorPalette[index];
  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
  const ambient=ctx.createLinearGradient(x,y,x+w,y+h);
- ambient.addColorStop(0,`rgba(${palette.ambient},.22)`);
- ambient.addColorStop(.52,'rgba(4,7,14,.05)');ambient.addColorStop(1,'rgba(1,3,10,.29)');
+ ambient.addColorStop(0,`rgba(${palette.ambient},.06)`);
+ ambient.addColorStop(.52,'rgba(4,7,14,.05)');ambient.addColorStop(1,'rgba(1,3,10,.10)');
  ctx.fillStyle=ambient;ctx.fillRect(x,y,w,h);
  const lamps=index===0?[[.10,.18],[.55,.67],[.89,.28]]:index===3?[[.12,.27],[.84,.19],[.46,.76]]:
                index===4?[[.50,.40],[.28,.24],[.78,.72]]:[[.18,.25],[.72,.30],[.51,.75]];
  for(const [xx,yy] of lamps){
   const rx=w*(index===4?.31:.18),ry=h*(index===4?.38:.28);
-  oval(ctx,x+w*xx,y+h*yy,rx,ry,palette.light,index===4?.33:.23);
+  oval(ctx,x+w*xx,y+h*yy,rx,ry,palette.light,index===4?.12:.08);
  }
- for(const [tx,ty] of walls){
-  oval(ctx,x+(tx+.85)*c,y+(ty+.80)*c,c*.80,c*.35,'2,4,10',.54);
- }
+
  ctx.restore();return true;
 }
 export function paintPremiumMineAtmosphere(ctx,s,roomId='q2r1',timeMs=0,motion=true,lit=true){
@@ -131,11 +136,11 @@ export function paintPremiumMineAtmosphere(ctx,s,roomId='q2r1',timeMs=0,motion=t
  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,index=roomIndex(roomId),pal=floorPalette[index];
  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
  const dark=ctx.createRadialGradient(x+w*.50,y+h*.48,w*.12,x+w*.50,y+h*.48,w*.73);
- dark.addColorStop(0,'rgba(0,2,9,0)');dark.addColorStop(.65,'rgba(0,2,9,.05)');dark.addColorStop(1,'rgba(0,1,6,.46)');
+ dark.addColorStop(0,'rgba(0,2,9,0)');dark.addColorStop(.65,'rgba(0,2,9,.05)');dark.addColorStop(1,'rgba(0,1,6,.24)');
  ctx.fillStyle=dark;ctx.fillRect(x,y,w,h);
  // Pinprick mineral reflections; stable frame positions and low opacity.
  const t=motion?timeMs*.0007:0;
- for(let i=0;i<(lit?(index===4?27:14):0);i++){
+ for(let i=0;i<(lit?(index===4?12:7):0);i++){
   const nx=((i*67+11)%103)/103,ny=((i*43+5)%97)/97;
   const glint=(.22+Math.sin(t*2+i*1.7)*.10)*(index===4?.75:.48);
   oval(ctx,x+nx*w,y+ny*h,c*.045,c*.065,pal.light,glint);
@@ -146,12 +151,12 @@ export function paintPremiumMineForeground(ctx,s,actors=[],timeMs=0,motion=true,
  if(!premiumMineReady(roomId)||s.iso)return false;
  const {originX:x,originY:y,cell:c}=s,w=9*c,h=7*c,t=motion?timeMs*.000025:0;
  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
- for(let i=0;i<13;i++){
+ for(let i=0;i<7;i++){
   const nx=((i*37+11)%97)/97,ny=(((i*59+29)%89)/89+t*(.5+(i%3)*.21))%1;
   let min=Infinity;
   for(const a of actors){const p=a.p||a;if(!Number.isFinite(p?.x))continue;min=Math.min(min,Math.hypot(nx*9-p.x-.5,ny*7-p.y-.5))}
   const fade=min<1.25?.1:min<2?.34:1;
-  ctx.globalAlpha=fade*(.12+(.035*Math.sin(t*85+i)));
+  ctx.globalAlpha=fade*(.06+(.015*Math.sin(t*85+i)));
   ctx.fillStyle=roomId==='q2r5'?'#d0b1ff':'#bbcfd1';
   ctx.beginPath();ctx.ellipse(x+w*nx,y+h*ny,c*.025,c*.040,i*.9,0,Math.PI*2);ctx.fill();
  }
@@ -174,10 +179,11 @@ export function paintPremiumMineActor(ctx,s,p,kind,sprite,{label='',selected=fal
  else if(shiny&&p.faces===6&&ready('shinyD6'))sprite=art.shinyD6;
  else if(kind==='enemy'&&p.faces===4&&ready('normalD4'))sprite=art.normalD4;
  else if(kind==='enemy'&&p.faces===6&&ready('normalD6'))sprite=art.normalD6;
+ else if(kind==='enemy'&&p.faces===8&&ready('normalD8'))sprite=art.normalD8;
  if(!sprite?.complete||!sprite.naturalWidth)return false;
  ctx.save();
  if(shiny||boss){
-  oval(ctx,pt.x,pt.y+c*.17,c*(boss?.87:.62),c*.44,boss?'181,100,237':'90,216,236',boss?.40:.34);
+  oval(ctx,pt.x,pt.y+c*.17,c*(boss?.87:.62),c*.44,boss?'181,100,237':'90,216,236',boss?.16:.12);
  }
  if(selected||active){
   ctx.strokeStyle=selected?'#ffbb70':'#d9f4df';ctx.lineWidth=Math.max(2,c*.032);
@@ -185,10 +191,10 @@ export function paintPremiumMineActor(ctx,s,p,kind,sprite,{label='',selected=fal
  }
  paintPremiumMineContactShadow(ctx,s,p);
  const bob=motion&&p.hp>0?Math.sin(timeMs*.0022+p.x*7+p.y*11)*c*.014:0;
- const imageSize=c*(boss?1.76:shiny?1.53:kind==='enemy'?1.29:1.40)*(giant?1.6:1);
+ const imageSize=c*(boss?1.42:shiny?1.24:kind==='enemy'?1.20:1.40)*(giant?1.6:1);
  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
- ctx.shadowColor=boss?'rgba(146,83,213,.67)':shiny?'rgba(51,155,188,.62)':'rgba(1,3,10,.80)';
- ctx.shadowBlur=c*(shiny||boss?.25:.11);ctx.shadowOffsetY=c*.055;
+ ctx.shadowColor=boss?'rgba(60,41,82,.38)':shiny?'rgba(31,67,80,.38)':'rgba(1,3,10,.80)';
+ ctx.shadowBlur=c*(shiny||boss?.10:.08);ctx.shadowOffsetY=c*.055;
  // Every upgraded dice creature is a transparent, square art asset.
  // Never crop their upper crystals or feet as we did for the old placeholders.
  ctx.drawImage(sprite,pt.x-imageSize*.50,pt.y-imageSize*.58+bob,imageSize,imageSize);

@@ -13,7 +13,7 @@ function makeWorker(){
 }
 function env(old=false){
  const files={
-  '/index.html':old?'<html>MEDIUM MAZES 13x9</html>':'<html data-build="v2-q5-complete-20261112-r1"><select id="cinematicQ5Room"></select></html>',
+  '/index.html':old?'<html>MEDIUM MAZES 13x9</html>':'<html data-build="v2-q2-polish-20261113-r2"><select id="cinematicQ5Room"></select></html>',
   '/app.js':'/* initPremiumDesert */',
   '/styles.css':'/* .cin-room layout */',
   '/assets/premium-woodland/training-clearing-ground.jpg':'fake-image-bytes',
@@ -21,6 +21,7 @@ function env(old=false){
   '/assets/premium-desert/rushing-dunes-ground-r1.webp':'fake-dune-bytes',
  };
  for (const name of ['ridge-ground','caravan-ground','crossing-ground','shieldwall-ground','smuggler-ground','toll-ground','toll-boss-d16']) files['/assets/premium-desert/q5-' + name + '-r1.webp'] = 'fake-art';
+ for(const name of ['entrance-ground','hollow-ground','gallery-ground','vault-ground','heart-ground','normal-d8','boss-d12'])files['/assets/premium-mine/q2-'+name+'-r2.webp']='fake-mine-art';
  return {ASSETS:{fetch:async req=>{
    const value=files[new URL(req.url).pathname];
    return value===undefined?new Response('Missing',{status:404}):new Response(value);
@@ -32,9 +33,9 @@ test('V2 public version endpoint confirms the matching Worker and cinematic asse
  assert.equal(response.status,200);
  const body=await response.json();
  assert.equal(body.worker,'dicebound-4-visual-v2');
- assert.equal(body.build,'v2-q5-complete-20261112-r1');
+ assert.equal(body.build,'v2-q2-polish-20261113-r2');
  assert.equal(body.cinematicAssetsReady,true);
- assert.deepEqual(Object.values(body.checks),Array(13).fill(200));
+ assert.deepEqual(Object.values(body.checks),Array(20).fill(200));
 });
 test('V2 deployment probe detects accidental 1 November old UI files',async()=>{
  const worker=makeWorker();

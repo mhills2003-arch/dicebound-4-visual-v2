@@ -6,7 +6,7 @@ import {MINE_ROOMS,MINE_FILES,MINE_FRAMES,mineFrameImage,initPremiumMine,premium
  paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineActor,
  paintPremiumMineAtmosphere,paintPremiumMineForeground} from '../public/v2-premium-mine.mjs';
 class ImageStub{constructor(){this.complete=true;this.naturalWidth=420;this.naturalHeight=420;this.src='stub'}}
-initPremiumMine(ImageStub);
+for(const id of MINE_ROOMS)initPremiumMine(ImageStub,id);
 function context(){const drawn=[],labels=[];const ctx={drawn,labels,
  save(){},restore(){},beginPath(){},closePath(){},rect(){},clip(){},moveTo(){},lineTo(){},ellipse(){},arc(){},roundRect(){},stroke(){},strokeRect(){},fill(){},fillRect(){},translate(){},scale(){},
  drawImage(image,...args){drawn.push([image?.src,...args])},strokeText(t){labels.push(t)},fillText(){},
@@ -23,7 +23,7 @@ test('Quest 2 is the five correct existing Easy rooms with unchanged encounters'
  assert.equal(ROOM_DATA.q2r5.final,true);
 });
 test('five distinct background images, real environment props and dice sprites are packaged',()=>{
- assert.equal(Object.keys(MINE_FILES).length,22);
+ assert.equal(Object.keys(MINE_FILES).length,21);
  for(const [key,path] of Object.entries(MINE_FILES)){
   assert.match(path,/^\.\/assets\/premium-mine\//);
   assert(statSync(new URL('../public/'+path.slice(2),import.meta.url)).size>1000,key);
@@ -70,13 +70,13 @@ test('Quest 2 is frontend-only, with unique cache-busting and no networking or i
  const mod=readFileSync(new URL('../public/v2-premium-mine.mjs',import.meta.url),'utf8');
  assert.match(app,/premiumMineActive=\(\)=>artActive\(\)&&isPremiumMineRoom\(me\?\.room\)&&view==='tactical'&&premiumMineReady\(me\?\.room\)/);
  assert.match(app,/paintPremiumMineActor\(ctx,s,a.p,a.kind,baseSprite,visualOptions\)/);
- assert.match(html,/app\.js\?build=v2-q5-complete-20261112-r1&mine=v2-quest2-mine-creatures-20261103-r4-objects-r1/);
- assert.match(app,/v2-premium-mine\.mjs\?build=v2-quest2-mine-creatures-20261103-r4-objects-r1/);
+ assert.match(html,/app\.js\?build=v2-q2-polish-20261113-r2&mine=v2-q2-polish-20261113-r2/);
+ assert.match(app,/v2-premium-mine\.mjs\?build=v2-q2-polish-20261113-r2/);
  assert.doesNotMatch(mod,/\bsend\(|\bfetch\(|new WebSocket\(|localStorage\.|\baddEventListener\(/);
 });
 
 
-test('each premium mine room has two distinct environment frames, not a recoloured common placeholder',()=>{
+test('each mine room uses the same crisp architectural framing with matching assets',()=>{
  assert.equal(Object.keys(MINE_FRAMES).length,10);
  for(const id of MINE_ROOMS){
   for(const side of ['left','right']){

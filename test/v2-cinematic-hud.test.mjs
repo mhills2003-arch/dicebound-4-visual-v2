@@ -46,7 +46,7 @@ test('Class selection, chat and secondary actions remain reachable without block
   assert.match(css,/\.hero-hud:has\(\.hero-bag\.hud-bag-open\)/);
 });
 test('Versioned script and stylesheet prevent stale mixed HUD releases',()=>{
-  assert.match(html,/styles\.css\?build=v2-cinematic-search-keys-20261102-r1/);
-  assert.match(html,/app\.js\?build=v2-q5-complete-20261112-r1/);
+  assert.match(html,/styles\.css\?build=v2-q2-polish-20261113-r2/);
+  assert.match(html,/app\.js\?build=v2-q2-polish-20261113-r2/);
   assert.match(html,/id="cinematicCritical"/);
 });

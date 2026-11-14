@@ -1390,7 +1390,8 @@ export function submitAction(s,id,action,now=nowMs(),deferResolution=false){
       if(Number.isInteger(last) && (p.combatTurns||0)<last+special.cooldown)throw new Error('Special attack is recharging');
     }
   }
-  b.actions[id]={type:action.type,dir:action.dir,target:action.target||id,sku:action.type==='item'?action.sku:undefined};
+  // An omitted enemy target means nearest in range; only ally actions default to self.
+  b.actions[id]={type:action.type,dir:action.dir,target:action.target||(['attack','special'].includes(action.type)?null:id),sku:action.type==='item'?action.sku:undefined};
   // A submitted action (including healing, defence or moving tactically) is meaningful participation.
   b.participated??={};b.participated[id]=true;
   s.revision++;

@@ -1,0 +1,209 @@
+[
+  {
+    "file": "public/assets/premium-desert/q5-ridge-ground-r1.webp",
+    "size_bytes": 332386,
+    "width": 1507,
+    "height": 1044,
+    "alpha": false,
+    "sha256": "bb0aa4e3d9ee8a5d0b5549b8366375b92fa05838ddf0ee977b1e3e8fb7fc7f5c",
+    "generation_brief": "Use case: stylized-concept. Production game terrain ground layer for DICEBOUND, matching the established premium painterly desert art visible in the references. Landscape 13:9 aspect, 1664x1152 if supported. Orthographic directly overhead surface, no horizon and no perspective convergence. Detailed hand-painted cinematic realism, warm upper-left sunlight, muted brown-violet crevices, amber/apricot palette, rich organic fine surface texture. This is an EMPTY FLOOR only: every location must read walkable. Fill edge to edge, no border, grid, text, figures, dice, tall obstacles, or deep shadows. Archers' Ridge: a plateau of shallow flat terracotta bedrock, apricot sand washing across ochre stone in broad diagonal wisps, tiny pebbles, worn transverse footpaths. The centre is a broad exposed firing lane, but all ground remains level and walkable."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-caravan-ground-r1.webp",
+    "size_bytes": 432654,
+    "width": 1507,
+    "height": 1044,
+    "alpha": false,
+    "sha256": "857a710644f4e7a4ca010fa237f07d048b235007baefeb38b71fa5ccb4adb9d9",
+    "generation_brief": "Use case: stylized-concept. Production game terrain ground layer for DICEBOUND, matching the established premium painterly desert art visible in the references. Landscape 13:9 aspect, 1664x1152 if supported. Orthographic directly overhead surface, no horizon and no perspective convergence. Detailed hand-painted cinematic realism, warm upper-left sunlight, muted brown-violet crevices, amber/apricot palette, rich organic fine surface texture. This is an EMPTY FLOOR only: every location must read walkable. Fill edge to edge, no border, grid, text, figures, dice, tall obstacles, or deep shadows. Iron Caravan: a sunlit desert caravan yard with broad dusty honey sandstone, visible parallel cart wheel ruts curving from west to east, flattened sand, subtle hoof marks and tiny straw fragments. No carts, cargo or furniture baked into this ground layer."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-crossing-ground-r1.webp",
+    "size_bytes": 342190,
+    "width": 1507,
+    "height": 1044,
+    "alpha": false,
+    "sha256": "7cf7f030bc4b995d5a49d5ab028341cf24318c12177ec7272110c089a77c8b33",
+    "generation_brief": "Use case: stylized-concept. Production game terrain ground layer for DICEBOUND, matching the established premium painterly desert art visible in the references. Landscape 13:9 aspect, 1664x1152 if supported. Orthographic directly overhead surface, no horizon and no perspective convergence. Detailed hand-painted cinematic realism, warm upper-left sunlight, muted brown-violet crevices, amber/apricot palette, rich organic fine surface texture. This is an EMPTY FLOOR only: every location must read walkable. Fill edge to edge, no border, grid, text, figures, dice, tall obstacles, or deep shadows. The Broken Crossing: a level dry desert river crossing with old flush limestone paving peeking through tawny sand in the horizontal centre, pale braided dry silt patterns running from north to south, broad ochre banks indicated only by flat colour and texture. No chasm, river, water, bridge ruins, cliffs or impassable feature; the entire surface is walkable."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-shieldwall-ground-r1.webp",
+    "size_bytes": 355970,
+    "width": 1507,
+    "height": 1044,
+    "alpha": false,
+    "sha256": "02414d98a710ff26ffcf32e5d55aa04b12edc7cc475a2c72c7a25e92cd14ed4c",
+    "generation_brief": "Use case: stylized-concept. Production game terrain ground layer for DICEBOUND, matching the established premium painterly desert art visible in the references. Landscape 13:9 aspect, 1664x1152 if supported. Orthographic directly overhead surface, no horizon and no perspective convergence. Detailed hand-painted cinematic realism, warm upper-left sunlight, muted brown-violet crevices, amber/apricot palette, rich organic fine surface texture. This is an EMPTY FLOOR only: every location must read walkable. Fill edge to edge, no border, grid, text, figures, dice, tall obstacles, or deep shadows. The Shieldwall: a timeworn desert fortress drill yard, pale ochre stone paving irregularly exposed through honey sand, faint rows of broad worn rectangular paving slabs, a few flattened scuffs and tiny pebbles. Warm sandstone fort ambience, open quiet ground without any walls or shields."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-smuggler-ground-r1.webp",
+    "size_bytes": 389922,
+    "width": 1507,
+    "height": 1044,
+    "alpha": false,
+    "sha256": "06d63c473efc394d58bce19f9bc448ed83c437591723568d5c855e349bad9a0f",
+    "generation_brief": "Use case: stylized-concept. Production game terrain ground layer for DICEBOUND, matching the established premium painterly desert art visible in the references. Landscape 13:9 aspect, 1664x1152 if supported. Orthographic directly overhead surface, no horizon and no perspective convergence. Detailed hand-painted cinematic realism, warm upper-left sunlight, muted brown-violet crevices, amber/apricot palette, rich organic fine surface texture. This is an EMPTY FLOOR only: every location must read walkable. Fill edge to edge, no border, grid, text, figures, dice, tall obstacles, or deep shadows. Smuggler's Station: dusty secluded desert trading yard, warm sand with worn paving fragments and old wheel tracks, extremely sparse tiny straw, flecks of spices and fabric fibres at edges. Faint warm terracotta and subdued teal weather stains give character. No objects, crates, stalls, bushes or people."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-toll-ground-r1.webp",
+    "size_bytes": 286132,
+    "width": 1507,
+    "height": 1044,
+    "alpha": false,
+    "sha256": "a36a0328dab744c15b65833c440c4c7ec3ee7e2a1d649319da1aba2f607e2272",
+    "generation_brief": "Use case: stylized-concept. Production game terrain ground layer for DICEBOUND, matching the established premium painterly desert art visible in the references. Landscape 13:9 aspect, 1664x1152 if supported. Orthographic directly overhead surface, no horizon and no perspective convergence. Detailed hand-painted cinematic realism, warm upper-left sunlight, muted brown-violet crevices, amber/apricot palette, rich organic fine surface texture. This is an EMPTY FLOOR only: every location must read walkable. Fill edge to edge, no border, grid, text, figures, dice, tall obstacles, or deep shadows. The High Roller's Toll: a grand ancient sandstone toll plaza in the desert, broad worn honey limestone flags and amber sand, a weathered circular brass-and-stone sixteen-ray sun medallion lying completely flush with the paving at about 72 percent across and 50 percent down. Grand but restrained, faded geometric inlay traces around the central horizontal approach. No walls, gates, objects, characters or raised structures."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-ridge-spine-r1.webp",
+    "size_bytes": 186112,
+    "width": 420,
+    "height": 1260,
+    "alpha": true,
+    "sha256": "baaeae0bcf540f705268ea58c47ecbd2eea3d061953883e0ae565dfef48e2d4b",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the warm hand-painted cinematic desert art in the references. Genuine TRANSPARENT background, no ground plane, no square base, no drop shadow baked outside silhouette, no border, no grid or text, no characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm sunlight from upper left with muted brown-violet self-shadow on lower right. Detailed premium painterly realism, naturally weathered material, not plastic or low-poly. Keep the entire object fully in frame with a very small transparent margin. A tall, narrow north-to-south sandstone ridge topped by broken ancient archer parapets. Continuous natural golden rock spine with a few carved crenellations incorporated into the crest, small chips, subtle faded turquoise stone inlay and worn chiselwork. Organic irregular outline, high centre with several elevations. Footprint ratio 1 wide to 3 tall, fully fill that narrow strip; seen steeply from above, not side elevation."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-parapet-r1.webp",
+    "size_bytes": 131352,
+    "width": 420,
+    "height": 840,
+    "alpha": true,
+    "sha256": "f654ddf4d00d139cafb449e77afd31b4fe02dba69448b3e52d7e9325a3bc9217",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the warm hand-painted cinematic desert art in the references. Genuine TRANSPARENT background, no ground plane, no square base, no drop shadow baked outside silhouette, no border, no grid or text, no characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm sunlight from upper left with muted brown-violet self-shadow on lower right. Detailed premium painterly realism, naturally weathered material, not plastic or low-poly. Keep the entire object fully in frame with a very small transparent margin. One narrow north-to-south stretch of ruined desert fortress parapet, irregular honey sandstone blocks, worn crenels, a broken end and layers of rocky foundations. Elaborate contiguous masonry, beautifully weathered, with a few faded turquoise glazed stone accents. Footprint 1 wide to 2 tall, long axis vertical on the image. Keep substantial solid coverage nearly to the edges, with organically broken silhouette."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-pillar-r1.webp",
+    "size_bytes": 78188,
+    "width": 420,
+    "height": 413,
+    "alpha": true,
+    "sha256": "c05d7ca82f93f0e384a12cd54686bfb682ec24c8dad3c490a283423ca48dc742",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the warm hand-painted cinematic desert art in the references. Genuine TRANSPARENT background, no ground plane, no square base, no drop shadow baked outside silhouette, no border, no grid or text, no characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm sunlight from upper left with muted brown-violet self-shadow on lower right. Detailed premium painterly realism, naturally weathered material, not plastic or low-poly. Keep the entire object fully in frame with a very small transparent margin. One squat broken sandstone sentry bastion, a chunky square-ish low tower with cracked carved capstones, several worn crenellations and a collapsed corner, elaborate weathered honey sandstone and dark bronze details. Viewed steeply from above so the worn roof fills most of it. Roughly square footprint with jagged organic corners. No doorway or open interior that could look walkable."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-iron-wagon-r1.webp",
+    "size_bytes": 250652,
+    "width": 1100,
+    "height": 550,
+    "alpha": true,
+    "sha256": "6ecdb8f43621460551b4f3dcac0fa0fdb8a7885b47664e79689e0dc61720bea1",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the warm hand-painted cinematic desert art in the references. Genuine TRANSPARENT background, no ground plane, no square base, no drop shadow baked outside silhouette, no border, no grid or text, no characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm sunlight from upper left with muted brown-violet self-shadow on lower right. Detailed premium painterly realism, naturally weathered material, not plastic or low-poly. Keep the entire object fully in frame with a very small transparent margin. One magnificent large ancient desert cargo wagon, long horizontal west-to-east wagon covered with a faded deep teal heavy canvas canopy, rugged dark bronze iron bands, warm weathered timber wheels, lashed sacks, a few bronze-edged wooden chests tucked under the canopy. Rich detailed craftsmanship, dusty amber wear. Viewed steeply from above, long horizontal silhouette exactly 2 wide to 1 tall. No camel, person, tow shaft or anything outside compact rectangular footprint. All wheels and cargo fit fully inside frame."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-cargo-island-r1.webp",
+    "size_bytes": 186976,
+    "width": 640,
+    "height": 640,
+    "alpha": true,
+    "sha256": "bba10a8c68e96591a1d17ee711b50a0561ec575c549e69667b4117cf93256431",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the warm hand-painted cinematic desert art in the references. Genuine TRANSPARENT background, no ground plane, no square base, no drop shadow baked outside silhouette, no border, no grid or text, no characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm sunlight from upper left with muted brown-violet self-shadow on lower right. Detailed premium painterly realism, naturally weathered material, not plastic or low-poly. Keep the entire object fully in frame with a very small transparent margin. A dense low 2 by 2-ish island of desert caravan cargo. An organic close-packed assortment of 5 different cedar crates, bronze binding strips, tightly lashed saffron sacks, rolled muted turquoise rugs, two little pottery amphorae. Varied heights, premium intricate materials, worn wood grain, dusty cloth and rope. Compact approximately square silhouette occupying almost the full square, no grid between objects, no base or ground."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-bridge-head-r1.webp",
+    "size_bytes": 397466,
+    "width": 900,
+    "height": 900,
+    "alpha": true,
+    "sha256": "ceb38c86cc8acab5dcaaa23b57dd08e1154ea611f19b5c3f44abe87a05c6ba09",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the warm hand-painted cinematic desert art in the references. Genuine TRANSPARENT background, no ground plane, no square base, no drop shadow baked outside silhouette, no border, no grid or text, no characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm sunlight from upper left with muted brown-violet self-shadow on lower right. Detailed premium painterly realism, naturally weathered material, not plastic or low-poly. Keep the entire object fully in frame with a very small transparent margin. An enormous solid ruined sandstone bridgehead, chunky ancient desert masonry platform with collapsed arch fragments heaped onto its top, broken balustrade on two edges, rich honey limestone, wind-worn relief carving and a little faded teal mosaic. Fully SOLID IMPASSABLE mound with no open doorway, tunnel, arch opening or empty walkable deck. Intricate raised ruin almost fills a square footprint, seen steeply from above. Organic broken edges, no projecting bridges or adjoining ground."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-bridge-abutment-r1.webp",
+    "size_bytes": 250796,
+    "width": 900,
+    "height": 600,
+    "alpha": true,
+    "sha256": "16f3cb326ffb232fa71333be4d4671cd3835c4ca7eb7aef23766c3eec653ccea",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the established warm hand-painted cinematic desert art. Genuine TRANSPARENT background; no square base, no ground plane, no cast shadow outside silhouette, no border, grid, labels or characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm upper-left sunlight and muted brown-violet self-shadow lower-right. Premium painterly realism with crisp intricate weathered material, not plastic or low-poly. Entire object in frame with tiny transparent margin. One broad ruined bridge abutment from an ancient desert crossing. Horizontal 3 wide by 2 deep footprint. A solid impassable mass of honey sandstone, collapsed voussoirs and fractured carved parapet stones, rich masonry texture, small turquoise mosaic remnants, natural jagged outer edges. The ruined arch is filled with collapsed blocks, NO open arch, tunnel or empty deck; must read as a solid obstacle from above."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-shieldwall-r1.webp",
+    "size_bytes": 136562,
+    "width": 420,
+    "height": 1103,
+    "alpha": true,
+    "sha256": "4ab9540a946489382e69ad2539103330cb0e14f5c003f48e7215451fbae666a1",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the established warm hand-painted cinematic desert art. Genuine TRANSPARENT background; no square base, no ground plane, no cast shadow outside silhouette, no border, grid, labels or characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm upper-left sunlight and muted brown-violet self-shadow lower-right. Premium painterly realism with crisp intricate weathered material, not plastic or low-poly. Entire object in frame with tiny transparent margin. One long narrow north-to-south sandstone defence barricade, solid interlocking ancient stone rampart with elaborate weathered crenellations and three broad bronze-rimmed shields leaning tightly against its west-facing side, faded deep teal and rusty saffron insignia, rich carved detail. Ratio 1 wide to 3.5 tall; long axis VERTICAL. Side shields stay within the narrow silhouette. A continuous cohesive structure, no detached objects or ground."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-cargo-spine-r1.webp",
+    "size_bytes": 229176,
+    "width": 420,
+    "height": 1260,
+    "alpha": true,
+    "sha256": "f36d4855a24f8272203f939f3ab31133ea6537644b43dbe04258b14488fcfb32",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the established warm hand-painted cinematic desert art. Genuine TRANSPARENT background; no square base, no ground plane, no cast shadow outside silhouette, no border, grid, labels or characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm upper-left sunlight and muted brown-violet self-shadow lower-right. Premium painterly realism with crisp intricate weathered material, not plastic or low-poly. Entire object in frame with tiny transparent margin. A long narrow north-to-south pile of smuggled desert cargo, three differently shaped weathered wooden crate stacks with copper bands, rolled muted teal carpets, rope, leather satchels and tightly bound ochre sacks packed into one continuous narrow column. Ratio 1 wide to 3 tall. No gaps through the pile, no broad ground plane. Organic ragged outer contour, intricate tactile materials. Orthographic steep overhead view, long axis VERTICAL."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-cargo-tower-r1.webp",
+    "size_bytes": 94446,
+    "width": 420,
+    "height": 420,
+    "alpha": true,
+    "sha256": "580ef39ba1cec2e9493ff87cd878231204a7de6c0e9b20d0ce9eba8fddce632a",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the established warm hand-painted cinematic desert art. Genuine TRANSPARENT background; no square base, no ground plane, no cast shadow outside silhouette, no border, grid, labels or characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm upper-left sunlight and muted brown-violet self-shadow lower-right. Premium painterly realism with crisp intricate weathered material, not plastic or low-poly. Entire object in frame with tiny transparent margin. A compact square cluster of tightly stacked smuggler's cedar chests, one open lid showing spice sacks, rolled muted teal cloth and a bronze lock, tiny rope knots. Rich worn wood grain, ochre cloth, oxidised metal, intricate premium hand-painted detail. Low dense chunky silhouette almost filling square footprint. Every visible part is cargo, no surrounding ground."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-smuggler-store-r1.webp",
+    "size_bytes": 148592,
+    "width": 420,
+    "height": 1260,
+    "alpha": true,
+    "sha256": "971058701c71a0ada01413ddc0b66ab47c8b1ad38ddefbcdf645386cf93a9e96",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the established warm hand-painted cinematic desert art. Genuine TRANSPARENT background; no square base, no ground plane, no cast shadow outside silhouette, no border, grid, labels or characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm upper-left sunlight and muted brown-violet self-shadow lower-right. Premium painterly realism with crisp intricate weathered material, not plastic or low-poly. Entire object in frame with tiny transparent margin. One very long VERY NARROW north-to-south improvised desert smuggler supply counter, ratio 1 wide to 5 tall silhouette. A single continuous row of low wooden crate stacks partly draped in a torn narrow teal and ochre woven awning, packed sacks and rolled rugs, chests with bronze bands, small pottery nestled within the row. Steep overhead orthographic view, the long row runs VERTICALLY. Full length completely within frame, with a tiny margin, no posts beyond the silhouette, no ground or walkway. Each section different but cohesive."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-toll-keep-r1.webp",
+    "size_bytes": 227134,
+    "width": 900,
+    "height": 600,
+    "alpha": true,
+    "sha256": "aa556c7cfee7e96e4a7259fba4a7156867ce6179573defce1d31bd99bed57dbb",
+    "generation_brief": "Use case: stylized-concept. ONE production scenery cutout for DICEBOUND tactical game, matching the established warm hand-painted cinematic desert art. Genuine TRANSPARENT background; no square base, no ground plane, no cast shadow outside silhouette, no border, grid, labels or characters. Orthographic camera steeply overhead about 70 degrees, up is north, no perspective convergence. Warm upper-left sunlight and muted brown-violet self-shadow lower-right. Premium painterly realism with crisp intricate weathered material, not plastic or low-poly. Entire object in frame with tiny transparent margin. One elaborate squat fortified sandstone tollhouse, horizontal footprint 3 wide to 2 deep. Viewed steeply from above, broad flat roof crowded with small worn crenellations, sealed bronze hatch, a folded deep teal canopy along one parapet, intricate sun reliefs and gold-bronze binding. A heavy ancient desert toll fort structure, solid and clearly impassable. Weathered honey sandstone, rich warm carved detail, subtle cracks and chips, broken irregular foundations, not a perfect rectangular base. No open door, characters, flags outside footprint or surrounding ground."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-ranged-d6-r1.webp",
+    "size_bytes": 127776,
+    "width": 640,
+    "height": 640,
+    "alpha": true,
+    "sha256": "5901c80d25c389a675c613396d68a10817e9cc459936ebde4537c24fba3f73da",
+    "generation_brief": "Make this exact D6 sandstone golem an archer. Preserve its cubic six-pip stone head, amber eyes, warm lighting, premium painted material, proportions and steep three-quarter overhead camera. Add a compact curved bronze-and-wood bow held beside the body, a small quiver of arrows behind one shoulder and a deep muted blue scarf. Entire compact character including bow fits square framing. Six clear top pips, no text."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-ranged-d8-r1.webp",
+    "size_bytes": 124570,
+    "width": 640,
+    "height": 640,
+    "alpha": true,
+    "sha256": "1d3984a569a7fab7df820ca40bab2103fa4dd944df2b9a6ef50578bca215e3a7",
+    "generation_brief": "Make this exact D8 sandstone golem an archer. Preserve its octahedral head with the engraved number 8, amber eyes, warm lighting, premium painted material, proportions and steep three-quarter overhead camera. Add a compact curved bronze-and-wood bow held beside the body, a small quiver of arrows behind one shoulder and a deep muted blue scarf. Entire compact character including bow fits square framing."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-swift-d8-r1.webp",
+    "size_bytes": 120114,
+    "width": 640,
+    "height": 640,
+    "alpha": true,
+    "sha256": "4cae3b9469ca71c794f2aed00796fbda26d0ac781764c0e877a8d4e259d65e60",
+    "generation_brief": "Make this exact D8 sandstone golem a Swift runner. Preserve the octahedral head with its engraved number 8, amber eyes, sandstone material and lighting. Change to an energetic compact running pose with one foot forward and a long wind-swept teal scarf, slim leather bracers and wrapped feet. Same premium hand-painted style and overhead three-quarter camera. Full character fits square framing, scarf entirely in frame."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-armoured-d8-r1.webp",
+    "size_bytes": 131982,
+    "width": 640,
+    "height": 640,
+    "alpha": true,
+    "sha256": "2cef9b7a8a1b76b02569bfa70ce9cf98ac46420318120521896dc4574efcaf36",
+    "generation_brief": "Make this exact D8 sandstone golem an Armoured guardian. Preserve octahedral sandstone head, clearly engraved number 8, amber eyes, premium hand-painted style and steep three-quarter camera. Fit weathered dark bronze plate bands and shoulder armour over its lower body, a large compact round bronze shield held at its side with a muted rusty-red centre, short dusty ochre cloth at the waist. Weighty braced pose. Full character and shield fit square framing."
+  },
+  {
+    "file": "public/assets/premium-desert/q5-toll-boss-d16-r1.webp",
+    "size_bytes": 143864,
+    "width": 640,
+    "height": 640,
+    "alpha": true,
+    "sha256": "eb5e19b2fd0659e1d62cf4fdea7d62ca585a6607b963ae791b27855d3024f30d",
+    "generation_brief": "One DICEBOUND desert boss enemy, the High Roller D16. A formidable squat sixteen-faced sandstone dice golem king, many triangular faces on a faceted bipyramid-shaped head/body, a single large sharply engraved '16' on its broad front triangular facet, blazing amber eyes below the numeral. Ancient bronze crown integrated around its upper ridges, elaborately engraved bronze shoulder plates, a worn deep teal royal cape, chunky articulated stone arms, one hand gripping a short bronze toll sceptre. Same family as the sandstone D8 reference: premium tactile honey sandstone and amber eyes, hand-painted detailed game sprite, steep overhead three-quarter camera, warm upper-left sun. Confident boss stance, friendly fantasy menace suitable for DICEBOUND, compact full-body square silhouette. No pedestal or ground. Only text is '16', no other numbers."
+  }
+]

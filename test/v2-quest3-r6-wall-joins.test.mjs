@@ -44,8 +44,8 @@ test('accepted boss and five continuous R5 floor images remain referenced',()=>{
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  assert.match(app,/paintPremiumGiantWalls\(ctx,s,me.room,state.roomWalls/);
- assert.match(app,/v2-quest3-giantwood-20261103-r6-walljoins/);
- assert.match(html,/q3=v2-quest3-giantwood-r6-walljoins/);
+ assert.match(app,/v2-q3-walls-20261114-r1/);
+ assert.match(html,/q3=v2-q3-walls-20261114-r1/);
 });
 
 test('real wall renderer remains a purely visual canvas painter',()=>{

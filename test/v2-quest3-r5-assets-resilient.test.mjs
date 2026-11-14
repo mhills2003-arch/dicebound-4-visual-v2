@@ -28,7 +28,7 @@ test('Q3 preserved R3 boss art and R5 cache-safe app entrypoint',()=>{
  const m=readFileSync(new URL('../public/v2-premium-giantwood.mjs',import.meta.url),'utf8');
  assert.match(app,/QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY/);
  assert.match(app,/isPremiumGiantRoom\(me.room\)/);
- assert.match(html,/q3=v2-quest3-giantwood-r6-walljoins/);
+ assert.match(html,/q3=v2-q3-walls-20261114-r1/);
  assert.match(m,/boss-d12-q3r3\.png/);
  assert.match(m,/boss\?2\.20/);
 });

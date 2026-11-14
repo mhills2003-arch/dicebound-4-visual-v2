@@ -38,6 +38,12 @@ export const GIANT_FILES = Object.freeze({
   wholeTree:'./assets/premium-giantwood/whole-fallen-tree-q3r4.png',
   premiumBoulder:'./assets/premium-giantwood/premium-moss-boulder-q3r2.png',
   premiumBush:'./assets/premium-giantwood/premium-forest-bush-q3r2.png',
+  wallH2:'./assets/premium-giantwood/ruin-horizontal-walls-r1.webp',
+  wallV2:'./assets/premium-giantwood/ruin-vertical-walls-r1.webp',
+  wallLDown:'./assets/premium-giantwood/ruin-corner-south-walls-r1.webp',
+  wallLUp:'./assets/premium-giantwood/ruin-corner-north-walls-r1.webp',
+  wallStep:'./assets/premium-giantwood/ruin-step-walls-r1.webp',
+  rootBank:'./assets/premium-giantwood/hollow-root-bank-walls-r1.webp',
   left:'./assets/premium-giantwood/trampled-trail-frame-left.jpg',
   right:'./assets/premium-giantwood/trampled-trail-frame-right.jpg'
 });
@@ -168,18 +174,65 @@ export function giantTreeRuns(roomId,walls=[]){
  runs.sort((a,b)=>b.length-a.length||a.y-b.y||a.x-b.x);
  return runs.slice(0,1);
 }
-/** This is a conservative R2 enhancement: R2 walls for every other cell,
- * plus ONE whole, transparent, natural tree for Hollow Tree's main formation.
- * Collision, enemies, doors and floor images remain exactly as before. */
+/** Connected components come from the supplied collision cells, never a second
+ * room layout. Match complete shapes so no illustration can bridge an open tile.
+ * Unknown shapes and independently missing images retain per-cell fallbacks. */
+export function giantWallFormations(roomId,walls=[]){
+ const treeCells=new Set(giantTreeRuns(roomId,walls).flatMap(run=>
+  Array.from({length:run.length},(_,i)=>`${run.x+i},${run.y}`)));
+ const pending=new Set(walls.map(([x,y])=>`${x},${y}`).filter(key=>!treeCells.has(key)));
+ const groups=[];
+ while(pending.size){
+  const start=pending.values().next().value;pending.delete(start);
+  const cells=[start.split(',').map(Number)];
+  for(let i=0;i<cells.length;i++){
+   const [x,y]=cells[i];
+   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+    const key=`${x+dx},${y+dy}`;
+    if(pending.delete(key))cells.push([x+dx,y+dy]);
+   }
+  }
+  cells.sort((a,b)=>a[1]-b[1]||a[0]-b[0]);
+  const x=Math.min(...cells.map(p=>p[0])),y=Math.min(...cells.map(p=>p[1]));
+  const width=Math.max(...cells.map(p=>p[0]))-x+1,height=Math.max(...cells.map(p=>p[1]))-y+1;
+  const shape=cells.map(([cx,cy])=>`${cx-x},${cy-y}`).join(';');
+  let key=null;
+  if(height===1&&width>=2&&width<=3&&cells.length===width)key='wallH2';
+  else if(width===1&&height===2&&cells.length===2)key='wallV2';
+  else if(shape==='0,0;0,1;1,1')key='wallLDown';
+  else if(shape==='0,0;1,0;0,1')key='wallLUp';
+  else if(shape==='0,0;1,0;1,1;2,1')key='wallStep';
+  else if(roomId==='q3r4'&&shape==='0,0;1,0;2,0;3,0;1,1;2,1')key='rootBank';
+  groups.push({key,x,y,width,height,cells});
+ }
+ return groups.sort((a,b)=>a.y-b.y||a.x-b.x);
+}
+function paintGiantFormation(ctx,s,group){
+ const {key,x,y,width,height}=group;
+ if(!key||!ready(key))return false;
+ const c=s.cell;
+ // The image alpha supplies a natural silhouette. A formation is painted once,
+ // eliminating the old repeated caps and overlapping tile-edge bridge sprites.
+ let dx=.10,dy=.04,w=width-.20,h=height-.12;
+ if(key==='wallH2'){dx=.02;dy=.08;w=width-.04;h=.84;}
+ if(key==='wallV2'){dx=.16;dy=.02;w=.68;h=height-.04;}
+ if(key==='rootBank'){dx=.02;dy=-.16;w=width-.04;h=height+.16;}
+ ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ ctx.shadowColor='rgba(2,12,7,.42)';ctx.shadowBlur=c*.065;ctx.shadowOffsetY=c*.04;
+ ctx.drawImage(art[key],s.originX+(x+dx)*c,s.originY+(y+dy)*c,w*c,h*c);
+ ctx.restore();return true;
+}
+/** One illustration per connected formation, plus the existing whole fallen
+ * tree. Floors, lighting, enemies, routes and blocked coordinates are untouched. */
 export function paintPremiumGiantWalls(ctx,s,roomId='q3r1',walls=[]){
  if(!premiumGiantReady(roomId)||s.iso)return false;
  const runs=giantTreeRuns(roomId,walls);
  const treeCells=new Set(runs.flatMap(run=>Array.from({length:run.length},(_,i)=>`${run.x+i},${run.y}`)));
- // Bridge only existing adjacent blocked cells, before their illustrated faces.
- // Exclude the continuous full fallen-tree span; it is an approved single asset.
- const stoneWalls=walls.filter(([x,y])=>!treeCells.has(`${x},${y}`));
- paintPremiumGiantWallJoins(ctx,s,stoneWalls);
- for(const [x,y] of stoneWalls)paintPremiumGiantWall(ctx,s,x,y,roomId,walls);
+ for(const group of giantWallFormations(roomId,walls)){
+  if(!paintGiantFormation(ctx,s,group)){
+   for(const [x,y] of group.cells)paintPremiumGiantWall(ctx,s,x,y,roomId,walls);
+  }
+ }
  if(!runs.length)return true;
  if(!ready('wholeTree')){
   // Safe fallback: no absent/cropped wall graphics if the optional file fails.

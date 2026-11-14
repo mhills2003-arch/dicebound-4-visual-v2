@@ -1,7 +1,7 @@
 import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
 import {initPremiumMine,isPremiumMineRoom,premiumMineReady,paintPremiumMineFloor,paintPremiumMineLighting,paintPremiumMineWall,paintPremiumMineConnectedWalls,paintPremiumMineAtmosphere,paintPremiumMineForeground,paintPremiumMineActor,paintPremiumMineContactShadow,mineFrameImage} from './v2-premium-mine.mjs?build=v2-q2-polish-20261113-r2';
-import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-quest3-giantwood-20261103-r6-walljoins';
+import {initPremiumGiant,isPremiumGiantRoom,premiumGiantReady,paintPremiumGiantFloor,paintPremiumGiantLighting,paintPremiumGiantWall,paintPremiumGiantWalls,paintPremiumGiantAtmosphere,paintPremiumGiantForeground,paintPremiumGiantActor,paintPremiumGiantContactShadow,giantFrameImage} from './v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1';
 import {initPremiumQuarry,isPremiumQuarryRoom,premiumQuarryReady,paintPremiumQuarryFloor,paintPremiumQuarryLighting,paintPremiumQuarryWall,paintPremiumQuarryConnectedWalls,paintPremiumQuarryAtmosphere,paintPremiumQuarryForeground,paintPremiumQuarryActor,paintPremiumQuarryContactShadow,quarryFrameImage} from './v2-premium-quarry.mjs?build=v2-quest4-five-premium-rooms-r3';
 import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paintV2Dressing,paintV2Light} from './v2-room-art.mjs';
 /** Two-player vertical slice: room/tactical rendering inspired by the 3.2.1
@@ -9,7 +9,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · QUEST 3 WALLS R1 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 

@@ -49,7 +49,7 @@ test('live boss shows a D8 sprite, label, HP without changing combat properties'
 test('new app and renderer receive unique cache-busting URLs without changing existing styles',()=>{
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
- assert.match(html,/app\.js\?build=v2-q3-walls-20261114-r1/);
+ assert.match(html,/app\.js\?build=v2-q6-art-20261115-r1/);
  assert.match(app,/v2-premium-woodland\.mjs\?build=v2-quest1-soft-edges-q5-caravan-r1/);
  assert.match(html,/styles\.css\?build=v2-q2-polish-20261113-r2/);
 });

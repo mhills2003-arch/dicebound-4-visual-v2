@@ -90,6 +90,9 @@ export default {
           .map(name => [name, '/assets/premium-desert/q5-' + name + '-r1.webp']),
         ...['crypt-floor','graveyard-floor','crypt-masonry','sarcophagus','ghost-atlas','zombie-atlas','teleporter-atlas','sentinel-atlas','drowned-boss']
           .map(name=>['crypt-'+name,'/assets/premium-crypt/'+name+'-r1.webp']),
+        ['crypt-coffins','/assets/premium-crypt/crypt-coffins-r3.webp'],
+        ['crypt-rubble','/assets/premium-crypt/crypt-rubble-r3.webp'],
+        ['crypt-architecture','/assets/premium-crypt/crypt-architecture-r2.webp'],
         ['crypt-renderer','/v2-premium-crypt.mjs'], ['crypt-layouts','/v2-quest6-layouts.mjs'], ['crypt-crops','/v2-crypt-sprite-crops.mjs']
       ];
       const checks = await Promise.all(assets.map(async ([name, path]) => {
@@ -100,11 +103,11 @@ export default {
       }));
       const ready = checks.every(check => check.status === 200)
         && checks[0].body.includes('id="cinematicQ5Room"')
-        && checks[0].body.includes('v2-q6-art-20261115-r1')
-        && checks[1].body.includes('v2-premium-crypt.mjs?build=v2-q6-art-20261115-r1')
+        && checks[0].body.includes('v2-q6-obstacles-20261120-r3')
+        && checks[1].body.includes('v2-premium-crypt.mjs?build=v2-q6-obstacles-20261120-r3')
         && checks[1].body.includes('v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1')
         && checks[1].body.includes('initPremiumDesert') && checks[2].body.includes('.cin-room');
-      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q6-art-20261115-r1',
+      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q6-obstacles-20261120-r3',
         cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }

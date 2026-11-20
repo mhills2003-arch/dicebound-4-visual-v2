@@ -1,0 +1,79 @@
+{
+  "build": "v2-q6-obstacles-20261120-r3",
+  "date": "2026-11-20",
+  "generation": "Built-in image generation. Full original atlases encoded as WebP, with alpha retained. Sprite crops are metadata.",
+  "obstacles": {
+    "coffin": [
+      2,
+      1
+    ],
+    "brokenCoffin": [
+      2,
+      1
+    ],
+    "verticalTomb": [
+      1,
+      2
+    ],
+    "brokenFont": [
+      1,
+      1
+    ],
+    "rubbleHeap": [
+      2,
+      2
+    ],
+    "fallenWallBank": [
+      2,
+      1
+    ],
+    "smallStones": [
+      1,
+      1
+    ]
+  },
+  "placement": "Each blocked cell belongs to one object footprint. The visible contour comes from sprite alpha directly over the room floor.",
+  "validation": {
+    "testsPassed": 455,
+    "roomsVisuallyReviewed": 8,
+    "blockedCells": 252,
+    "exactObstacleCoverage": true,
+    "renderingReviewedIn": "Local game preview"
+  },
+  "assets": [
+    {
+      "file": "public/assets/premium-crypt/crypt-coffins-r3.webp",
+      "source": "exec-0222a813-bb1f-4b64-8111-35925b2b38c6.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "bytes": 333426,
+      "sha256": "9d41b94f14b7d286082bb7b8f85d940d52fb02ef709e1b46617f203e49b6c60e",
+      "prompt": "Use case stylized-concept. Production sprite atlas for premium fantasy tactical dungeon DICEBOUND. Exactly TWO isolated stone coffin sprites, arranged one above the other in an otherwise entirely transparent landscape canvas, with a wide transparent gutter between rows. Camera steep overhead about 75 degrees downward from the ground, parallel orthographic game view, X axis horizontal on screen, each coffin lies horizontally left to right, about 2.1 times as wide as it is tall INCLUDING its short front stone face. TOP: heavy ancient carved stone coffin, cracked tapered limestone lid, worn delicate knotwork, one broken corner exposing dark interior, damp teal moss and a few clinging old roots. BOTTOM: second low crumbling stone sarcophagus with lid fractured and partly sunk in its own broken sides, a few small fallen fragments immediately touching it. Grey muted limestone, dark teal damp staining, softly lit upper left. Detailed realistic hand-painted 3D sprite, high-end dark fantasy illustration, readable at 150 pixels. Both objects are themselves the entire obstacle. No podium, no paving slab, no square base, no background, no backing plate, no ground patch, no cast shadow, no props behind the objects. Natural uneven chipped silhouettes, complete objects inside canvas, equal sized isolated sprites. No writing or numerals. Transparent pixels must surround and separate both."
+    },
+    {
+      "file": "public/assets/premium-crypt/crypt-rubble-r3.webp",
+      "source": "exec-63d7036e-3e0d-4b2d-9a6a-55e1572ae5b6.png",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "bytes": 468798,
+      "sha256": "92b97ffb4f1e5db91f12ac06df1079580216398cf1b1b87277de4a67f0eccf1d",
+      "prompt": "Use case stylized-concept. Production transparent sprite atlas for the premium top-down fantasy tactical game DICEBOUND. Exactly FOUR SEPARATE irregular piles of collapsed crypt stone in a neat 2 by 2 sprite atlas with very wide transparent gutters, each pile centered in its own quadrant. Top-left a broad approximately square organic heap of collapsed ancient tomb vault: broken large limestone arch fragments and smaller rubble, tilted slabs partly swallowed by moss and dark roots, all naturally slumped together. Top-right a second roughly square pile of ruined crypt masonry with weathered carved gravestone fragments and angular stone blocks. Bottom-left a long low fallen wall fragment and natural rubble bank, about 2:1 horizontal footprint, asymmetrical jagged edge, green damp moss and intertwining roots. Bottom-right a compact single roundish pile of three or four large heavy broken stones surrounded by a few close tiny fragments, one-cell obstacle footprint. Camera steep top-down 75 degrees above ground, orthographic parallel view, axes aligned to image. Intricate realistic hand-painted dungeon game assets with believable volume, grey-green limestone, subdued teal damp and moss, soft upper-left light. The PILES are the obstacles themselves and have unique organic ragged contours. No floor or ground plane, no square base, no platform, no backing slabs, no intact rectangle, no paving surface, no casts of shadows. Nothing except the actual 4 isolated piles on TRUE ALPHA. No text. Materials and tone match ancient flooded mausoleum, sophisticated muted contrast. Keep all silhouettes complete with transparent margins."
+    }
+  ],
+  "reusedFontAtlas": {
+    "file": "public/assets/premium-crypt/crypt-architecture-r2.webp",
+    "sourceLibraryId": "libfile_ed89df96bf3c8191902e558b4f052519",
+    "crop": [
+      974,
+      105,
+      356,
+      530
+    ]
+  }
+}

@@ -42,7 +42,7 @@ test('Board Focus affects UI only and preserves the current Quest 1 renderer and
 
 test('Focus deployment does not mix old styles with new controls',()=>{
  assert.match(html,/styles\.css\?build=v2-q2-polish-20261113-r2/);
- assert.match(html,/app\.js\?build=v2-q6-obstacles-20261120-r3/);
+ assert.match(html,/app\.js\?build=v2-q7-monastery-r1/);
  assert.match(html,/<style id="boardFocusCritical"/);
  assert.match(html,/body\.hud-board-focus \.side-left,body\.hud-board-focus \.side-right\{display:none\}/);
  assert.match(html,/body\.hud-board-focus \.sidebar\.hud-panel-open/);

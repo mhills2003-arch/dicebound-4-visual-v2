@@ -34,5 +34,5 @@ test('Hotkey help and styles never change the actual playfield dimensions',()=>{
  assert.match(c,/body\.hud-board-focus \.cin-hotkey-help:not\(\[hidden\]\)/);
  assert.doesNotMatch(c.slice(c.indexOf('/* V2 Search overlay')),/canvas-wrap\{[^}]*width/);
  assert.match(h,/styles\.css\?build=v2-q2-polish-20261113-r2/);
- assert.match(h,/app\.js\?build=v2-q6-obstacles-20261120-r3/);
+ assert.match(h,/app\.js\?build=v2-q7-monastery-r1/);
 });

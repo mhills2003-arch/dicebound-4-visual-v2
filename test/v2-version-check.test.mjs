@@ -13,8 +13,8 @@ function makeWorker(){
 }
 function env(old=false,missing=null){
  const files={
-  '/index.html':old?'<html>MEDIUM MAZES 13x9</html>':'<html data-build="v2-q6-obstacles-20261120-r3"><select id="cinematicQ5Room"></select></html>',
-  '/app.js':'/* initPremiumDesert v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1 v2-premium-crypt.mjs?build=v2-q6-obstacles-20261120-r3 */',
+  '/index.html':old?'<html>MEDIUM MAZES 13x9</html>':'<html data-build="v2-q7-monastery-r1"><select id="cinematicQ5Room"></select></html>',
+  '/app.js':'/* initPremiumDesert v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1 v2-premium-monastery.mjs?build=v2-q7-monastery-r1 */',
   '/styles.css':'/* .cin-room layout */',
   '/assets/premium-woodland/training-clearing-ground.jpg':'fake-image-bytes',
   '/assets/premium-desert/caravan-ground-q5-r1.webp':'fake-webp-bytes',
@@ -27,6 +27,7 @@ function env(old=false,missing=null){
  for(const name of ['v2-premium-crypt','v2-quest6-layouts','v2-crypt-sprite-crops'])files['/'+name+'.mjs']='fake-module';
  for(const name of ['crypt-architecture'])files['/assets/premium-crypt/'+name+'-r2.webp']='fake-wall-art';
  for(const name of ['crypt-coffins','crypt-rubble'])files['/assets/premium-crypt/'+name+'-r3.webp']='fake-obstacle-art';
+ for(const path of ["/v2-premium-monastery.mjs", "/v2-monastery-plan.mjs", "/assets/premium-monastery/terrain/7-8.webp"])files[path]='art';
  if(missing)delete files[missing];
  return {ASSETS:{fetch:async req=>{
    const value=files[new URL(req.url).pathname];
@@ -39,9 +40,9 @@ test('V2 public version endpoint confirms the matching Worker and cinematic asse
  assert.equal(response.status,200);
  const body=await response.json();
  assert.equal(body.worker,'dicebound-4-visual-v2');
- assert.equal(body.build,'v2-q6-obstacles-20261120-r3');
+ assert.equal(body.build,'v2-q7-monastery-r1');
  assert.equal(body.cinematicAssetsReady,true);
- assert.deepEqual(Object.values(body.checks),Array(41).fill(200));
+ assert.deepEqual(Object.values(body.checks),Array(44).fill(200));
 });
 test('V2 deployment probe detects accidental 1 November old UI files',async()=>{
  const worker=makeWorker();

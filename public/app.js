@@ -1,3 +1,4 @@
+import * as monastery from './v2-premium-monastery.mjs?build=v2-q7-monastery-r1';
 import {initPremiumCrypt,isPremiumCryptRoom,premiumCryptReady,paintPremiumCryptFloor,paintPremiumCryptWalls,paintPremiumCryptSurround,paintPremiumCryptAtmosphere,paintPremiumCryptActor,paintPremiumCryptRemains} from './v2-premium-crypt.mjs?build=v2-q6-obstacles-20261120-r3';
 import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
@@ -10,7 +11,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 6 CRYPT OBSTACLES R3 · QUEST 3 WALLS R1 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · QUEST 7 MONASTERY R1 · QUEST 6 CRYPT OBSTACLES R3 · QUEST 3 WALLS R1 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 
@@ -100,7 +101,8 @@ const premiumGiantActive=()=>artActive()&&isPremiumGiantRoom(me?.room)&&view==='
 const premiumQuarryActive=()=>artActive()&&isPremiumQuarryRoom(me?.room)&&view==='tactical'&&premiumQuarryReady(me?.room);
 const premiumDesertActive=()=>artActive()&&isPremiumDesertRoom(me?.room)&&view==='tactical'&&premiumDesertReady(me?.room);
 const premiumCryptActive=()=>artActive()&&isPremiumCryptRoom(me?.room)&&view==='tactical'&&premiumCryptReady(me?.room);
-const anyPremiumActive=()=>premiumCryptActive()||premiumActive()||premiumMineActive()||premiumGiantActive()||premiumQuarryActive()||premiumDesertActive();
+const monasteryActive=()=>artActive()&&view==='tactical'&&monastery.ready(me?.room);
+const anyPremiumActive=()=>monasteryActive()||premiumCryptActive()||premiumActive()||premiumMineActive()||premiumGiantActive()||premiumQuarryActive()||premiumDesertActive();
 let woodlandDepthEnabled=localStorage.getItem('db4_v2_woodland_depth')!=='off';
 const woodlandDepthToggle=document.createElement('button');
 woodlandDepthToggle.id='woodlandDepthToggle';
@@ -256,7 +258,7 @@ let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
 const requestedTrial = new URLSearchParams(location.search).get('trial');
-const desertTrials = new Set([...Array.from({length:8},(_,i)=>'crypt-q6-r'+(i+1)), 'mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
+const desertTrials = new Set([...Array.from({length:8},(_,i)=>'monastery-q7-r'+(i+1)),...Array.from({length:8},(_,i)=>'crypt-q6-r'+(i+1)), 'mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
   'quest5-room3', 'quest5-room4', 'quest5-room5', 'quest5-room6', 'quest5-room7', 'quest5-room8']);
 const desertTrial = desertTrials.has(requestedTrial) ? requestedTrial : null;
 if (desertTrial) $('cinematicQ5Room').value = desertTrial;
@@ -395,6 +397,7 @@ function connect(){if(authClosed)return;const u=new URL(ROOT+'/api/ws',location.
 }
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e}
 function syncUI(){if(!state||!me)return;
+ if(monastery.has(me.room))monastery.loadRoom(me.room,state.rooms[me.room].battle.enemies);
  if(isPremiumMineRoom(me.room))initPremiumMine(undefined,me.room);
  if(isPremiumCryptRoom(me.room))initPremiumCrypt(undefined,me.room);
  if(isPremiumDesertRoom(me.room))initPremiumDesert(undefined,me.room);
@@ -779,7 +782,8 @@ function sceneFloor(s){
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
     const cs=s.cell, premium=anyPremiumActive();
-    if(premiumCryptActive())paintPremiumCryptFloor(ctx,s,me.room);
+    if(monasteryActive())monastery.floor(ctx,s,me.room);
+    else if(premiumCryptActive())paintPremiumCryptFloor(ctx,s,me.room);
     else if(premiumDesertActive())paintPremiumDesertFloor(ctx,s,me.room);
     else if(premiumActive()){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
     else if(premiumMineActive()){paintPremiumMineFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumMineLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}
@@ -932,12 +936,12 @@ function drawStoneIso(s,tx,ty,terrain){
   ctx.restore();
 }
 function render(){if(!state||!me)return;
-  woodlandLightingToggle.hidden=!anyPremiumActive();
+  woodlandLightingToggle.hidden=!anyPremiumActive()||monasteryActive();
   if(!woodlandLightingToggle.hidden){
     woodlandLightingToggle.textContent=premiumMineActive()?(woodlandLightingEnabled?'💎 Cave glow: ON':'💎 Cave glow: OFF'):(woodlandLightingEnabled?'☀ Sunlight: ON':'☾ Sunlight: OFF');
     woodlandLightingToggle.setAttribute('aria-pressed',String(woodlandLightingEnabled));
   }
-  woodlandDepthToggle.hidden=!anyPremiumActive()||premiumCryptActive();
+  woodlandDepthToggle.hidden=monasteryActive()||!anyPremiumActive()||premiumCryptActive();
   if(!woodlandDepthToggle.hidden){
     woodlandDepthToggle.textContent=premiumMineActive()?(woodlandDepthEnabled?'✨ Cave dust: ON':'✨ Cave dust: OFF'):(woodlandDepthEnabled?'🍃 Foreground: ON':'🍃 Foreground: OFF');
     woodlandDepthToggle.setAttribute('aria-pressed',String(woodlandDepthEnabled));
@@ -957,6 +961,7 @@ function render(){if(!state||!me)return;
     const label=isPremiumQuarryRoom(me.room)?(v2ArtEnabled?(premiumQuarryReady(me.room)?'⛏ Quest 4 quarry premium: ON':'⛏ Loading quarry artwork…'):'◇ Quest 4 quarry premium: OFF'):isPremiumGiantRoom(me.room)?(v2ArtEnabled?(premiumGiantReady(me.room)?'🌳 Quest 3 giant forest premium: ON':'🌳 Loading giantwood artwork…'):'◇ Quest 3 giantwood premium: OFF'):isPremiumMineRoom(me.room)?(v2ArtEnabled?(premiumMineReady(me.room)?'💎 Quest 2 mine premium: ON':'💎 Loading mine artwork…'):'◇ Quest 2 mine premium: OFF'):(v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF');
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }
+  if(monastery.has(me.room)&&v2ArtToggle)v2ArtToggle.textContent=v2ArtEnabled?(monastery.ready(me.room)?'Monastery art: ON':'Loading monastery art…'):'Monastery art: OFF';
   if(isPremiumCryptRoom(me.room)){
     if(v2ArtToggle)v2ArtToggle.textContent=v2ArtEnabled?(premiumCryptReady(me.room)?'✦ Quest 6 crypt art: ON':'Loading crypt artwork…'):'◇ Quest 6 crypt art: OFF';
     woodlandLightingToggle.textContent=woodlandLightingEnabled?'✦ Crypt light: ON':'◇ Crypt light: OFF';
@@ -977,13 +982,14 @@ function render(){if(!state||!me)return;
   // Visual-only terrain. Original DICEBOUND stone textures are coloured by
   // setting; the server remains authoritative for ALL wall coordinates.
   const terrain=wallTerrain(roomDef(me.room));
+  const monasteryPainted=monasteryActive()&&monastery.walls(ctx,s,me.room,state.roomWalls?.[me.room]||[]);
   const cryptConnectedPainted=premiumCryptActive()&&paintPremiumCryptWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const desertConnectedPainted=premiumDesertActive()&&paintPremiumDesertWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const woodlandConnectedPainted=premiumActive()&&paintPremiumWoodlandWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const mineConnectedPainted=premiumMineActive()&&paintPremiumMineConnectedWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   const quarryConnectedPainted=premiumQuarryActive()&&paintPremiumQuarryConnectedWalls(ctx,s,state.roomWalls?.[me.room]||[],me.room);
   if(premiumGiantActive())paintPremiumGiantWalls(ctx,s,me.room,state.roomWalls?.[me.room]||[]);
-  else if(!cryptConnectedPainted&&!desertConnectedPainted&&!woodlandConnectedPainted&&!mineConnectedPainted&&!quarryConnectedPainted)for(const [x,y] of state.roomWalls?.[me.room]||[]){
+  else if(!monasteryPainted&&!cryptConnectedPainted&&!desertConnectedPainted&&!woodlandConnectedPainted&&!mineConnectedPainted&&!quarryConnectedPainted)for(const [x,y] of state.roomWalls?.[me.room]||[]){
     if(premiumActive())paintPremiumWoodlandWall(ctx,s,x,y,me.room);
     else if(premiumMineActive())paintPremiumMineWall(ctx,s,x,y,me.room);
     else if(premiumQuarryActive())paintPremiumQuarryWall(ctx,s,x,y,me.room);
@@ -998,7 +1004,7 @@ function render(){if(!state||!me)return;
   else if(premiumMineActive())paintPremiumMineAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
   else if(premiumGiantActive())paintPremiumGiantAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
   else if(premiumQuarryActive())paintPremiumQuarryAtmosphere(ctx,s,me.room,performance.now(),!reducedMotion,woodlandLightingEnabled);
-  else if(artActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
+  else if(artActive()&&!monasteryActive()){paintV2Dressing(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});paintV2Light(ctx,s,state.roomWalls?.[me.room]||[],{roomId:me.room});}
   // Illustrated undergrowth tucks into existing obstacle footprints and is
   // rendered below all actors/targets, leaving the full battle state untouched.
   if(premiumActive()&&woodlandDepthEnabled)
@@ -1050,12 +1056,12 @@ function render(){if(!state||!me)return;
       active:a.kind!=='enemy'&&state.turn?.activePlayer===a.p.id,
       motion:!reducedMotion,timeMs:performance.now(),light:woodlandLightingEnabled,roomId:me.room
     };
-    const drew=integrated&&(premiumCryptActive()?paintPremiumCryptActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumDesertActive()?paintPremiumDesertActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumMineActive()?paintPremiumMineActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumGiantActive()?paintPremiumGiantActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumQuarryActive()?paintPremiumQuarryActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):paintPremiumWoodlandActor(ctx,s,a.p,a.kind,baseSprite,visualOptions));
+    const drew=integrated&&(monasteryActive()?monastery.actor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumCryptActive()?paintPremiumCryptActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumDesertActive()?paintPremiumDesertActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumMineActive()?paintPremiumMineActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumGiantActive()?paintPremiumGiantActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):premiumQuarryActive()?paintPremiumQuarryActor(ctx,s,a.p,a.kind,baseSprite,visualOptions):paintPremiumWoodlandActor(ctx,s,a.p,a.kind,baseSprite,visualOptions));
     if(!drew)iconAt(s,a.p,a.kind,s.iso?Math.max(medium?15:23,s.cell*(medium?.76:1.15)):Math.max(medium?15:28,s.cell*(medium?.82:.75)));
   }
   // Foreground passes run AFTER the units. Painted canopy silhouettes sit at
   // the board rim; their opacity falls away near heroes/enemies and labels.
-  if(anyPremiumActive()&&!premiumDesertActive()&&!premiumCryptActive()){
+  if(anyPremiumActive()&&!monasteryActive()&&!premiumDesertActive()&&!premiumCryptActive()){
     if(woodlandDepthEnabled){
       const movement=!reducedMotion;
       const timestamp=performance.now();

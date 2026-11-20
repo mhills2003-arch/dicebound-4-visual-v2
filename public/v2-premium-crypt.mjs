@@ -4,7 +4,8 @@ import {CRYPT_SPRITE_CROPS} from './v2-crypt-sprite-crops.mjs';
 const base='./assets/premium-crypt/';
 export const CRYPT_FILES=Object.freeze({
   floor:base+'crypt-floor-r1.webp', moor:base+'graveyard-floor-r1.webp',
-  masonry:base+'crypt-masonry-r1.webp', tomb:base+'sarcophagus-r1.webp',
+  features:base+'crypt-architecture-r2.webp', tomb:base+'sarcophagus-r1.webp',
+  coffins:base+'crypt-coffins-r3.webp', rubble:base+'crypt-rubble-r3.webp',
   ghost:base+'ghost-atlas-r1.webp', zombie:base+'zombie-atlas-r1.webp',
   teleporter:base+'teleporter-atlas-r1.webp', normal:base+'sentinel-atlas-r1.webp',
   boss:base+'drowned-boss-r1.webp'
@@ -20,7 +21,7 @@ export function initPremiumCrypt(ImageCtor=globalThis.Image,roomId='q6r3'){
     const im=new ImageCtor();im.decoding='async';im.src=path;art[key]=im;
   }
 }
-export const premiumCryptReady=id=>isPremiumCryptRoom(id)&&ready(floorKey(id))&&ready('masonry');
+export const premiumCryptReady=id=>isPremiumCryptRoom(id)&&ready(floorKey(id))&&(ready('rubble')||ready('features'));
 export function cryptSprite(p){
   if(p.variant==='boss')return {key:'boss',col:0,row:0,cols:1,rows:1};
   const key=['ghost','zombie','teleporter'].includes(p.role)?p.role:'normal';
@@ -60,55 +61,154 @@ export function cryptWallEdges(walls){
     if(!set.has(keyOf(x+dx,y+dy)))edges.push({x,y,side});
   return edges;
 }
-function wallMask(ctx,s,walls){
-  const c=s.cell,set=new Set(walls.map(p=>p.join(','))),inset=.025*c;ctx.beginPath();
-  for(const[x,y]of walls){
-    const l=set.has(keyOf(x-1,y))?0:inset,r=set.has(keyOf(x+1,y))?0:inset;
-    const t=set.has(keyOf(x,y-1))?0:inset,b=set.has(keyOf(x,y+1))?0:inset;
-    ctx.rect(s.originX+x*c+l,s.originY+y*c+t,c-l-r,c-t-b);
+// Obstacles are placed directly on the floor. Their transparent silhouettes
+// define the visible obstruction; each descriptor covers its collision cells.
+const obstacleSizes={
+  coffin:[2,1], 'coffin-broken':[2,1], grave:[1,2], font:[1,1],
+  rubble:[2,2], 'rubble-alt':[2,2], bank:[2,1], 'bank-vertical':[1,2], stones:[1,1]
+};
+const obstaclePlans={
+  q6r1:[
+    ['rubble',3,0], ['bank',3,2], ['coffin',7,0],
+    ['bank',7,1], ['grave',10,1], ['grave',11,1],
+    ['bank',10,3], ['rubble-alt',6,3], ['rubble-alt',2,7],
+    ['font',4,7], ['stones',4,8], ['coffin-broken',9,7],
+    ['bank',9,8]
+  ],
+  q6r2:[
+    ['grave',3,0], ['grave',4,0], ['bank',3,2],
+    ['coffin',7,0], ['coffin-broken',7,1], ['rubble',10,0],
+    ['font',7,4], ['stones',8,4], ['coffin',7,5],
+    ['rubble-alt',10,6], ['bank',10,8], ['coffin-broken',3,7],
+    ['coffin',3,8], ['grave',7,7], ['grave',8,7]
+  ],
+  q6r3:[
+    ['rubble',1,0], ['coffin',3,0], ['bank',3,1],
+    ['rubble-alt',3,2], ['coffin-broken',3,4], ['font',3,5],
+    ['stones',4,5], ['rubble-alt',8,3], ['coffin',8,5],
+    ['font',8,6], ['stones',9,6], ['bank',8,7],
+    ['coffin-broken',8,8], ['rubble',10,7]
+  ],
+  q6r4:[
+    ['rubble-alt',2,0], ['coffin-broken',2,2], ['bank',8,0],
+    ['coffin',10,0], ['bank',8,1], ['font',10,1],
+    ['stones',11,1], ['font',11,2], ['font',5,2],
+    ['stones',5,3], ['bank-vertical',5,4], ['grave',9,5],
+    ['stones',8,7], ['font',9,7], ['coffin-broken',8,8],
+    ['rubble',0,7], ['font',2,7], ['stones',2,8]
+  ],
+  q6r5:[
+    ['coffin',1,0], ['bank',1,1], ['grave',7,0],
+    ['grave',8,0], ['bank',7,2], ['rubble',10,1],
+    ['rubble-alt',3,2], ['coffin-broken',3,4], ['rubble-alt',7,5],
+    ['coffin',7,7], ['coffin-broken',7,8], ['rubble',2,7],
+    ['font',4,7], ['stones',4,8]
+  ],
+  q6r6:[
+    ['rubble',3,0], ['grave',3,2], ['bank-vertical',4,2],
+    ['coffin-broken',3,4], ['coffin',6,0], ['font',6,1],
+    ['stones',7,1], ['font',11,0], ['stones',10,1],
+    ['font',11,1], ['stones',11,2], ['rubble-alt',7,4],
+    ['font',7,6], ['stones',8,6], ['rubble',7,7],
+    ['coffin-broken',2,7], ['bank',2,8]
+  ],
+  q6r7:[
+    ['rubble',1,0], ['font',3,0], ['stones',3,1],
+    ['bank-vertical',3,2], ['grave',3,4], ['rubble-alt',9,0],
+    ['font',11,0], ['stones',11,1], ['bank-vertical',9,2],
+    ['font',9,4], ['stones',9,5], ['font',6,3],
+    ['stones',6,4], ['bank-vertical',6,5], ['grave',6,7],
+    ['coffin-broken',9,8], ['bank',11,8]
+  ],
+  q6r8:[
+    ['rubble',1,0], ['font',3,1], ['coffin-broken',2,2],
+    ['coffin',6,0], ['rubble-alt',8,0], ['font',10,0],
+    ['stones',10,1], ['coffin',6,3], ['coffin-broken',6,4],
+    ['grave',2,6], ['font',3,6], ['stones',3,7],
+    ['coffin',2,8], ['rubble',10,6], ['coffin-broken',10,8]
+  ],
+};
+export function cryptObstaclePlan(id,walls=Q6_LAYOUTS[id]?.walls||[]){
+  const wallSet=new Set(walls.map(cell=>cell.join(',')));
+  const covered=new Set();
+  const plan=[];
+  for(const [kind,x,y] of obstaclePlans[id]||[]){
+    const [width,height]=obstacleSizes[kind];
+    const cells=[];
+    for(let row=0;row<height;row++)for(let col=0;col<width;col++){
+      cells.push(keyOf(x+col,y+row));
+    }
+    if(!cells.every(cell=>wallSet.has(cell)))continue;
+    for(const cell of cells)covered.add(cell);
+    plan.push({kind,x,y,width,height});
   }
+  // A changed or older wall list still receives an object on each blocked cell.
+  for(const [x,y] of walls){
+    if(!covered.has(keyOf(x,y)))plan.push({kind:'stones',x,y,width:1,height:1});
+  }
+  return plan;
+}
+const obstacleCrops={
+  'coffin':[265,41,1001,425],
+  'coffin-broken':[302,602,934,399],
+  'rubble':[59,17,632,594],
+  'rubble-alt':[852,32,603,545],
+  'bank':[31,660,821,333],
+  'stones':[1013,666,325,320],
+};
+const fontCrop=[974,105,356,530];
+const oldRubbleCrop=[1421,157,738,467];
+
+function obstacleSprite(kind){
+  if(kind==='font'&&ready('features'))return {key:'features',crop:fontCrop};
+  if(kind==='grave'&&ready('tomb')){
+    return {key:'tomb',crop:[0,0,art.tomb.naturalWidth,art.tomb.naturalHeight]};
+  }
+  const key=kind.startsWith('coffin')?'coffins':'rubble';
+  const crop=obstacleCrops[kind==='bank-vertical'?'bank':kind];
+  if(crop&&ready(key))return {key,crop,vertical:kind==='bank-vertical'};
+  if(ready('rubble'))return {key:'rubble',crop:obstacleCrops.stones};
+  if(ready('features'))return {key:'features',crop:oldRubbleCrop};
+  return null;
+}
+function drawObstacle(ctx,obstacle){
+  const {kind,x,y,width,height}=obstacle;
+  const sprite=obstacleSprite(kind);
+  if(!sprite)return;
+  const [sx,sy,sw,sh]=sprite.crop;
+  const variation=((x*17+y*13)%7-3);
+  const tilt=kind.startsWith('coffin')?variation*.018:0;
+  const angle=(sprite.vertical?Math.PI/2:0)+tilt;
+  const maxWidth=width-.045,maxHeight=height-.045;
+  const cosine=Math.abs(Math.cos(angle)),sine=Math.abs(Math.sin(angle));
+  const sourceWidth=sw*cosine+sh*sine,sourceHeight=sw*sine+sh*cosine;
+  const scale=Math.min(maxWidth/sourceWidth,maxHeight/sourceHeight);
+  const drawWidth=sw*scale,drawHeight=sh*scale;
+  ctx.save();
+  ctx.translate(x+width/2,y+height/2);
+  if(angle)ctx.rotate(angle);
+  ctx.drawImage(art[sprite.key],sx,sy,sw,sh,-drawWidth/2,-drawHeight/2,drawWidth,drawHeight);
+  ctx.restore();
 }
 function drawWalls(ctx,s,walls,id){
-  const c=s.cell,x0=s.originX,y0=s.originY;ctx.save();wallMask(ctx,s,walls);ctx.clip();
-  // A continuous material crosses tile boundaries; only exposed edges receive bevels.
-  const tile=3.7*c;
-  for(let y=0;y<9*c;y+=tile)for(let x=0;x<13*c;x+=tile)ctx.drawImage(art.masonry,x0+x,y0+y,tile,tile);
-  for(const {x,y,side}of cryptWallEdges(walls)){
-    const X=x0+x*c,Y=y0+y*c;
-    if(side==='south'){
-      const g=ctx.createLinearGradient(0,Y+c*.69,0,Y+c);g.addColorStop(0,'rgba(1,9,14,.17)');g.addColorStop(1,'rgba(1,8,12,.86)');
-      ctx.fillStyle=g;ctx.fillRect(X,Y+c*.70,c,c*.30);
-      ctx.strokeStyle='rgba(6,14,18,.30)';ctx.lineWidth=c*.018;ctx.beginPath();ctx.moveTo(X,Y+c*.86);ctx.lineTo(X+c,Y+c*.86);ctx.stroke();
-    }else if(side==='east'){
-      const g=ctx.createLinearGradient(X+c*.80,0,X+c,0);g.addColorStop(0,'rgba(2,13,17,0)');g.addColorStop(1,'rgba(2,13,17,.55)');ctx.fillStyle=g;ctx.fillRect(X+c*.80,Y,c*.20,c);
-    }else{
-      ctx.strokeStyle='rgba(199,215,205,.44)';ctx.lineWidth=Math.max(.7,c*.018);ctx.beginPath();
-      if(side==='north'){ctx.moveTo(X,Y+c*.04);ctx.lineTo(X+c,Y+c*.04);}
-      else{ctx.moveTo(X+c*.04,Y);ctx.lineTo(X+c*.04,Y+c);}ctx.stroke();
-    }
-  }
-  if(ready('tomb')&&['q6r1','q6r2','q6r5','q6r8'].includes(id)){
-    for(const f of Q6_LAYOUTS[id].formations){
-      const xs=f.cells.map(p=>p[0]),ys=f.cells.map(p=>p[1]);
-      const x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x+1,h=Math.max(...ys)-y+1;
-      if(w<2||h<2)continue;
-      const width=Math.min(w,2)*c*.74,height=Math.min(h,3)*c*.78;
-      ctx.drawImage(art.tomb,x0+(x+w/2)*c-width/2,y0+(y+h/2)*c-height/2-c*.06,width,height);
-    }
-  }
+  ctx.save();ctx.translate(s.originX,s.originY);ctx.scale(s.cell,s.cell);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  // Lower objects render later so overlapping loose fragments keep their depth.
+  const obstacles=cryptObstaclePlan(id,walls).sort((a,b)=>(a.y+a.height)-(b.y+b.height));
+  for(const obstacle of obstacles)drawObstacle(ctx,obstacle);
   ctx.restore();
 }
 export function paintPremiumCryptWalls(ctx,s,walls,id){
   if(!premiumCryptReady(id)||s.iso)return false;
   const ratio=Math.min(2,Math.max(1,ctx.getTransform?.().a||1));
-  const key=`${id}:${s.cell}:${ratio}:${ready('tomb')}:${walls.map(p=>p.join(',')).join(';')}`;
+  const key=`${id}:${s.cell}:${ratio}:${ready('tomb')}:${ready('coffins')}:${ready('rubble')}:${ready('features')}:${walls.map(p=>p.join(',')).join(';')}`;
   if(typeof OffscreenCanvas==='undefined'){drawWalls(ctx,s,walls,id);return true;}
   let layer=layers.get(key);
   if(!layer){
     const physical=new OffscreenCanvas(Math.ceil(13*s.cell*ratio),Math.ceil(9*s.cell*ratio));
     const brush=physical.getContext('2d');brush.scale(ratio,ratio);drawWalls(brush,{...s,originX:0,originY:0},walls,id);
     layer=new OffscreenCanvas(physical.width,physical.height);const out=layer.getContext('2d');
-    out.shadowColor='rgba(0,8,13,.82)';out.shadowBlur=s.cell*ratio*.14;out.shadowOffsetX=s.cell*ratio*.07;out.shadowOffsetY=s.cell*ratio*.13;out.drawImage(physical,0,0);
+    out.shadowColor='rgba(0,8,13,.72)';out.shadowBlur=s.cell*ratio*.075;out.shadowOffsetX=s.cell*ratio*.025;out.shadowOffsetY=s.cell*ratio*.06;out.drawImage(physical,0,0);
     layers.set(key,layer);while(layers.size>4)layers.delete(layers.keys().next().value);
   }
   ctx.drawImage(layer,s.originX,s.originY,layer.width/ratio,layer.height/ratio);return true;

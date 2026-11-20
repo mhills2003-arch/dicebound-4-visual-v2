@@ -1,3 +1,4 @@
+import {Q6_LAYOUTS} from '../public/v2-quest6-layouts.mjs';
 import {Q5_ROOMS} from '../public/v2-quest5-layouts.mjs';
 import {DUNE_FOES} from '../public/v2-rushing-dunes-layout.mjs';
 import {PLAYABLE_QUESTS} from './campaign.mjs';
@@ -413,6 +414,8 @@ for (const [id, plan] of Object.entries(Q5_ROOMS)) {
 }
 // Every post-tutorial room has its own terrain, encounter formation and tactical hook.
 for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHALLENGES}))Object.assign(ROOM_DATA[room],plan);
+// Authored Q6 start positions preserve the existing encounter roster.
+for(const [id,plan] of Object.entries(Q6_LAYOUTS))ROOM_DATA[id].spawnPositions=plan.spawnPositions;
 ROOM_DATA.camp={name:'Adventurers’ Camp',subtitle:'Quest board, supplies and the travelling merchant',left:null,right:null,encounter:[],foes:[],quest:0,final:false,stageTwo:false};
 export const ROOM_IDS=Object.keys(ROOM_DATA);
 export const WIDTH=9,HEIGHT=7,ROUND_MS=60_000; // Base rooms stay 9 × 7.
@@ -469,6 +472,7 @@ const WALL_LAYOUTS={
 // Hand-authored room-by-room designs replace the repetitive four-template maze
 // generator. Their terrain must be stable on reload and identical across clients.
 for(const [id,rows] of Object.entries({...ROOM_BLUEPRINTS,...MEDIUM_BRIDGE_BLUEPRINTS,...HARD_BLUEPRINTS,...EXTREME_BLUEPRINTS}))WALL_LAYOUTS[id]=rows;
+for(const [id,plan] of Object.entries(Q6_LAYOUTS))WALL_LAYOUTS[id]=plan.blueprint;
 export const ROOM_WALLS=Object.fromEntries(Object.entries(WALL_LAYOUTS).map(([room,rows])=>[
   room, rows.flatMap((row,y)=>[...row].flatMap((tile,x)=>tile==='#'?[[x,y]]:[]))
 ]));

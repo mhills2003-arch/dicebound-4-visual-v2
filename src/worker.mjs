@@ -1,5 +1,6 @@
 import {ensureMineTrialPlayer} from './mine-trial.mjs';
 import {ensureCaravanTrialPlayer} from './caravan-trial.mjs';
+import {ensureCryptTrialPlayer} from './crypt-trial.mjs';
 import { DurableObject } from 'cloudflare:workers';
 import {createMaze,joinMaze,leaveMaze,mazeTravel,mazeSearch,mazeClaim,mazeBonus,mazeAction,mazeRetreat,mazeReward,mazeVoteAbandon,mazeTick,nextMazeDeadline,mazePublic,resumeMazeClock} from './maze-play.mjs';
 import {ensureChat,chatForViewer,postChat,togglePersonalMute,reportChat,toggleAdminMute} from './chat.mjs';
@@ -8,6 +9,7 @@ import {freshState,ensurePlayer,markDisconnected,move,submitAction,claimLoot,res
 const ROOT='/dicebound-v2';
 const COOKIE='db4_v2_session';
 const trialWorlds = new Map([
+  ...[1,2,3,4,5,6,7,8].map(n=>['crypt-q6-r'+n,'quest-v2-crypt-q6-r'+n]),
   ...[1,2,3,4,5].map(n=>['mine-q2-r'+n,'quest-v2-mine-q2-r'+n]),
   ['balance-v9', 'quest-v9-balance-trial'],
   ['caravan-q5-r1', 'quest-v2-caravan-q5-r1'],
@@ -85,7 +87,10 @@ export default {
         ...['ruin-horizontal','ruin-vertical','ruin-corner-south','ruin-corner-north','ruin-step','hollow-root-bank']
           .map(name=>['giant-'+name,'/assets/premium-giantwood/'+name+'-walls-r1.webp']),
         ...['ridge-ground','caravan-ground','crossing-ground','shieldwall-ground','smuggler-ground','toll-ground','toll-boss-d16']
-          .map(name => [name, '/assets/premium-desert/q5-' + name + '-r1.webp'])
+          .map(name => [name, '/assets/premium-desert/q5-' + name + '-r1.webp']),
+        ...['crypt-floor','graveyard-floor','crypt-masonry','sarcophagus','ghost-atlas','zombie-atlas','teleporter-atlas','sentinel-atlas','drowned-boss']
+          .map(name=>['crypt-'+name,'/assets/premium-crypt/'+name+'-r1.webp']),
+        ['crypt-renderer','/v2-premium-crypt.mjs'], ['crypt-layouts','/v2-quest6-layouts.mjs'], ['crypt-crops','/v2-crypt-sprite-crops.mjs']
       ];
       const checks = await Promise.all(assets.map(async ([name, path]) => {
         try {
@@ -95,10 +100,11 @@ export default {
       }));
       const ready = checks.every(check => check.status === 200)
         && checks[0].body.includes('id="cinematicQ5Room"')
-        && checks[0].body.includes('v2-q3-walls-20261114-r1')
+        && checks[0].body.includes('v2-q6-art-20261115-r1')
+        && checks[1].body.includes('v2-premium-crypt.mjs?build=v2-q6-art-20261115-r1')
         && checks[1].body.includes('v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1')
         && checks[1].body.includes('initPremiumDesert') && checks[2].body.includes('.cin-room');
-      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q3-walls-20261114-r1',
+      return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q6-art-20261115-r1',
         cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }
@@ -159,6 +165,7 @@ export class GameRoom extends DurableObject {
       const startRoom=trial==='caravan-q5-r1'?'q5r1':trial==='rushing-dunes-q5-r2'?'q5r2':'q5r'+trial.slice(-1);
       ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),startRoom);
     }
+    else if(/^crypt-q6-r[1-8]$/.test(trial||''))ensureCryptTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q6r'+trial.slice(-1));
     else if(/^mine-q2-r[1-5]$/.test(trial||''))ensureMineTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q2r'+trial.slice(-1));
     else ensurePlayer(this.game,id,req.headers.get('x-dicebound-name'),null);
     resumeMazeClock(this.game,id);
@@ -251,11 +258,16 @@ export class GameRoom extends DurableObject {
       else if(packet.type==='potion')result=this.game.rooms[this.game.players[id].room].battle.status==='active' ? submitSequentialAction(this.game,id,{type:'potion',target:packet.target||id}) : usePotion(this.game,id,packet.target);
       else if(packet.type==='reset-lab'){
         if(id!=='one')throw new Error('Only Player One can reset this technical test adventure');
+        const cryptTrial=this.game.cryptTrial,cryptStart=this.game.cryptTrialRoom||'q6r3';
         const mineTrial=this.game.mineTrial;
         const mineStart=this.game.mineTrialRoom||'q2r1';
         const caravanTrial=this.game.caravanTrial;
         const startRoom=this.game.caravanTrialRoom||'q5r1';
         this.game=resetTestAdventure(this.game);
+        if(cryptTrial){
+          this.game.cryptTrial=true;this.game.cryptTrialRoom=cryptStart;
+          for(const player of Object.values(this.game.players))if(player.connected)ensureCryptTrialPlayer(this.game,player.id,player.name,cryptStart);
+        }
         if(caravanTrial){
           this.game.caravanTrial=true;
           this.game.caravanTrialRoom=startRoom;

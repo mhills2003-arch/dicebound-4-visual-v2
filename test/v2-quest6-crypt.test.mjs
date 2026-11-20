@@ -4,7 +4,7 @@ import {readFileSync,existsSync} from 'node:fs';
 import {Q6_LAYOUTS} from '../public/v2-quest6-layouts.mjs';
 import {ROOM_DATA,ROOM_WALLS,freshState,ensurePlayer,resetTestAdventure,enterQuest,isWall} from '../src/engine.mjs';
 import {ensureCryptTrialPlayer} from '../src/crypt-trial.mjs';
-import {CRYPT_FILES,cryptSprite,cryptWallEdges,isPremiumCryptRoom,initPremiumCrypt,premiumCryptReady,paintPremiumCryptActor} from '../public/v2-premium-crypt.mjs';
+import {CRYPT_FILES,cryptSprite,cryptWallEdges,cryptObstaclePlan,isPremiumCryptRoom,initPremiumCrypt,premiumCryptReady,paintPremiumCryptActor} from '../public/v2-premium-crypt.mjs';
 import {CRYPT_SPRITE_CROPS} from '../public/v2-crypt-sprite-crops.mjs';
 const approved=JSON.parse(readFileSync(new URL('../design/quest6/layouts-r1.json',import.meta.url),'utf8'));
 
@@ -79,4 +79,27 @@ test('Q6 trials support four entrants, preserve reconnect progress and reset int
   }
   const ordinary=freshState();assert.equal(ordinary.unlockedQuest,1);assert(!ordinary.cryptTrial);
   for(const invalid of ['q6r9','q5r3','camp','q6r1;reset'])assert.throws(()=>ensureCryptTrialPlayer(freshState(),'one','Tester',invalid),/Unknown/);
+});
+
+test('Q6 objects cover the blocked cells exactly with coffins on two cells and fonts on one',()=>{
+  for(const room of approved.rooms){
+    const cells=[];
+    for(const {kind,x,y,width,height} of cryptObstaclePlan(room.id)){
+      if(kind.startsWith('coffin'))assert.deepEqual([width,height],[2,1]);
+      if(kind==='font')assert.deepEqual([width,height],[1,1]);
+      for(let dy=0;dy<height;dy++)for(let dx=0;dx<width;dx++)cells.push(`${x+dx},${y+dy}`);
+    }
+    assert.equal(cells.length,new Set(cells).size,'objects must not claim the same cell');
+    assert.deepEqual(new Set(cells),new Set(room.walls.map(cell=>cell.join(','))));
+  }
+});
+test('Q6 obstacle art reconciles changed wall footprints without filling an open cell',()=>{
+  const walls=Q6_LAYOUTS.q6r8.walls.filter(([x,y])=>x!==1||y!==0);
+  walls.push([0,0]);
+  const cells=[];
+  for(const {x,y,width,height} of cryptObstaclePlan('q6r8',walls)){
+    for(let dy=0;dy<height;dy++)for(let dx=0;dx<width;dx++)cells.push(`${x+dx},${y+dy}`);
+  }
+  assert.equal(cells.length,new Set(cells).size);
+  assert.deepEqual(new Set(cells),new Set(walls.map(cell=>cell.join(','))));
 });

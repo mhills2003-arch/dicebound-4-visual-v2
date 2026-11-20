@@ -1,0 +1,76 @@
+{
+  "build": "v2-q6-art-20261115-r1",
+  "verifiedDate": "2026-11-20",
+  "baseline": "DICEBOUND_V2_Q3_WALLS_R1_DEPLOY.zip",
+  "baselineZipSha256": "c8a8b2eed973680a2cc8ab358018b5d80976371b1166c36b29aa15e6ca6e2e5c",
+  "otherRoomsUnchanged": 126,
+  "originalAssetsUnchanged": 234,
+  "allRostersUnchanged": true,
+  "combatAndProgressionUnchanged": true,
+  "workerConfigurationUnchanged": true,
+  "rooms": [
+    {
+      "id": "q6r1",
+      "walls": 30,
+      "enemies": 6,
+      "doorSteps": 14,
+      "largeSteps": 13
+    },
+    {
+      "id": "q6r2",
+      "walls": 32,
+      "enemies": 6,
+      "doorSteps": 14,
+      "largeSteps": 13
+    },
+    {
+      "id": "q6r3",
+      "walls": 32,
+      "enemies": 6,
+      "doorSteps": 20,
+      "largeSteps": 20
+    },
+    {
+      "id": "q6r4",
+      "walls": 31,
+      "enemies": 6,
+      "doorSteps": 16,
+      "largeSteps": 16
+    },
+    {
+      "id": "q6r5",
+      "walls": 34,
+      "enemies": 7,
+      "doorSteps": 14,
+      "largeSteps": 14
+    },
+    {
+      "id": "q6r6",
+      "walls": 32,
+      "enemies": 7,
+      "doorSteps": 16,
+      "largeSteps": 16
+    },
+    {
+      "id": "q6r7",
+      "walls": 30,
+      "enemies": 7,
+      "doorSteps": 24,
+      "largeSteps": 25
+    },
+    {
+      "id": "q6r8",
+      "walls": 31,
+      "enemies": 8,
+      "doorSteps": 14,
+      "largeSteps": 13
+    }
+  ],
+  "automatedTests": 453,
+  "playthroughSeeds": [
+    101,
+    202,
+    303
+  ],
+  "liveDeployed": false
+}

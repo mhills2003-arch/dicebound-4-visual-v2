@@ -1,0 +1,113 @@
+{
+  "method": "Built-in image generation; exact original artwork recovered from saved source images. Full-image WebP encoding only; no compositional changes.",
+  "assets": [
+    {
+      "file": "crypt-floor-r1.webp",
+      "sourceName": "Flooded Crypt Stone Floor.png",
+      "sourceLibraryId": "libfile_247cd4e332a0819197d3dfd20fd09533",
+      "mode": "RGB",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 556882,
+      "sha256": "c20467cd0527f0e705545fefd0e69cca8cd2b3a1141e0bf5e94712045016ad10"
+    },
+    {
+      "file": "crypt-masonry-r1.webp",
+      "sourceName": "Weathered Limestone Crypt Masonry.png",
+      "sourceLibraryId": "libfile_d33ff01e03488191b1615c0ac24ac333",
+      "mode": "RGB",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 582194,
+      "sha256": "50f2eccf9f00c089218661c6b5b96f3902c074c06750e64675d9b253be3fc4a6"
+    },
+    {
+      "file": "ghost-atlas-r1.webp",
+      "sourceName": "Spectral Dice Monster Quartet.png",
+      "sourceLibraryId": "libfile_4e41de0ffe588191998b9255c5b6ee81",
+      "mode": "RGBA",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 301976,
+      "sha256": "c693c87b366fb715918d996fbf132e79e3f95b634272fc39b548d2d80fd9eb3e"
+    },
+    {
+      "file": "zombie-atlas-r1.webp",
+      "sourceName": "Resurrected dice monsters sprite atlas.png",
+      "sourceLibraryId": "libfile_9332563075b8819180edabc6c8f61b7d",
+      "mode": "RGBA",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 582692,
+      "sha256": "530720ae6502b92a7a6e902a9d4826fbbf922ab59e0a0869bbd1eb13b8ec6207"
+    },
+    {
+      "file": "teleporter-atlas-r1.webp",
+      "sourceName": "Arcane polyhedral dice monster atlas.png",
+      "sourceLibraryId": "libfile_7d7483bacfc88191bf8b8104ae16cb28",
+      "mode": "RGBA",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 662228,
+      "sha256": "1ba92b85b9c372dc058635dda065f1945b9777731f0e0d83186c55d7909fbdf9"
+    },
+    {
+      "file": "sentinel-atlas-r1.webp",
+      "sourceName": "Twin Graveyard Dice Sentinels.png",
+      "sourceLibraryId": "libfile_52905725cf508191ab963e20fbf5f3d9",
+      "mode": "RGBA",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 295176,
+      "sha256": "cbb16c3760c9a384840b69487bfbdaa0354fba1bfac842418064c842f1af24b8"
+    },
+    {
+      "file": "drowned-boss-r1.webp",
+      "sourceName": "The Drowned Mausoleum's D20 Guardian.png",
+      "sourceLibraryId": "libfile_22419fcbf508819192f97e43f125b7d1",
+      "mode": "RGBA",
+      "dimensions": [
+        1312,
+        1199
+      ],
+      "bytes": 447246,
+      "sha256": "32fca31552b3bdd7b481a5e1dd39b206da8506dc2e57ec5118fd1bcfc936cd2b"
+    },
+    {
+      "file": "graveyard-floor-r1.webp",
+      "sourceName": "Mossy Haunted Graveyard Flagstone Causeway.png",
+      "sourceLibraryId": "libfile_9ae1e3e53ae08191bf67441667ea9d24",
+      "mode": "RGB",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 561124,
+      "sha256": "14ab278024bb4b32d6794195b1c9a6262d974b0d4e87182eb27f5560f80a4881"
+    },
+    {
+      "file": "sarcophagus-r1.webp",
+      "sourceName": "Weathered Limestone Sarcophagus.png",
+      "sourceLibraryId": "libfile_4750f0945a708191ab95faa176ad5bd2",
+      "mode": "RGBA",
+      "dimensions": [
+        934,
+        1685
+      ],
+      "bytes": 462998,
+      "sha256": "6f7d419d345cb62e2041eb14a59f863d218a04db451c576094a8f79ac68de17c"
+    }
+  ]
+}

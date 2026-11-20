@@ -1,0 +1,5636 @@
+{
+  "title": "DICEBOUND \u2014 Quest 6: Ghost of a Chance",
+  "version": "Dungeon design R1",
+  "date": "2026-11-15",
+  "status": "Implemented in Quest 6 art R1 deployment package",
+  "baseline": "DICEBOUND_V2_Q3_WALLS_R1_DEPLOY.zip",
+  "coordinates": "Zero-based x,y in data; columns A\u2013M and rows 1\u20139 in the viewer. A5 is the west doorway and M5 the east doorway.",
+  "rules": {
+    "grid": [
+      13,
+      9
+    ],
+    "wallDensityPercent": [
+      25,
+      30
+    ],
+    "blockedSquares": [
+      30,
+      35
+    ],
+    "enemyCounts": "Existing six, six, six, six, seven, seven, seven and eight. No roster or stat changes.",
+    "normalMovement": "Orthogonal movement; solid wall cells blocked.",
+    "ghosts": "Current engine ignores wall collision while moving, including intermediate turn positions inside walls. No floor-only stopping rule is assumed.",
+    "teleporters": "Every third enemy phase; at most four Manhattan squares; valid unoccupied landing; no attack in the blink phase.",
+    "zombies": "After the first defeat, remain inert for one complete enemy phase; then revive once at 50% HP.",
+    "boss": "Existing D20 boss is mechanically 1\u00d71.",
+    "water": "Shallow water is cosmetic walkable floor; no new hazard or movement cost.",
+    "art": "Use the same wall cell data for collision and image placement. Whole connected formations, natural alpha edges, coherent material/camera/light, no separate square outlines. Raised art stays within blocked footprints; shadows can soften onto floor."
+  },
+  "rooms": [
+    {
+      "id": "q6r1",
+      "number": "6-1",
+      "name": "Misty Causeway",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          10,
+          8
+        ]
+      ],
+      "blueprint": [
+        "...##..##....",
+        "...##..##.##.",
+        "...##.....##.",
+        "......##..##.",
+        "......##.....",
+        ".............",
+        ".............",
+        "..###....##..",
+        "..###....##.."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "West grave bank",
+          "cells": [
+            [
+              3,
+              0
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "bounds": [
+            3,
+            0,
+            5,
+            3
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "Northern tombs",
+          "cells": [
+            [
+              7,
+              0
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              1
+            ]
+          ],
+          "bounds": [
+            7,
+            0,
+            9,
+            2
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "Chapel remnant",
+          "cells": [
+            [
+              10,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              10,
+              2
+            ],
+            [
+              11,
+              2
+            ],
+            [
+              10,
+              3
+            ],
+            [
+              11,
+              3
+            ]
+          ],
+          "bounds": [
+            10,
+            1,
+            12,
+            4
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "Broken causeway pier",
+          "cells": [
+            [
+              6,
+              3
+            ],
+            [
+              7,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "bounds": [
+            6,
+            3,
+            8,
+            5
+          ]
+        },
+        {
+          "id": "formation-5",
+          "name": "Southern burial bank",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              8
+            ]
+          ],
+          "bounds": [
+            2,
+            7,
+            5,
+            9
+          ]
+        },
+        {
+          "id": "formation-6",
+          "name": "East sunken tombs",
+          "cells": [
+            [
+              9,
+              7
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              10,
+              8
+            ]
+          ],
+          "bounds": [
+            9,
+            7,
+            11,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r1-enemy-1",
+          "index": 0,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 8,
+          "y": 4
+        },
+        {
+          "id": "q6r1-enemy-2",
+          "index": 1,
+          "faces": 6,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 5,
+          "y": 5
+        },
+        {
+          "id": "q6r1-enemy-3",
+          "index": 2,
+          "faces": 8,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 9,
+          "y": 3
+        },
+        {
+          "id": "q6r1-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "normal",
+          "x": 10,
+          "y": 5
+        },
+        {
+          "id": "q6r1-enemy-5",
+          "index": 4,
+          "faces": 8,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 7,
+          "y": 6
+        },
+        {
+          "id": "q6r1-enemy-6",
+          "index": 5,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 11,
+          "y": 4
+        }
+      ],
+      "spawnPositions": [
+        [
+          8,
+          4
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "design": {
+        "idea": "A broken causeway with a short southern turn and a longer northern flank.",
+        "play": "The front zombie draws the party toward the broken pier. Keep a route around the pier so a revival does not pin the rear player against it.",
+        "threat": "Three zombies return once; ordinary dice advance through the same openings as the party.",
+        "art": "Water-darkened causeway stone, raised burial banks and a broken bridge pier. Shallow reflective floor remains walkable."
+      },
+      "metrics": {
+        "walls": 30,
+        "floor": 87,
+        "reachable": 87,
+        "door_steps": 14,
+        "large_steps": 13,
+        "blockedPercent": 25.6,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 36
+    },
+    {
+      "id": "q6r2",
+      "number": "6-2",
+      "name": "Graves That Stir",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          10,
+          0
+        ],
+        [
+          11,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          11,
+          7
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          11,
+          8
+        ]
+      ],
+      "blueprint": [
+        "...##..##.##.",
+        "...##..##.##.",
+        "...##........",
+        ".............",
+        ".......##....",
+        ".......##....",
+        "..........##.",
+        "...##..##.##.",
+        "...##..##.##."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "Western tomb island",
+          "cells": [
+            [
+              3,
+              0
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "bounds": [
+            3,
+            0,
+            5,
+            3
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "Northern tomb island",
+          "cells": [
+            [
+              7,
+              0
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              1
+            ]
+          ],
+          "bounds": [
+            7,
+            0,
+            9,
+            2
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "Eastern tomb island",
+          "cells": [
+            [
+              10,
+              0
+            ],
+            [
+              11,
+              0
+            ],
+            [
+              10,
+              1
+            ],
+            [
+              11,
+              1
+            ]
+          ],
+          "bounds": [
+            10,
+            0,
+            12,
+            2
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "Centre grave island",
+          "cells": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              7,
+              5
+            ],
+            [
+              8,
+              5
+            ]
+          ],
+          "bounds": [
+            7,
+            4,
+            9,
+            6
+          ]
+        },
+        {
+          "id": "formation-5",
+          "name": "Southeast tombs",
+          "cells": [
+            [
+              10,
+              6
+            ],
+            [
+              11,
+              6
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              11,
+              7
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              11,
+              8
+            ]
+          ],
+          "bounds": [
+            10,
+            6,
+            12,
+            9
+          ]
+        },
+        {
+          "id": "formation-6",
+          "name": "Southwest tombs",
+          "cells": [
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              8
+            ]
+          ],
+          "bounds": [
+            3,
+            7,
+            5,
+            9
+          ]
+        },
+        {
+          "id": "formation-7",
+          "name": "South middle tombs",
+          "cells": [
+            [
+              7,
+              7
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              8
+            ]
+          ],
+          "bounds": [
+            7,
+            7,
+            9,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r2-enemy-1",
+          "index": 0,
+          "faces": 6,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 5,
+          "y": 4
+        },
+        {
+          "id": "q6r2-enemy-2",
+          "index": 1,
+          "faces": 8,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 6,
+          "y": 6
+        },
+        {
+          "id": "q6r2-enemy-3",
+          "index": 2,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 9,
+          "y": 4
+        },
+        {
+          "id": "q6r2-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 9,
+          "y": 6
+        },
+        {
+          "id": "q6r2-enemy-5",
+          "index": 4,
+          "faces": 10,
+          "variant": "normal",
+          "role": "normal",
+          "x": 11,
+          "y": 3
+        },
+        {
+          "id": "q6r2-enemy-6",
+          "index": 5,
+          "faces": 8,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 6,
+          "y": 2
+        }
+      ],
+      "spawnPositions": [
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          6,
+          2
+        ]
+      ],
+      "design": {
+        "idea": "Tomb islands create a return loop around each fight.",
+        "play": "Choose the upper approach or circle the central grave island. Finish a zombie beside an escape route instead of filling the narrow gap with the whole party.",
+        "threat": "Four zombies make the location of a first defeat matter. The two ordinary dice contest the eastern side.",
+        "art": "Distinct connected raised grave islands, water-worn headstones and broken low enclosure walls; no isolated tile-sized rubble spam."
+      },
+      "metrics": {
+        "walls": 32,
+        "floor": 85,
+        "reachable": 85,
+        "door_steps": 14,
+        "large_steps": 13,
+        "blockedPercent": 27.4,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          11,
+          3
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 18
+    },
+    {
+      "id": "q6r3",
+      "number": "6-3",
+      "name": "Whispering Crypt",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          11,
+          7
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          11,
+          8
+        ]
+      ],
+      "blueprint": [
+        ".####........",
+        ".####........",
+        "...##........",
+        "...##...##...",
+        "...##...##...",
+        "...##...##...",
+        "........##...",
+        "........####.",
+        "........####."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "West crypt wing / Northwest crypt buttress",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "bounds": [
+            1,
+            0,
+            5,
+            6
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "East crypt wing / Southeast crypt buttress",
+          "cells": [
+            [
+              8,
+              3
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              9,
+              5
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              9,
+              6
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              11,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              9,
+              8
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              11,
+              8
+            ]
+          ],
+          "bounds": [
+            8,
+            3,
+            12,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r3-enemy-1",
+          "index": 0,
+          "faces": 8,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 5,
+          "y": 4
+        },
+        {
+          "id": "q6r3-enemy-2",
+          "index": 1,
+          "faces": 6,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 7,
+          "y": 5
+        },
+        {
+          "id": "q6r3-enemy-3",
+          "index": 2,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 7,
+          "y": 1
+        },
+        {
+          "id": "q6r3-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 10,
+          "y": 3
+        },
+        {
+          "id": "q6r3-enemy-5",
+          "index": 4,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 11,
+          "y": 5
+        },
+        {
+          "id": "q6r3-enemy-6",
+          "index": 5,
+          "faces": 8,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 5,
+          "y": 1
+        }
+      ],
+      "spawnPositions": [
+        [
+          5,
+          4
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "design": {
+        "idea": "Opposing crypt wings create a deliberate winding route.",
+        "play": "The party travels below the western wing and above the eastern wing. Ghosts cut directly through those wings, so camping behind a wall is temporary protection from the ordinary foe only.",
+        "threat": "Four ghosts exploit wall crossings, supported by one ordinary die and one zombie.",
+        "art": "Two substantial connected crypt wings with buttresses. Render whole structures, with the walkable central passage visibly open."
+      },
+      "metrics": {
+        "walls": 32,
+        "floor": 85,
+        "reachable": 85,
+        "door_steps": 20,
+        "large_steps": 20,
+        "blockedPercent": 27.4,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          12,
+          2
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          11,
+          3
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          12,
+          2
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 24,
+      "specialistExample": {
+        "kind": "ghost",
+        "from": [
+          5,
+          4
+        ],
+        "to": [
+          2,
+          4
+        ],
+        "ordinarySteps": 7,
+        "directDistance": 3,
+        "ordinaryRoute": [
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "q6r4",
+      "number": "6-4",
+      "name": "The Flickering Moor",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          10,
+          0
+        ],
+        [
+          11,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          0,
+          7
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          0,
+          8
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          8
+        ]
+      ],
+      "blueprint": [
+        "..##....####.",
+        "..##....####.",
+        "..##.#.....#.",
+        ".....#.......",
+        ".....#.......",
+        ".....#...#...",
+        ".........#...",
+        "###.....##...",
+        "###.....##..."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "Northwest mausoleum",
+          "cells": [
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "bounds": [
+            2,
+            0,
+            4,
+            3
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "Northern mausoleum / Northeast buttress",
+          "cells": [
+            [
+              8,
+              0
+            ],
+            [
+              9,
+              0
+            ],
+            [
+              10,
+              0
+            ],
+            [
+              11,
+              0
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              10,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              11,
+              2
+            ]
+          ],
+          "bounds": [
+            8,
+            0,
+            12,
+            3
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "Blink screen",
+          "cells": [
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ]
+          ],
+          "bounds": [
+            5,
+            2,
+            6,
+            6
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "Eastern screen / Southern tombs",
+          "cells": [
+            [
+              9,
+              5
+            ],
+            [
+              9,
+              6
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              9,
+              7
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              9,
+              8
+            ]
+          ],
+          "bounds": [
+            8,
+            5,
+            10,
+            9
+          ]
+        },
+        {
+          "id": "formation-5",
+          "name": "Southwest tombs",
+          "cells": [
+            [
+              0,
+              7
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              0,
+              8
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              2,
+              8
+            ]
+          ],
+          "bounds": [
+            0,
+            7,
+            3,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r4-enemy-1",
+          "index": 0,
+          "faces": 8,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 6,
+          "y": 3
+        },
+        {
+          "id": "q6r4-enemy-2",
+          "index": 1,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 7,
+          "y": 5
+        },
+        {
+          "id": "q6r4-enemy-3",
+          "index": 2,
+          "faces": 6,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 8,
+          "y": 3
+        },
+        {
+          "id": "q6r4-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 10,
+          "y": 4
+        },
+        {
+          "id": "q6r4-enemy-5",
+          "index": 4,
+          "faces": 8,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 6,
+          "y": 6
+        },
+        {
+          "id": "q6r4-enemy-6",
+          "index": 5,
+          "faces": 10,
+          "variant": "normal",
+          "role": "normal",
+          "x": 11,
+          "y": 5
+        }
+      ],
+      "spawnPositions": [
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          11,
+          5
+        ]
+      ],
+      "design": {
+        "idea": "Two offset screens separate broad landing areas.",
+        "play": "Advance across the lower opening, then turn above the eastern screen. Keep a neighbour within support distance: teleporters can cross a screen into an exposed flank.",
+        "threat": "Three teleporters blink at most four Manhattan squares every third enemy phase and do not attack in that phase. One ghost ignores the screens.",
+        "art": "Broken moorland chapel walls and collapsed burial structures. Use distinct low screens, not tall scenery that hides landing cells."
+      },
+      "metrics": {
+        "walls": 31,
+        "floor": 86,
+        "reachable": 86,
+        "door_steps": 16,
+        "large_steps": 16,
+        "blockedPercent": 26.5,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 14,
+      "specialistExample": {
+        "kind": "teleporter",
+        "from": [
+          6,
+          3
+        ],
+        "to": [
+          4,
+          3
+        ],
+        "ordinarySteps": 6,
+        "directDistance": 2,
+        "ordinaryRoute": [
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "q6r5",
+      "number": "6-5",
+      "name": "Sunken Graves",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          10,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "blueprint": [
+        ".##....##....",
+        ".##....##.##.",
+        "...##..##.##.",
+        "...##........",
+        "...##........",
+        ".......##....",
+        ".......##....",
+        "..###..##....",
+        "..###..##...."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "Northwest graves",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "bounds": [
+            1,
+            0,
+            3,
+            2
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "Central tomb bank",
+          "cells": [
+            [
+              7,
+              0
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              7,
+              2
+            ],
+            [
+              8,
+              2
+            ]
+          ],
+          "bounds": [
+            7,
+            0,
+            9,
+            3
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "Eastern grave bank",
+          "cells": [
+            [
+              10,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              10,
+              2
+            ],
+            [
+              11,
+              2
+            ]
+          ],
+          "bounds": [
+            10,
+            1,
+            12,
+            3
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "Western grave wall",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "bounds": [
+            3,
+            2,
+            5,
+            5
+          ]
+        },
+        {
+          "id": "formation-5",
+          "name": "Southern grave wall",
+          "cells": [
+            [
+              7,
+              5
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              7,
+              6
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              7,
+              7
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              8
+            ]
+          ],
+          "bounds": [
+            7,
+            5,
+            9,
+            9
+          ]
+        },
+        {
+          "id": "formation-6",
+          "name": "Southwest graves",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              8
+            ]
+          ],
+          "bounds": [
+            2,
+            7,
+            5,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r5-enemy-1",
+          "index": 0,
+          "faces": 8,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 5,
+          "y": 4
+        },
+        {
+          "id": "q6r5-enemy-2",
+          "index": 1,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 6,
+          "y": 6
+        },
+        {
+          "id": "q6r5-enemy-3",
+          "index": 2,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 9,
+          "y": 4
+        },
+        {
+          "id": "q6r5-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 9,
+          "y": 6
+        },
+        {
+          "id": "q6r5-enemy-5",
+          "index": 4,
+          "faces": 10,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 5,
+          "y": 1
+        },
+        {
+          "id": "q6r5-enemy-6",
+          "index": 5,
+          "faces": 10,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 9,
+          "y": 2
+        },
+        {
+          "id": "q6r5-enemy-7",
+          "index": 6,
+          "faces": 10,
+          "variant": "normal",
+          "role": "normal",
+          "x": 11,
+          "y": 5
+        }
+      ],
+      "spawnPositions": [
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          11,
+          5
+        ]
+      ],
+      "design": {
+        "idea": "Staggered grave banks turn the approach into an S-shaped route.",
+        "play": "The lower western opening feeds a middle regrouping area before the upper eastern turn. Clear the rear zombie before sending every player around the next corner.",
+        "threat": "Three zombies threaten retreat, while one ghost and one teleporter make a fixed defensive line unreliable.",
+        "art": "Sunken burial terraces with raised stone edges, dense reeds contained on the blocked banks, and a clear shallow-water route."
+      },
+      "metrics": {
+        "walls": 34,
+        "floor": 83,
+        "reachable": 83,
+        "door_steps": 14,
+        "large_steps": 14,
+        "blockedPercent": 29.1,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 25,
+      "specialistExample": {
+        "kind": "teleporter",
+        "from": [
+          9,
+          2
+        ],
+        "to": [
+          6,
+          2
+        ],
+        "ordinarySteps": 5,
+        "directDistance": 3,
+        "ordinaryRoute": [
+          [
+            9,
+            2
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "id": "q6r6",
+      "number": "6-6",
+      "name": "The Haunted Crossing",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          11,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          7
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "blueprint": [
+        "...##.##...#.",
+        "...##.##..##.",
+        "...##......#.",
+        "...##........",
+        "...##..##....",
+        ".......##....",
+        ".......##....",
+        "..##...##....",
+        "..##...##...."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "West crossing pier",
+          "cells": [
+            [
+              3,
+              0
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "bounds": [
+            3,
+            0,
+            5,
+            5
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "North vault",
+          "cells": [
+            [
+              6,
+              0
+            ],
+            [
+              7,
+              0
+            ],
+            [
+              6,
+              1
+            ],
+            [
+              7,
+              1
+            ]
+          ],
+          "bounds": [
+            6,
+            0,
+            8,
+            2
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "East crossing pier / East buttress",
+          "cells": [
+            [
+              11,
+              0
+            ],
+            [
+              10,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              11,
+              2
+            ]
+          ],
+          "bounds": [
+            10,
+            0,
+            12,
+            3
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "Middle crossing pier",
+          "cells": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              7,
+              5
+            ],
+            [
+              8,
+              5
+            ],
+            [
+              7,
+              6
+            ],
+            [
+              8,
+              6
+            ],
+            [
+              7,
+              7
+            ],
+            [
+              8,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              8
+            ]
+          ],
+          "bounds": [
+            7,
+            4,
+            9,
+            9
+          ]
+        },
+        {
+          "id": "formation-5",
+          "name": "South vault",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              8
+            ]
+          ],
+          "bounds": [
+            2,
+            7,
+            4,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r6-enemy-1",
+          "index": 0,
+          "faces": 8,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 5,
+          "y": 3
+        },
+        {
+          "id": "q6r6-enemy-2",
+          "index": 1,
+          "faces": 8,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 6,
+          "y": 5
+        },
+        {
+          "id": "q6r6-enemy-3",
+          "index": 2,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 9,
+          "y": 4
+        },
+        {
+          "id": "q6r6-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 9,
+          "y": 2
+        },
+        {
+          "id": "q6r6-enemy-5",
+          "index": 4,
+          "faces": 10,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 9,
+          "y": 6
+        },
+        {
+          "id": "q6r6-enemy-6",
+          "index": 5,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 5,
+          "y": 6
+        },
+        {
+          "id": "q6r6-enemy-7",
+          "index": 6,
+          "faces": 10,
+          "variant": "normal",
+          "role": "normal",
+          "x": 11,
+          "y": 5
+        }
+      ],
+      "spawnPositions": [
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          11,
+          5
+        ]
+      ],
+      "design": {
+        "idea": "Two offset crossing piers divide the room into three fighting areas.",
+        "play": "Move below the western pier and above the middle pier. A teleporter can skip the middle pier while a ghost approaches through it, so split attention rather than the party.",
+        "threat": "Two ghosts and two teleporters cross the barriers; the zombie and two ordinary dice still take the winding route.",
+        "art": "Connected flooded-bridge abutments and fractured crypt foundations. All gaps between piers remain visually open."
+      },
+      "metrics": {
+        "walls": 32,
+        "floor": 85,
+        "reachable": 85,
+        "door_steps": 16,
+        "large_steps": 16,
+        "blockedPercent": 27.4,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 28,
+      "specialistExample": {
+        "kind": "ghost",
+        "from": [
+          9,
+          6
+        ],
+        "to": [
+          6,
+          6
+        ],
+        "ordinarySteps": 9,
+        "directDistance": 3,
+        "ordinaryRoute": [
+          [
+            9,
+            6
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            9,
+            4
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "id": "q6r7",
+      "number": "6-7",
+      "name": "Crypts of the Lost",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": false,
+      "walls": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          10,
+          0
+        ],
+        [
+          11,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          11,
+          8
+        ],
+        [
+          12,
+          8
+        ]
+      ],
+      "blueprint": [
+        ".###.....###.",
+        ".###.....###.",
+        "...#.....#...",
+        "...#..#..#...",
+        "...#..#..#...",
+        "...#..#..#...",
+        "......#......",
+        "......#......",
+        "......#..####"
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "West crypt screen / Northwest vault",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ]
+          ],
+          "bounds": [
+            1,
+            0,
+            4,
+            6
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "East crypt screen / Northeast vault",
+          "cells": [
+            [
+              9,
+              0
+            ],
+            [
+              10,
+              0
+            ],
+            [
+              11,
+              0
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              10,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              9,
+              2
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              9,
+              5
+            ]
+          ],
+          "bounds": [
+            9,
+            0,
+            12,
+            6
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "Middle crypt screen",
+          "cells": [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              8
+            ]
+          ],
+          "bounds": [
+            6,
+            3,
+            7,
+            9
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "South burial plinth",
+          "cells": [
+            [
+              9,
+              8
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              11,
+              8
+            ],
+            [
+              12,
+              8
+            ]
+          ],
+          "bounds": [
+            9,
+            8,
+            13,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r7-enemy-1",
+          "index": 0,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 5,
+          "y": 6
+        },
+        {
+          "id": "q6r7-enemy-2",
+          "index": 1,
+          "faces": 8,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 4,
+          "y": 3
+        },
+        {
+          "id": "q6r7-enemy-3",
+          "index": 2,
+          "faces": 10,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 8,
+          "y": 4
+        },
+        {
+          "id": "q6r7-enemy-4",
+          "index": 3,
+          "faces": 8,
+          "variant": "normal",
+          "role": "normal",
+          "x": 8,
+          "y": 7
+        },
+        {
+          "id": "q6r7-enemy-5",
+          "index": 4,
+          "faces": 12,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 10,
+          "y": 3
+        },
+        {
+          "id": "q6r7-enemy-6",
+          "index": 5,
+          "faces": 10,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 10,
+          "y": 6
+        },
+        {
+          "id": "q6r7-enemy-7",
+          "index": 6,
+          "faces": 10,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 7,
+          "y": 2
+        }
+      ],
+      "spawnPositions": [
+        [
+          5,
+          6
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          7,
+          2
+        ]
+      ],
+      "design": {
+        "idea": "Three interlocked screens create the quest\u2019s longest ordinary route.",
+        "play": "Alternate below, above and below the three screens. Use the two-square corridors to pass a teammate, and deal with a returning zombie before committing to the next bend.",
+        "threat": "Two ghosts and two teleporters bypass the long route; two zombies can reopen a fight behind the party. One ordinary die anchors the far passage.",
+        "art": "Long connected ossuary partitions with continuous caps, coherent corners and low silhouettes. No stamped stacks of separate posts."
+      },
+      "metrics": {
+        "walls": 30,
+        "floor": 87,
+        "reachable": 87,
+        "door_steps": 24,
+        "large_steps": 25,
+        "blockedPercent": 25.6,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          8,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          11,
+          7
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 18,
+      "specialistExample": {
+        "kind": "ghost",
+        "from": [
+          10,
+          3
+        ],
+        "to": [
+          8,
+          3
+        ],
+        "ordinarySteps": 8,
+        "directDistance": 2,
+        "ordinaryRoute": [
+          [
+            10,
+            3
+          ],
+          [
+            10,
+            4
+          ],
+          [
+            10,
+            5
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            9,
+            6
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            8,
+            4
+          ],
+          [
+            8,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "q6r8",
+      "number": "6-8",
+      "name": "The Drowned Mausoleum",
+      "width": 13,
+      "height": 9,
+      "entry": [
+        0,
+        4
+      ],
+      "exit": [
+        12,
+        4
+      ],
+      "final": true,
+      "walls": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          10,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          11,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          10,
+          8
+        ],
+        [
+          11,
+          8
+        ]
+      ],
+      "blueprint": [
+        ".##...#####..",
+        ".###....###..",
+        "..##.........",
+        "......##.....",
+        "......##.....",
+        ".............",
+        "..##......##.",
+        "..##......##.",
+        "..##......##."
+      ],
+      "formations": [
+        {
+          "id": "formation-1",
+          "name": "West burial bay / Northwest tomb",
+          "cells": [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "bounds": [
+            1,
+            0,
+            4,
+            3
+          ]
+        },
+        {
+          "id": "formation-2",
+          "name": "North altar wall / Altar buttress",
+          "cells": [
+            [
+              6,
+              0
+            ],
+            [
+              7,
+              0
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              9,
+              0
+            ],
+            [
+              10,
+              0
+            ],
+            [
+              8,
+              1
+            ],
+            [
+              9,
+              1
+            ],
+            [
+              10,
+              1
+            ]
+          ],
+          "bounds": [
+            6,
+            0,
+            11,
+            2
+          ]
+        },
+        {
+          "id": "formation-3",
+          "name": "Central sarcophagus",
+          "cells": [
+            [
+              6,
+              3
+            ],
+            [
+              7,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "bounds": [
+            6,
+            3,
+            8,
+            5
+          ]
+        },
+        {
+          "id": "formation-4",
+          "name": "Southwest burial bay",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              8
+            ]
+          ],
+          "bounds": [
+            2,
+            6,
+            4,
+            9
+          ]
+        },
+        {
+          "id": "formation-5",
+          "name": "Southeast burial bay",
+          "cells": [
+            [
+              10,
+              6
+            ],
+            [
+              11,
+              6
+            ],
+            [
+              10,
+              7
+            ],
+            [
+              11,
+              7
+            ],
+            [
+              10,
+              8
+            ],
+            [
+              11,
+              8
+            ]
+          ],
+          "bounds": [
+            10,
+            6,
+            12,
+            9
+          ]
+        }
+      ],
+      "enemies": [
+        {
+          "id": "q6r8-enemy-1",
+          "index": 0,
+          "faces": 20,
+          "variant": "boss",
+          "role": "normal",
+          "x": 9,
+          "y": 4
+        },
+        {
+          "id": "q6r8-enemy-2",
+          "index": 1,
+          "faces": 8,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 5,
+          "y": 2
+        },
+        {
+          "id": "q6r8-enemy-3",
+          "index": 2,
+          "faces": 8,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 5,
+          "y": 6
+        },
+        {
+          "id": "q6r8-enemy-4",
+          "index": 3,
+          "faces": 10,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 8,
+          "y": 2
+        },
+        {
+          "id": "q6r8-enemy-5",
+          "index": 4,
+          "faces": 12,
+          "variant": "normal",
+          "role": "ghost",
+          "x": 8,
+          "y": 6
+        },
+        {
+          "id": "q6r8-enemy-6",
+          "index": 5,
+          "faces": 12,
+          "variant": "normal",
+          "role": "teleporter",
+          "x": 11,
+          "y": 3
+        },
+        {
+          "id": "q6r8-enemy-7",
+          "index": 6,
+          "faces": 12,
+          "variant": "normal",
+          "role": "zombie",
+          "x": 9,
+          "y": 6
+        },
+        {
+          "id": "q6r8-enemy-8",
+          "index": 7,
+          "faces": 10,
+          "variant": "normal",
+          "role": "normal",
+          "x": 11,
+          "y": 5
+        }
+      ],
+      "spawnPositions": [
+        [
+          9,
+          4
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          11,
+          5
+        ]
+      ],
+      "design": {
+        "idea": "A central sarcophagus splits the approach to an open boss arena.",
+        "play": "Approach the guardian above or below the central obstruction. Keep the eastern arena and a return lane clear while prioritising the ghosts, teleporters and reviving zombies.",
+        "threat": "The existing Boss D20 and seven followers enter together. The boss retains its current one-square collision footprint; no new waves or mechanics are added.",
+        "art": "A drowned mausoleum, low central sarcophagus, joined burial bays and an altar ruin. Leave breathing room around the boss and keep the exit visible."
+      },
+      "metrics": {
+        "walls": 31,
+        "floor": 86,
+        "reachable": 86,
+        "door_steps": 14,
+        "large_steps": 13,
+        "blockedPercent": 26.5,
+        "independentRoutes": 2
+      },
+      "shortestRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "largeRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "openingRoute": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ]
+      ],
+      "baselineWallCount": 18
+    }
+  ]
+}

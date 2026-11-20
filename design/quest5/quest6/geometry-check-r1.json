@@ -1,0 +1,74 @@
+[
+  {
+    "room": "q6r1",
+    "walls": 30,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 14,
+    "largeFootprintSteps": 13,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r2",
+    "walls": 32,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 14,
+    "largeFootprintSteps": 13,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r3",
+    "walls": 32,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 20,
+    "largeFootprintSteps": 20,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r4",
+    "walls": 31,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 16,
+    "largeFootprintSteps": 16,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r5",
+    "walls": 34,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 14,
+    "largeFootprintSteps": 14,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r6",
+    "walls": 32,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 16,
+    "largeFootprintSteps": 16,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r7",
+    "walls": 30,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 24,
+    "largeFootprintSteps": 25,
+    "openingRoute": true
+  },
+  {
+    "room": "q6r8",
+    "walls": 31,
+    "floorConnected": true,
+    "independentDoorRoutes": 2,
+    "doorSteps": 14,
+    "largeFootprintSteps": 13,
+    "openingRoute": true
+  }
+]

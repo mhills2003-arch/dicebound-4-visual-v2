@@ -1,0 +1,251 @@
+{
+  "build": "v2-q5-complete-20261112-r1",
+  "date": "2026-11-12",
+  "automated_tests": {
+    "passed": 433,
+    "failed": 0
+  },
+  "new_room_playthroughs": [
+    {
+      "seed": 31,
+      "rooms": [
+        {
+          "room": "q5r3",
+          "turns": 13,
+          "hp": 85,
+          "level": 6,
+          "potions": 3
+        },
+        {
+          "room": "q5r4",
+          "turns": 21,
+          "hp": 72,
+          "level": 6,
+          "potions": 0
+        },
+        {
+          "room": "q5r5",
+          "turns": 13,
+          "hp": 92,
+          "level": 6,
+          "potions": 1
+        },
+        {
+          "room": "q5r6",
+          "turns": 18,
+          "hp": 90,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r7",
+          "turns": 15,
+          "hp": 93,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r8",
+          "turns": 23,
+          "hp": 96,
+          "level": 6,
+          "potions": 1
+        }
+      ],
+      "completed": true,
+      "replay": true
+    },
+    {
+      "seed": 101,
+      "rooms": [
+        {
+          "room": "q5r3",
+          "turns": 14,
+          "hp": 113,
+          "level": 6,
+          "potions": 3
+        },
+        {
+          "room": "q5r4",
+          "turns": 15,
+          "hp": 119,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r5",
+          "turns": 19,
+          "hp": 72,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r6",
+          "turns": 27,
+          "hp": 65,
+          "level": 6,
+          "potions": 0
+        },
+        {
+          "room": "q5r7",
+          "turns": 23,
+          "hp": 74,
+          "level": 6,
+          "potions": 1
+        },
+        {
+          "room": "q5r8",
+          "turns": 19,
+          "hp": 80,
+          "level": 6,
+          "potions": 1
+        }
+      ],
+      "completed": true,
+      "replay": true
+    },
+    {
+      "seed": 2026,
+      "rooms": [
+        {
+          "room": "q5r3",
+          "turns": 19,
+          "hp": 96,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r4",
+          "turns": 25,
+          "hp": 81,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r5",
+          "turns": 13,
+          "hp": 105,
+          "level": 6,
+          "potions": 1
+        },
+        {
+          "room": "q5r6",
+          "turns": 13,
+          "hp": 77,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r7",
+          "turns": 22,
+          "hp": 80,
+          "level": 6,
+          "potions": 1
+        },
+        {
+          "room": "q5r8",
+          "turns": 16,
+          "hp": 73,
+          "level": 6,
+          "potions": 1
+        }
+      ],
+      "completed": true,
+      "replay": true
+    }
+  ],
+  "full_quest_playthrough": [
+    {
+      "seed": 101,
+      "rooms": [
+        {
+          "room": "q5r1",
+          "turns": 14,
+          "hp": 90,
+          "level": 6,
+          "potions": 3
+        },
+        {
+          "room": "q5r2",
+          "turns": 15,
+          "hp": 108,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r3",
+          "turns": 10,
+          "hp": 110,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r4",
+          "turns": 17,
+          "hp": 76,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r5",
+          "turns": 19,
+          "hp": 106,
+          "level": 6,
+          "potions": 0
+        },
+        {
+          "room": "q5r6",
+          "turns": 20,
+          "hp": 88,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r7",
+          "turns": 19,
+          "hp": 88,
+          "level": 6,
+          "potions": 2
+        },
+        {
+          "room": "q5r8",
+          "turns": 22,
+          "hp": 58,
+          "level": 6,
+          "potions": 0
+        }
+      ],
+      "completed": true,
+      "replay": true
+    }
+  ],
+  "visual_review": {
+    "rooms": [
+      "q5r3",
+      "q5r4",
+      "q5r5",
+      "q5r6",
+      "q5r7",
+      "q5r8"
+    ],
+    "renderer": "shipping canvas renderer with real engine and local test transport",
+    "viewport": [
+      1363,
+      936
+    ],
+    "browser_combat": [
+      "q5r3",
+      "q5r8"
+    ],
+    "findings": "All room-specific ground, obstacle and enemy assets rendered. Labels and routes readable; no occupied-cell box outlines."
+  },
+  "preservation": {
+    "other_room_definitions_unchanged": 128,
+    "other_collision_maps_unchanged": 128,
+    "all_preexisting_artwork_bytes_unchanged": true,
+    "wrangler_config_unchanged": true
+  },
+  "asset_count": 23,
+  "new_asset_bytes": 5105012,
+  "live_deployment_tested": false
+}

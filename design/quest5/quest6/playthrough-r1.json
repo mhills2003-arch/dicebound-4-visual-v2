@@ -1,0 +1,191 @@
+[
+  {
+    "seed": 101,
+    "rooms": [
+      {
+        "room": "q6r1",
+        "turns": 14,
+        "hp": 154,
+        "level": 8,
+        "potions": 3
+      },
+      {
+        "room": "q6r2",
+        "turns": 19,
+        "hp": 107,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r3",
+        "turns": 14,
+        "hp": 122,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r4",
+        "turns": 14,
+        "hp": 112,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r5",
+        "turns": 32,
+        "hp": 106,
+        "level": 8,
+        "potions": 0
+      },
+      {
+        "room": "q6r6",
+        "turns": 16,
+        "hp": 144,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r7",
+        "turns": 17,
+        "hp": 160,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r8",
+        "turns": 23,
+        "hp": 63,
+        "level": 8,
+        "potions": 0
+      }
+    ],
+    "completed": true,
+    "replay": true
+  },
+  {
+    "seed": 202,
+    "rooms": [
+      {
+        "room": "q6r1",
+        "turns": 21,
+        "hp": 130,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r2",
+        "turns": 22,
+        "hp": 112,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r3",
+        "turns": 12,
+        "hp": 167,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r4",
+        "turns": 19,
+        "hp": 106,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r5",
+        "turns": 17,
+        "hp": 145,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r6",
+        "turns": 19,
+        "hp": 110,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r7",
+        "turns": 14,
+        "hp": 146,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r8",
+        "turns": 17,
+        "hp": 125,
+        "level": 8,
+        "potions": 1
+      }
+    ],
+    "completed": true,
+    "replay": true
+  },
+  {
+    "seed": 303,
+    "rooms": [
+      {
+        "room": "q6r1",
+        "turns": 19,
+        "hp": 150,
+        "level": 8,
+        "potions": 3
+      },
+      {
+        "room": "q6r2",
+        "turns": 17,
+        "hp": 105,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r3",
+        "turns": 14,
+        "hp": 145,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r4",
+        "turns": 17,
+        "hp": 144,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r5",
+        "turns": 27,
+        "hp": 109,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r6",
+        "turns": 17,
+        "hp": 139,
+        "level": 8,
+        "potions": 1
+      },
+      {
+        "room": "q6r7",
+        "turns": 22,
+        "hp": 129,
+        "level": 8,
+        "potions": 2
+      },
+      {
+        "room": "q6r8",
+        "turns": 29,
+        "hp": 106,
+        "level": 8,
+        "potions": 1
+      }
+    ],
+    "completed": true,
+    "replay": true
+  }
+]

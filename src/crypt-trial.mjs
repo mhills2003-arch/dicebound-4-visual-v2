@@ -13,11 +13,17 @@ export function ensureMonasteryTrialPlayer(game,id,name,startRoom){
   return startTrial(game,id,name,startRoom,7,'monasteryTrialStarter');
 }
 
-function startTrial(game,id,name,startRoom,quest,starter){
+export function ensureDiceworksTrialPlayer(game,id,name,startRoom){
+  if(!/^q8r[1-8]$/.test(startRoom))throw new Error('Unknown Quest 8 test room');
+  game.diceworksTrialRoom=startRoom;
+  return startTrial(game,id,name,startRoom,8,'diceworksTrialStarter',12);
+}
+
+function startTrial(game,id,name,startRoom,quest,starter,level=8){
   game.unlockedQuest=Math.max(quest,game.unlockedQuest||1);
   const player = ensurePlayer(game, id, name, null);
   if (player[starter]) return player;
-  player.room = 'camp';player.level = 8;player.xp = 0;player.gold = 1000;
+  player.room = 'camp';player.level = level;player.xp = 0;player.gold = 1000;
   selectClass(game, id, 'knight');player.maxHp = effectiveStats(player).maxHp;player.hp = player.maxHp;
   for (const sku of ['sword-uncommon', 'armour-uncommon']) {
     buyFromShop(game, id, sku);const item = player.inventory.equipment.at(-1);

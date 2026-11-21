@@ -1,3 +1,4 @@
+import {diceworks} from '../public/v2-diceworks-plan.mjs';
 import {Q6_LAYOUTS} from '../public/v2-quest6-layouts.mjs';
 import {Q5_ROOMS} from '../public/v2-quest5-layouts.mjs';
 import {DUNE_FOES} from '../public/v2-rushing-dunes-layout.mjs';
@@ -416,6 +417,7 @@ for (const [id, plan] of Object.entries(Q5_ROOMS)) {
 for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHALLENGES}))Object.assign(ROOM_DATA[room],plan);
 // Authored Q6 start positions preserve the existing encounter roster.
 for(const [id,plan] of Object.entries(Q6_LAYOUTS))ROOM_DATA[id].spawnPositions=plan.spawnPositions;
+for(const [id,room] of Object.entries(diceworks)) ROOM_DATA[id].spawnPositions=room.spawns;
 ROOM_DATA.camp={name:'Adventurers’ Camp',subtitle:'Quest board, supplies and the travelling merchant',left:null,right:null,encounter:[],foes:[],quest:0,final:false,stageTwo:false};
 export const ROOM_IDS=Object.keys(ROOM_DATA);
 export const WIDTH=9,HEIGHT=7,ROUND_MS=60_000; // Base rooms stay 9 × 7.

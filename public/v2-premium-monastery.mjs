@@ -5,6 +5,7 @@ const rooms = {...monastery,...Object.fromEntries(Object.entries(diceworks).map(
 const isWorks = id => Object.hasOwn(diceworks,id);
 const prefix = id => isWorks(id)?'diceworks/':'monastery/';
 const obstacleKey = (id,name) => prefix(id)+(isWorks(id)?'machinery/':'obstacles/')+name;
+const assemblyBoard = 'diceworks/floors/8-1-engine-pit-r3';
 const images = new Map();
 const floorKey = id => prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
 const enemyKey = (id,p) => isWorks(id)?'diceworks/enemies/'+(p.variant==='boss'?'boss':p.role)+p.faces:'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
@@ -20,20 +21,30 @@ function loaded(key) {
   return image?.complete && image.naturalWidth ? image : null;
 }
 export function loadRoom(id,enemies) {
+  if (id === 'q8r1') request(assemblyBoard);
   request(floorKey(id));
   for (const [name] of rooms[id]) request(obstacleKey(id,name));
   for (const enemy of enemies) request(enemyKey(id,enemy));
 }
 export const ready = id => has(id) && !!loaded(floorKey(id));
-export function floor(ctx,s,id) {
-  ctx.drawImage(loaded(floorKey(id)),s.originX,s.originY,s.cell*13,s.cell*9);
+export function floor(ctx,s,id,blocked = []) {
+  const image = assemblyImage(id,blocked) || loaded(floorKey(id));
+  ctx.drawImage(image,s.originX,s.originY,s.cell*13,s.cell*9);
 }
 const footprints = Object.fromEntries(Object.entries(rooms).map(([id,items]) => {
   const cells = new Set();
   for(const [,x,y,w,h] of items) for(let j=0;j<h;j++) for(let i=0;i<w;i++) cells.add((y+j)*13+x+i);
   return [id,cells];
 }));
+function matchesFootprint(id,blocked) {
+  const actual = new Set(blocked.map(([x,y])=>y*13+x));
+  return actual.size === footprints[id].size && [...actual].every(cell=>footprints[id].has(cell));
+}
+function assemblyImage(id,blocked) {
+  return id === 'q8r1' && matchesFootprint(id,blocked) && loaded(assemblyBoard);
+}
 export function walls(ctx,s,id,blocked) {
+  if (assemblyImage(id,blocked)) return true;
   const expected = footprints[id];
   if (blocked.length!==expected.size || blocked.some(([x,y])=>!expected.has(y*13+x))) return false;
   if (rooms[id].some(([name])=>!loaded(obstacleKey(id,name)))) return false;

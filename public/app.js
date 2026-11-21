@@ -1,4 +1,4 @@
-import * as monastery from './v2-premium-monastery.mjs?build=v2-q8-diceworks-r1';
+import * as monastery from './v2-premium-monastery.mjs?build=v2-q8-diceworks-r1&assembly=3';
 import {initPremiumCrypt,isPremiumCryptRoom,premiumCryptReady,paintPremiumCryptFloor,paintPremiumCryptWalls,paintPremiumCryptSurround,paintPremiumCryptAtmosphere,paintPremiumCryptActor,paintPremiumCryptRemains} from './v2-premium-crypt.mjs?build=v2-q6-obstacles-20261120-r3';
 import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
@@ -782,7 +782,7 @@ function sceneFloor(s){
   const {width:cols,height:rows}=roomSize(me.room),centre=doorRow(me.room);
   if(!s.iso){
     const cs=s.cell, premium=anyPremiumActive();
-    if(monasteryActive())monastery.floor(ctx,s,me.room);
+    if(monasteryActive())monastery.floor(ctx,s,me.room,state.roomWalls?.[me.room]||[]);
     else if(premiumCryptActive())paintPremiumCryptFloor(ctx,s,me.room);
     else if(premiumDesertActive())paintPremiumDesertFloor(ctx,s,me.room);
     else if(premiumActive()){paintPremiumWoodlandFloor(ctx,s,me.room);if(woodlandLightActive())paintPremiumWoodlandGroundLighting(ctx,s,state.roomWalls?.[me.room]||[],me.room);}

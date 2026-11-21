@@ -1,14 +1,21 @@
+import {warrens} from './v2-warrens-plan.mjs';
 import {diceworks} from './v2-diceworks-plan.mjs';
 import {rooms as monastery} from './v2-monastery-plan.mjs';
 
-const rooms = {...monastery,...Object.fromEntries(Object.entries(diceworks).map(([id,r])=>[id,r.machinery]))};
+const isWarrens = id => Object.hasOwn(warrens,id);
+const rooms = {...monastery,...Object.fromEntries(Object.keys(warrens).map(id=>[id,[]])),...Object.fromEntries(Object.entries(diceworks).map(([id,r])=>[id,r.machinery]))};
 const isWorks = id => Object.hasOwn(diceworks,id);
 const prefix = id => isWorks(id)?'diceworks/':'monastery/';
 const obstacleKey = (id,name) => prefix(id)+(isWorks(id)?'machinery/':'obstacles/')+name;
 const integratedBoard = id => id === 'q8r1' ? 'diceworks/floors/8-1-engine-pit-r3' : floorKey(id)+'-integrated-r4';
 const images = new Map();
-const floorKey = id => prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
-const enemyKey = (id,p) => isWorks(id)?'diceworks/enemies/'+(p.variant==='boss'?'boss':p.role)+p.faces:'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
+const floorKey = id => isWarrens(id) ? 'warrens/floors/9-'+id.slice(-1) : prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
+function warrensEnemy(p) {
+  if (p.variant==='boss' || (p.clone && p.faces===20)) return 'boss20';
+  const role=p.clone && p.parentId!=='nest' ? 'cloner' : p.role;
+  return role+p.faces;
+}
+const enemyKey = (id,p) => isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+(p.variant==='boss'?'boss':p.role)+p.faces:'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
 export const has = id => Object.hasOwn(rooms,id);
 function request(key) {
   if (images.has(key)) return;
@@ -26,13 +33,14 @@ export function loadRoom(id,enemies) {
   for (const [name] of rooms[id]) request(obstacleKey(id,name));
   for (const enemy of enemies) request(enemyKey(id,enemy));
 }
-export const ready = id => has(id) && !!loaded(floorKey(id));
+export const ready = (id,blocked=[]) => has(id) && (!isWarrens(id)||matchesFootprint(id,blocked)) && !!loaded(floorKey(id));
 export function floor(ctx,s,id,blocked = []) {
   const image = integratedImage(id,blocked) || loaded(floorKey(id));
   ctx.drawImage(image,s.originX,s.originY,s.cell*13,s.cell*9);
 }
 const footprints = Object.fromEntries(Object.entries(rooms).map(([id,items]) => {
   const cells = new Set();
+  if(isWarrens(id)) warrens[id].blueprint.forEach((row,y)=>[...row].forEach((v,x)=>{if(v==='#')cells.add(y*13+x)}));
   for(const [,x,y,w,h] of items) for(let j=0;j<h;j++) for(let i=0;i<w;i++) cells.add((y+j)*13+x+i);
   return [id,cells];
 }));
@@ -44,6 +52,7 @@ function integratedImage(id,blocked) {
   return isWorks(id) && matchesFootprint(id,blocked) && loaded(integratedBoard(id));
 }
 export function walls(ctx,s,id,blocked) {
+  if(isWarrens(id)) return matchesFootprint(id,blocked) && !!loaded(floorKey(id));
   if (integratedImage(id,blocked)) return true;
   const expected = footprints[id];
   if (blocked.length!==expected.size || blocked.some(([x,y])=>!expected.has(y*13+x))) return false;

@@ -1,4 +1,4 @@
-import * as monastery from './v2-premium-monastery.mjs?build=v2-q7-monastery-r1';
+import * as monastery from './v2-premium-monastery.mjs?build=v2-q8-diceworks-r1';
 import {initPremiumCrypt,isPremiumCryptRoom,premiumCryptReady,paintPremiumCryptFloor,paintPremiumCryptWalls,paintPremiumCryptSurround,paintPremiumCryptAtmosphere,paintPremiumCryptActor,paintPremiumCryptRemains} from './v2-premium-crypt.mjs?build=v2-q6-obstacles-20261120-r3';
 import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
@@ -11,7 +11,7 @@ import {isV2ArtRoom,paintArtBackdrop,paintStoneFloorTile,paintIsoFloorTile,paint
  * All position, HP and combat outcomes are authoritative WebSocket messages.
  */
 const ROOT = new URL('.',import.meta.url).pathname.replace(/\/$/,'');
-const CLIENT_BUILD='VISUAL V2 · QUEST 7 MONASTERY R1 · QUEST 6 CRYPT OBSTACLES R3 · QUEST 3 WALLS R1 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
+const CLIENT_BUILD='VISUAL V2 · QUEST 8 DICEWORKS R1 · QUEST 7 MONASTERY R1 · QUEST 6 CRYPT OBSTACLES R3 · QUEST 3 WALLS R1 · QUEST 2 POLISH R2 · QUEST 5 COMPLETE R1 · Q5-1 CARAVAN GATE R1 · Q5-2 RUSHING DUNES R1 · Q1 SOFT OBSTACLE EDGES · QUEST 1 WOODLAND COHESION R2 · QUEST 3 GIANTWOOD R5 FULL ASSET RECOVERY · LEVEL HUD · QUEST 4 THE GLITTERING GIANTS R1';
 const $ = id => document.getElementById(id);
 initPremiumWoodland();
 
@@ -258,7 +258,7 @@ let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
 const requestedTrial = new URLSearchParams(location.search).get('trial');
-const desertTrials = new Set([...Array.from({length:8},(_,i)=>'monastery-q7-r'+(i+1)),...Array.from({length:8},(_,i)=>'crypt-q6-r'+(i+1)), 'mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
+const desertTrials = new Set([...Array.from({length:8},(_,i)=>'diceworks-q8-r'+(i+1)),...Array.from({length:8},(_,i)=>'monastery-q7-r'+(i+1)),...Array.from({length:8},(_,i)=>'crypt-q6-r'+(i+1)), 'mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
   'quest5-room3', 'quest5-room4', 'quest5-room5', 'quest5-room6', 'quest5-room7', 'quest5-room8']);
 const desertTrial = desertTrials.has(requestedTrial) ? requestedTrial : null;
 if (desertTrial) $('cinematicQ5Room').value = desertTrial;
@@ -961,7 +961,10 @@ function render(){if(!state||!me)return;
     const label=isPremiumQuarryRoom(me.room)?(v2ArtEnabled?(premiumQuarryReady(me.room)?'⛏ Quest 4 quarry premium: ON':'⛏ Loading quarry artwork…'):'◇ Quest 4 quarry premium: OFF'):isPremiumGiantRoom(me.room)?(v2ArtEnabled?(premiumGiantReady(me.room)?'🌳 Quest 3 giant forest premium: ON':'🌳 Loading giantwood artwork…'):'◇ Quest 3 giantwood premium: OFF'):isPremiumMineRoom(me.room)?(v2ArtEnabled?(premiumMineReady(me.room)?'💎 Quest 2 mine premium: ON':'💎 Loading mine artwork…'):'◇ Quest 2 mine premium: OFF'):(v2ArtEnabled?(premiumWoodlandReady()?(me.room==='watchpost'?'🏰 Old Watchpost premium: ON':me.room==='clearing'?'🌲 Training Clearing premium: ON':'🌲 Premium woodland art: ON'):'🌲 Loading illustrated assets…'):'◇ Premium woodland art: OFF');
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }
-  if(monastery.has(me.room)&&v2ArtToggle)v2ArtToggle.textContent=v2ArtEnabled?(monastery.ready(me.room)?'Monastery art: ON':'Loading monastery art…'):'Monastery art: OFF';
+  if(monastery.has(me.room)&&v2ArtToggle){
+    const theme=me.room.startsWith('q8')?'Diceworks':'Monastery';
+    v2ArtToggle.textContent=v2ArtEnabled?(monastery.ready(me.room)?theme+' art: ON':'Loading '+theme+' art…'):theme+' art: OFF';
+  }
   if(isPremiumCryptRoom(me.room)){
     if(v2ArtToggle)v2ArtToggle.textContent=v2ArtEnabled?(premiumCryptReady(me.room)?'✦ Quest 6 crypt art: ON':'Loading crypt artwork…'):'◇ Quest 6 crypt art: OFF';
     woodlandLightingToggle.textContent=woodlandLightingEnabled?'✦ Crypt light: ON':'◇ Crypt light: OFF';

@@ -1,14 +1,19 @@
-import {rooms} from './v2-monastery-plan.mjs';
+import {diceworks} from './v2-diceworks-plan.mjs';
+import {rooms as monastery} from './v2-monastery-plan.mjs';
 
+const rooms = {...monastery,...Object.fromEntries(Object.entries(diceworks).map(([id,r])=>[id,r.machinery]))};
+const isWorks = id => Object.hasOwn(diceworks,id);
+const prefix = id => isWorks(id)?'diceworks/':'monastery/';
+const obstacleKey = (id,name) => prefix(id)+(isWorks(id)?'machinery/':'obstacles/')+name;
 const images = new Map();
-const floorKey = id => 'terrain/7-' + id.slice(-1);
-const enemyKey = p => 'enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
+const floorKey = id => prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
+const enemyKey = (id,p) => isWorks(id)?'diceworks/enemies/'+(p.variant==='boss'?'boss':p.role)+p.faces:'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
 export const has = id => Object.hasOwn(rooms,id);
 function request(key) {
   if (images.has(key)) return;
   const image = new Image();
   images.set(key,image);
-  image.src = new URL('./assets/premium-monastery/'+key+'.webp',import.meta.url);
+  image.src = new URL('./assets/premium-'+key+'.webp',import.meta.url);
 }
 function loaded(key) {
   const image = images.get(key);
@@ -16,8 +21,8 @@ function loaded(key) {
 }
 export function loadRoom(id,enemies) {
   request(floorKey(id));
-  for (const [name] of rooms[id]) request('obstacles/'+name);
-  for (const enemy of enemies) request(enemyKey(enemy));
+  for (const [name] of rooms[id]) request(obstacleKey(id,name));
+  for (const enemy of enemies) request(enemyKey(id,enemy));
 }
 export const ready = id => has(id) && !!loaded(floorKey(id));
 export function floor(ctx,s,id) {
@@ -31,22 +36,25 @@ const footprints = Object.fromEntries(Object.entries(rooms).map(([id,items]) => 
 export function walls(ctx,s,id,blocked) {
   const expected = footprints[id];
   if (blocked.length!==expected.size || blocked.some(([x,y])=>!expected.has(y*13+x))) return false;
-  if (rooms[id].some(([name])=>!loaded('obstacles/'+name))) return false;
+  if (rooms[id].some(([name])=>!loaded(obstacleKey(id,name)))) return false;
   ctx.save();
   ctx.shadowColor = '#17151580';ctx.shadowOffsetY = s.cell*.035;ctx.shadowBlur = s.cell*.025;
-  for(const [name,x,y,w,h] of rooms[id]) {
-    const image=loaded('obstacles/'+name), width=(w-.06)*s.cell,height=(h-.06)*s.cell;
-    const aspect=image.naturalWidth/image.naturalHeight;
-    const ratio=id==='q7r1'?width/height:aspect*Math.max(.82,Math.min(1.22,width/height/aspect));
+  for(const [name,x,y,w,h,rotation=0] of rooms[id]) {
+    const image=loaded(obstacleKey(id,name)), width=(w-.06)*s.cell,height=(h-.06)*s.cell;
+    const aspect=rotation?image.naturalHeight/image.naturalWidth:image.naturalWidth/image.naturalHeight;
+    const ratio=id==='q7r1'?width/height:aspect*Math.max(isWorks(id)?.70:.82,Math.min(isWorks(id)?1.40:1.22,width/height/aspect));
     const dw=Math.min(width,height*ratio),dh=dw/ratio;
     const centre=s.at(x+(w-1)/2,y+(h-1)/2);
-    ctx.drawImage(image,centre.x-dw/2,centre.y-dh/2,dw,dh);
+    if(rotation){
+      ctx.save();ctx.translate(centre.x,centre.y);ctx.rotate(-Math.PI/2);
+      ctx.drawImage(image,-dh/2,-dw/2,dh,dw);ctx.restore();
+    }else ctx.drawImage(image,centre.x-dw/2,centre.y-dh/2,dw,dh);
   }
   ctx.restore();
   return true;
 }
-export function actor(ctx,s,p,kind,base,{label,selected,active}) {
-  const enemy=kind==='enemy',image=enemy?loaded(enemyKey(p)):base;
+export function actor(ctx,s,p,kind,base,{label,selected,active,roomId}) {
+  const enemy=kind==='enemy',image=enemy?loaded(enemyKey(roomId,p)):base;
   if(!image?.naturalWidth)return false;
   const c=s.cell,pt=s.at(p.x,p.y),boss=p.variant==='boss';
   const scale=Math.min(c*(boss?1:.9)/image.naturalWidth,c*(boss?1:.9)/image.naturalHeight)*(p.clone?.82:1);

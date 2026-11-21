@@ -1,3 +1,4 @@
+import {chaos} from '../public/v2-chaos-plan.mjs';
 import {warrens} from '../public/v2-warrens-plan.mjs';
 import {diceworks} from '../public/v2-diceworks-plan.mjs';
 import {Q6_LAYOUTS} from '../public/v2-quest6-layouts.mjs';
@@ -419,6 +420,12 @@ for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHA
 // Authored Q6 start positions preserve the existing encounter roster.
 for(const [id,plan] of Object.entries(Q6_LAYOUTS))ROOM_DATA[id].spawnPositions=plan.spawnPositions;
 for(const [id,room] of Object.entries({...diceworks,...warrens})) ROOM_DATA[id].spawnPositions=room.spawns;
+for(const [id,plan] of Object.entries(chaos)){
+  const room=ROOM_DATA[id];
+  room.foes=plan.foes;
+  room.encounter=plan.foes.map(f=>f.faces);
+  room.spawnPositions=plan.spawns;
+}
 ROOM_DATA.camp={name:'Adventurers’ Camp',subtitle:'Quest board, supplies and the travelling merchant',left:null,right:null,encounter:[],foes:[],quest:0,final:false,stageTwo:false};
 export const ROOM_IDS=Object.keys(ROOM_DATA);
 export const WIDTH=9,HEIGHT=7,ROUND_MS=60_000; // Base rooms stay 9 × 7.
@@ -483,6 +490,9 @@ ROOM_WALLS.camp=[];
 export const HARD_HAZARDS=Object.fromEntries(Object.entries({...HARD_BLUEPRINTS,...EXTREME_BLUEPRINTS}).filter(([roomId])=>ROOM_DATA[roomId].hazard==='chaos'||ROOM_DATA[roomId].hazard==='tide'||ROOM_DATA[roomId].hazard==='flood'||ROOM_DATA[roomId].hazard==='storm').map(([roomId,rows])=>{
  const seed=Number(roomId.match(/r(\d+)/)[1]), tiles=[];
  for(let y=1;y<rows.length-1;y++)for(let x=3;x<rows[0].length-3;x++)if(rows[y][x]==='.' && (((x*11+y*7+seed*13+ROOM_DATA[roomId].quest)%11===0)||(((x+seed*2)%6===0)&&(y===(seed%5+2)))))tiles.push([x,y]);
+ // These revised boards completely cover the original surge pattern.
+ if(roomId==='q10r4' && !tiles.length)tiles.push([6,3]);
+ if(roomId==='q10r6' && !tiles.length)tiles.push([8,7]);
  return [roomId,tiles];
 }));
 export function isWall(roomId,x,y){return !!ROOM_WALLS[roomId]?.some(([wx,wy])=>wx===x&&wy===y)}
@@ -935,7 +945,7 @@ export function freshState(now=nowMs()){
   for(const [id,def] of Object.entries(ROOM_DATA)){
     rooms[id]={id,discovered:id==='woodland',battle:{status:def.encounter.length?'dormant':'none',round:0,deadline:null,actions:{},eligibleRound:{},enemies:[]}};
   }
-  return {turn:{round:1,ended:{},eligibleRound:{},deadline:now+ROUND_MS},version:8,epoch:now,revision:0,unlockedQuest:1,completedQuests:[],questRewardOffers:{},questRewardClaimed:{},legendaryMerchantOffer:null,mythicMerchantOffer:null,exoticMerchantOffer:null,events:[],nextEventId:1,players:{},rooms,log:[{at:now,text:'A Roll in the Woods begins. Find your friends and explore.'}]};
+  return {chaosLayoutVersion:1,turn:{round:1,ended:{},eligibleRound:{},deadline:now+ROUND_MS},version:8,epoch:now,revision:0,unlockedQuest:1,completedQuests:[],questRewardOffers:{},questRewardClaimed:{},legendaryMerchantOffer:null,mythicMerchantOffer:null,exoticMerchantOffer:null,events:[],nextEventId:1,players:{},rooms,log:[{at:now,text:'A Roll in the Woods begins. Find your friends and explore.'}]};
 }
 function addLog(s,text,now){s.log.push({at:now,text});if(s.log.length>35)s.log=s.log.slice(-35)}
 function emitEvent(s,type,payload,at){s.events??=[];s.nextEventId??=1;s.events.push({id:s.nextEventId++,type,...payload,at});s.events=s.events.slice(-40)}
@@ -957,6 +967,10 @@ export function ensureWorld(s){
   for(const [id,def] of Object.entries(ROOM_DATA)){
     if(!s.rooms[id])s.rooms[id]={id,discovered:id==='woodland',battle:{status:def.encounter.length?'dormant':'none',round:0,deadline:null,actions:{},eligibleRound:{},enemies:[]}};
     else {const b=s.rooms[id].battle;b.wave??=0;b.participated??={};b.damageBy??={};b.turnEnded??={};}
+  }
+  if(!s.chaosLayoutVersion){
+    reconcilePositions(s,Object.keys(chaos));
+    s.chaosLayoutVersion=1;
   }
   s.completedQuests??=[];s.questRewardOffers??={};s.questRewardClaimed??={};
   // Preserve old lab success: a cleared Watchpost unlocks Quest 2 on migration.
@@ -1180,8 +1194,8 @@ function spawnFoes(s,roomId,foes,now){
     const formation=ROOM_DATA[roomId].formation||'stagger';
     const plan=ROOM_DATA[roomId].spawnPositions||positions[formation]||positions.stagger;
     const [px,py]=plan[i%plan.length];
-    const targetX=ROOM_DATA[roomId].quest>=10?Math.min(13,px+2):medium?px:Math.max(2,Math.round(px*8/12));
-    const targetY=ROOM_DATA[roomId].quest>=10?py+1:medium?py:Math.min(5,Math.round(py*6/8));
+    const targetX=chaos[roomId]?px:ROOM_DATA[roomId].quest>=10?Math.min(13,px+2):medium?px:Math.max(2,Math.round(px*8/12));
+    const targetY=chaos[roomId]?py:ROOM_DATA[roomId].quest>=10?py+1:medium?py:Math.min(5,Math.round(py*6/8));
     const candidates=ROOM_DATA[roomId].quest===1 ? [[5,3],[6,3],[5,2],[6,2],[4,2],[5,1],[6,5],[3,4],[3,1],[7,1],[1,1],[1,5]] : Array.from({length:roomSize(roomId).width*roomSize(roomId).height},(_,k)=>[k%roomSize(roomId).width,Math.floor(k/roomSize(roomId).width)]);
     if(ROOM_DATA[roomId].quest>1)candidates.sort(([ax,ay],[bx,by])=>{
       const score=(x,y)=>Math.abs(x-targetX)*3+Math.abs(y-targetY)*3+(x<=2?20:0);
@@ -1227,8 +1241,8 @@ function occupied(s,roomId,x,y,ignorePlayer=null,ignoreEnemy=null){
   const battle=s.rooms[roomId].battle;
   return battle.status==='active'&&battle.enemies.some(e=>e.id!==ignoreEnemy&&e.hp>0&&enemyTiles(e).some(([xx,yy])=>xx===x&&yy===y));
 }
-function reconcilePositions(s){
-  for(const roomId of ROOM_IDS){
+function reconcilePositions(s,ids=ROOM_IDS){
+  for(const roomId of ids){
     const reserved=new Set();
     if (Object.hasOwn(warrens,roomId)) {
       const nests=s.rooms[roomId]?.battle?.nests || [];

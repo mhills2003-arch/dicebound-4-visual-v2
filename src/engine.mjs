@@ -1,3 +1,4 @@
+import {warrens} from '../public/v2-warrens-plan.mjs';
 import {diceworks} from '../public/v2-diceworks-plan.mjs';
 import {Q6_LAYOUTS} from '../public/v2-quest6-layouts.mjs';
 import {Q5_ROOMS} from '../public/v2-quest5-layouts.mjs';
@@ -417,7 +418,7 @@ for (const [id, plan] of Object.entries(Q5_ROOMS)) {
 for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHALLENGES}))Object.assign(ROOM_DATA[room],plan);
 // Authored Q6 start positions preserve the existing encounter roster.
 for(const [id,plan] of Object.entries(Q6_LAYOUTS))ROOM_DATA[id].spawnPositions=plan.spawnPositions;
-for(const [id,room] of Object.entries(diceworks)) ROOM_DATA[id].spawnPositions=room.spawns;
+for(const [id,room] of Object.entries({...diceworks,...warrens})) ROOM_DATA[id].spawnPositions=room.spawns;
 ROOM_DATA.camp={name:'Adventurers’ Camp',subtitle:'Quest board, supplies and the travelling merchant',left:null,right:null,encounter:[],foes:[],quest:0,final:false,stageTwo:false};
 export const ROOM_IDS=Object.keys(ROOM_DATA);
 export const WIDTH=9,HEIGHT=7,ROUND_MS=60_000; // Base rooms stay 9 × 7.
@@ -1229,6 +1230,18 @@ function occupied(s,roomId,x,y,ignorePlayer=null,ignoreEnemy=null){
 function reconcilePositions(s){
   for(const roomId of ROOM_IDS){
     const reserved=new Set();
+    if (Object.hasOwn(warrens,roomId)) {
+      const nests=s.rooms[roomId]?.battle?.nests || [];
+      for (const nest of nests) {
+        if (!isWall(roomId,nest.x,nest.y)) continue;
+        const open=[];
+        for(let y=0;y<9;y++)for(let x=0;x<13;x++){
+          if(!isWall(roomId,x,y) && !nests.some(other=>other!==nest && other.x===x && other.y===y)) open.push({x,y});
+        }
+        open.sort((a,b)=>dist(a,nest)-dist(b,nest));
+        Object.assign(nest,open[0]);
+      }
+    }
     const actors=[...Object.values(s.players).filter(p=>p.room===roomId).sort((a,b)=>a.id.localeCompare(b.id)),...(s.rooms[roomId].battle.enemies||[]).filter(e=>e.hp>0)];
     for(const actor of actors){
       const size=actor.variant?enemyFootprint(actor):1;

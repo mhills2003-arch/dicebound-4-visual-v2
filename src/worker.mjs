@@ -1,6 +1,6 @@
 import {ensureMineTrialPlayer} from './mine-trial.mjs';
 import {ensureCaravanTrialPlayer} from './caravan-trial.mjs';
-import {ensureCryptTrialPlayer,ensureMonasteryTrialPlayer,ensureDiceworksTrialPlayer} from './crypt-trial.mjs';
+import {ensureCryptTrialPlayer,ensureMonasteryTrialPlayer,ensureDiceworksTrialPlayer,ensureWarrensTrialPlayer} from './crypt-trial.mjs';
 import { DurableObject } from 'cloudflare:workers';
 import {createMaze,joinMaze,leaveMaze,mazeTravel,mazeSearch,mazeClaim,mazeBonus,mazeAction,mazeRetreat,mazeReward,mazeVoteAbandon,mazeTick,nextMazeDeadline,mazePublic,resumeMazeClock} from './maze-play.mjs';
 import {ensureChat,chatForViewer,postChat,togglePersonalMute,reportChat,toggleAdminMute} from './chat.mjs';
@@ -10,6 +10,7 @@ const ROOT='/dicebound-v2';
 const COOKIE='db4_v2_session';
 const trialWorlds = new Map([
   ...[1,2,3,4,5,6,7,8].map(n=>['monastery-q7-r'+n,'quest-v2-monastery-q7-r'+n]),
+  ...[1,2,3,4,5,6,7,8].map(n=>['warrens-q9-r'+n,'quest-v2-warrens-q9-r'+n]),
   ...[1,2,3,4,5,6,7,8].map(n=>['diceworks-q8-r'+n,'quest-v2-diceworks-q8-r'+n]),
   ...[1,2,3,4,5,6,7,8].map(n=>['crypt-q6-r'+n,'quest-v2-crypt-q6-r'+n]),
   ...[1,2,3,4,5].map(n=>['mine-q2-r'+n,'quest-v2-mine-q2-r'+n]),
@@ -95,6 +96,9 @@ export default {
         ['crypt-coffins','/assets/premium-crypt/crypt-coffins-r3.webp'],
         ['crypt-rubble','/assets/premium-crypt/crypt-rubble-r3.webp'],
         ['crypt-architecture','/assets/premium-crypt/crypt-architecture-r2.webp'],
+        ['warrens-plan','/v2-warrens-plan.mjs'],
+        ['warrens-floor','/assets/premium-warrens/floors/9-1.webp'],
+        ['warrens-boss','/assets/premium-warrens/enemies/boss20.webp'],
         ['diceworks-0','/v2-diceworks-plan.mjs'],
         ['diceworks-1','/assets/premium-diceworks/floors/8-1.webp'],
         ['diceworks-2','/assets/premium-diceworks/enemies/boss20.webp'],
@@ -116,7 +120,7 @@ export default {
         && checks[1].body.includes('v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1')
         && checks[1].body.includes('initPremiumDesert') && checks[2].body.includes('.cin-room');
       return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q8-diceworks-r1',
-        cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
+        artRevision:'q9-warrens-r1', cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
@@ -177,6 +181,7 @@ export class GameRoom extends DurableObject {
       ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),startRoom);
     }
     else if(/^monastery-q7-r[1-8]$/.test(trial||''))ensureMonasteryTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q7r'+trial.slice(-1));
+    else if(/^warrens-q9-r[1-8]$/.test(trial||''))ensureWarrensTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q9r'+trial.slice(-1));
     else if(/^diceworks-q8-r[1-8]$/.test(trial||''))ensureDiceworksTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q8r'+trial.slice(-1));
     else if(/^crypt-q6-r[1-8]$/.test(trial||''))ensureCryptTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q6r'+trial.slice(-1));
     else if(/^mine-q2-r[1-5]$/.test(trial||''))ensureMineTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q2r'+trial.slice(-1));
@@ -272,6 +277,7 @@ export class GameRoom extends DurableObject {
       else if(packet.type==='reset-lab'){
         if(id!=='one')throw new Error('Only Player One can reset this technical test adventure');
         const monasteryStart=this.game.monasteryTrialRoom;
+        const warrensStart=this.game.warrensTrialRoom;
         const diceworksStart=this.game.diceworksTrialRoom;
         const cryptTrial=this.game.cryptTrial,cryptStart=this.game.cryptTrialRoom||'q6r3';
         const mineTrial=this.game.mineTrial;
@@ -286,6 +292,10 @@ export class GameRoom extends DurableObject {
         if(diceworksStart){
           this.game.diceworksTrialRoom=diceworksStart;
           for(const player of Object.values(this.game.players))if(player.connected)ensureDiceworksTrialPlayer(this.game,player.id,player.name,diceworksStart);
+        }
+        if(warrensStart){
+          this.game.warrensTrialRoom=warrensStart;
+          for(const player of Object.values(this.game.players))if(player.connected)ensureWarrensTrialPlayer(this.game,player.id,player.name,warrensStart);
         }
         if(cryptTrial){
           this.game.cryptTrial=true;this.game.cryptTrialRoom=cryptStart;

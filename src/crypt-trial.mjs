@@ -19,6 +19,12 @@ export function ensureDiceworksTrialPlayer(game,id,name,startRoom){
   return startTrial(game,id,name,startRoom,8,'diceworksTrialStarter',12);
 }
 
+export function ensureWarrensTrialPlayer(game,id,name,startRoom){
+  if(!/^q9r[1-8]$/.test(startRoom))throw new Error('Unknown Quest 9 test room');
+  game.warrensTrialRoom=startRoom;
+  return startTrial(game,id,name,startRoom,9,'warrensTrialStarter',16);
+}
+
 function startTrial(game,id,name,startRoom,quest,starter,level=8){
   game.unlockedQuest=Math.max(quest,game.unlockedQuest||1);
   const player = ensurePlayer(game, id, name, null);

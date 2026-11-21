@@ -73,18 +73,51 @@ export function walls(ctx,s,id,blocked) {
   ctx.restore();
   return true;
 }
+// Visible bounds in source pixels, excluding the soft transparent fringe.
+const warrensBounds = {
+  boss20: [34,3,479,369],
+  cloner10: [22,63,434,454],
+  cloner12: [27,132,444,478],
+  cloner14: [42,23,467,455],
+  ninja12: [10,63,354,412],
+  ninja14: [28,35,379,427],
+  normal10: [21,104,331,425],
+  normal12: [43,83,357,431],
+  ranged10: [37,38,384,423],
+  ranged12: [25,13,394,434],
+  swift10: [19,50,357,441],
+  swift12: [5,139,385,473],
+  swift14: [36,23,381,434],
+  teleporter14: [46,17,451,431],
+};
 export function actor(ctx,s,p,kind,base,{label,selected,active,roomId}) {
   const enemy=kind==='enemy',image=enemy?loaded(enemyKey(roomId,p)):base;
   if(!image?.naturalWidth)return false;
   const c=s.cell,pt=s.at(p.x,p.y),boss=p.variant==='boss';
-  const scale=Math.min(c*(boss?1:.9)/image.naturalWidth,c*(boss?1:.9)/image.naturalHeight)*(p.clone?.82:1);
-  const dw=image.naturalWidth*scale,dh=image.naturalHeight*scale;
+  const w=image.naturalWidth,h=image.naturalHeight;
+  let left,top,dw,dh;
+  if(isWorks(roomId)){
+    const scale=c*(boss?1:.9)*(p.clone?.82:1)/Math.max(w,h);
+    dw=w*scale; dh=h*scale;
+    left=pt.x-dw/2; top=pt.y+c*.28-dh;
+  }else if(!enemy){
+    // Use the same player image, dimensions and resting anchor as Q5.
+    dw=dh=c*1.28;
+    left=pt.x-dw/2; top=pt.y-dh*.65;
+  }else{
+    const [x,y,right,bottom]=(isWarrens(roomId) && warrensBounds[warrensEnemy(p)]) || [0,0,w,h];
+    const span=c*(boss?1.34:1.10)*(p.clone?.82:1);
+    const scale=span/Math.max(right-x,bottom-y);
+    dw=w*scale; dh=h*scale;
+    left=pt.x-(x+right)*scale/2;
+    top=pt.y+c*.35-bottom*scale;
+  }
   ctx.save();
   if(active||selected){
     ctx.strokeStyle='#ffdc88';ctx.lineWidth=Math.max(2,c*.04);ctx.beginPath();
     ctx.ellipse(pt.x,pt.y+c*.22,c*.44,c*.19,0,0,Math.PI*2);ctx.stroke();
   }
-  ctx.drawImage(image,pt.x-dw/2,pt.y+c*.28-dh,dw,dh);
+  ctx.drawImage(image,left,top,dw,dh);
   const title=boss?'Boss D'+p.faces:p.hp===0?'DOWN':label;
   const fs=Math.max(9,c*.17);
   ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';

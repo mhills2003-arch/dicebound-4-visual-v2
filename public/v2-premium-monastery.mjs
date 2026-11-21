@@ -1,22 +1,31 @@
+import {chaos} from './v2-chaos-plan.mjs';
 import {warrens} from './v2-warrens-plan.mjs';
 import {diceworks} from './v2-diceworks-plan.mjs';
 import {rooms as monastery} from './v2-monastery-plan.mjs';
 
 const isWarrens = id => Object.hasOwn(warrens,id);
-const rooms = {...monastery,...Object.fromEntries(Object.keys(warrens).map(id=>[id,[]])),...Object.fromEntries(Object.entries(diceworks).map(([id,r])=>[id,r.machinery]))};
+const isChaos=id=>Object.hasOwn(chaos,id);
+const paintedPlans={...warrens,...chaos};
+const rooms = {...monastery,...Object.fromEntries(Object.keys(paintedPlans).map(id=>[id,[]])),...Object.fromEntries(Object.entries(diceworks).map(([id,r])=>[id,r.machinery]))};
 const isWorks = id => Object.hasOwn(diceworks,id);
 const prefix = id => isWorks(id)?'diceworks/':'monastery/';
 const obstacleKey = (id,name) => prefix(id)+(isWorks(id)?'machinery/':'obstacles/')+name;
 const integratedBoard = id => id === 'q8r1' ? 'diceworks/floors/8-1-engine-pit-r3' : floorKey(id)+'-integrated-r4';
 const images = new Map();
-const floorKey = id => isWarrens(id) ? 'warrens/floors/9-'+id.slice(-1) : prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
+const floorKey = id => isChaos(id) ? 'chaos/floors/10-'+id.slice(4) : isWarrens(id) ? 'warrens/floors/9-'+id.slice(-1) : prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
 function warrensEnemy(p) {
   if (p.variant==='boss' || (p.clone && p.faces===20)) return 'boss20';
   const role=p.clone && p.parentId!=='nest' ? 'cloner' : p.role;
   return role+p.faces;
 }
 const diceworksEnemy = p => (p.variant==='boss'?'boss':p.role)+p.faces;
-const enemyKey = (id,p) => isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+diceworksEnemy(p):'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
+const chaosSprites={
+  normal:'warrens/enemies/normal12',swift:'warrens/enemies/swift14',ranged:'diceworks/enemies/ranged14',
+  teleporter:'warrens/enemies/teleporter14',cloner:'warrens/enemies/cloner14',ghost:'chaos/enemies/ghost',
+  ninja:'monastery/enemies/ninja-d20',armoured:'diceworks/enemies/armoured14',healer:'monastery/enemies/healer-d12'
+};
+const chaosSprite=p=>p.variant==='boss'?'warrens/enemies/boss20':chaosSprites[p.role]||chaosSprites.normal;
+const enemyKey = (id,p) => isChaos(id)?chaosSprite(p): isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+diceworksEnemy(p):'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
 export const has = id => Object.hasOwn(rooms,id);
 function request(key) {
   if (images.has(key)) return;
@@ -34,26 +43,26 @@ export function loadRoom(id,enemies) {
   for (const [name] of rooms[id]) request(obstacleKey(id,name));
   for (const enemy of enemies) request(enemyKey(id,enemy));
 }
-export const ready = (id,blocked=[]) => has(id) && (!isWarrens(id)||matchesFootprint(id,blocked)) && !!loaded(floorKey(id));
+export const ready = (id,blocked=[]) => has(id) && (!paintedPlans[id]||matchesFootprint(id,blocked)) && !!loaded(floorKey(id));
 export function floor(ctx,s,id,blocked = []) {
   const image = integratedImage(id,blocked) || loaded(floorKey(id));
-  ctx.drawImage(image,s.originX,s.originY,s.cell*13,s.cell*9);
+  ctx.drawImage(image,s.originX,s.originY,s.cell*(isChaos(id)?15:13),s.cell*(isChaos(id)?11:9));
 }
 const footprints = Object.fromEntries(Object.entries(rooms).map(([id,items]) => {
   const cells = new Set();
-  if(isWarrens(id)) warrens[id].blueprint.forEach((row,y)=>[...row].forEach((v,x)=>{if(v==='#')cells.add(y*13+x)}));
+  if(paintedPlans[id]) paintedPlans[id].blueprint.forEach((row,y)=>[...row].forEach((v,x)=>{if(v==='#')cells.add(y*row.length+x)}));
   for(const [,x,y,w,h] of items) for(let j=0;j<h;j++) for(let i=0;i<w;i++) cells.add((y+j)*13+x+i);
   return [id,cells];
 }));
 function matchesFootprint(id,blocked) {
-  const actual = new Set(blocked.map(([x,y])=>y*13+x));
+  const actual = new Set(blocked.map(([x,y])=>y*(isChaos(id)?15:13)+x));
   return actual.size === footprints[id].size && [...actual].every(cell=>footprints[id].has(cell));
 }
 function integratedImage(id,blocked) {
   return isWorks(id) && matchesFootprint(id,blocked) && loaded(integratedBoard(id));
 }
 export function walls(ctx,s,id,blocked) {
-  if(isWarrens(id)) return matchesFootprint(id,blocked) && !!loaded(floorKey(id));
+  if(paintedPlans[id]) return matchesFootprint(id,blocked) && !!loaded(floorKey(id));
   if (integratedImage(id,blocked)) return true;
   const expected = footprints[id];
   if (blocked.length!==expected.size || blocked.some(([x,y])=>!expected.has(y*13+x))) return false;
@@ -91,6 +100,68 @@ const diceworksBounds = {
   swift10: [1, 0, 496, 603],
   swift12: [1, 0, 569, 617],
 };
+const chaosBounds = {
+  "warrens/enemies/boss20": [
+    34,
+    3,
+    479,
+    369
+  ],
+  "monastery/enemies/ninja-d20": [
+    0,
+    0,
+    851,
+    842
+  ],
+  "diceworks/enemies/armoured14": [
+    0,
+    0,
+    452,
+    555
+  ],
+  "monastery/enemies/healer-d12": [
+    0,
+    0,
+    652,
+    640
+  ],
+  "warrens/enemies/swift14": [
+    36,
+    23,
+    381,
+    434
+  ],
+  "warrens/enemies/cloner14": [
+    42,
+    23,
+    467,
+    455
+  ],
+  "diceworks/enemies/ranged14": [
+    0,
+    0,
+    706,
+    632
+  ],
+  "warrens/enemies/normal12": [
+    43,
+    83,
+    357,
+    431
+  ],
+  "warrens/enemies/teleporter14": [
+    46,
+    17,
+    451,
+    431
+  ],
+  "chaos/enemies/ghost": [
+    0,
+    0,
+    399,
+    527
+  ]
+};
 const warrensBounds = {
   boss20: [34,3,479,369],
   cloner10: [22,63,434,454],
@@ -120,6 +191,7 @@ export function actor(ctx,s,p,kind,base,{label,selected,active,roomId}) {
   }else{
     let bounds;
     if(isWorks(roomId)) bounds=diceworksBounds[diceworksEnemy(p)];
+    if(isChaos(roomId)) bounds=chaosBounds[chaosSprite(p)];
     if(isWarrens(roomId)) bounds=warrensBounds[warrensEnemy(p)];
     const [x,y,right,bottom]=bounds || [0,0,w,h];
     const span=c*(boss?1.34:1.10)*(p.clone?.82:1);

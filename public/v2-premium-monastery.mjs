@@ -15,7 +15,8 @@ function warrensEnemy(p) {
   const role=p.clone && p.parentId!=='nest' ? 'cloner' : p.role;
   return role+p.faces;
 }
-const enemyKey = (id,p) => isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+(p.variant==='boss'?'boss':p.role)+p.faces:'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
+const diceworksEnemy = p => (p.variant==='boss'?'boss':p.role)+p.faces;
+const enemyKey = (id,p) => isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+diceworksEnemy(p):'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
 export const has = id => Object.hasOwn(rooms,id);
 function request(key) {
   if (images.has(key)) return;
@@ -74,6 +75,22 @@ export function walls(ctx,s,id,blocked) {
   return true;
 }
 // Visible bounds in source pixels, excluding the soft transparent fringe.
+const diceworksBounds = {
+  armoured10: [0, 0, 433, 486],
+  armoured12: [1, 0, 452, 522],
+  armoured14: [0, 0, 452, 555],
+  boss20: [0, 1, 675, 606],
+  healer10: [1, 0, 624, 615],
+  healer12: [0, 0, 757, 638],
+  ninja12: [0, 0, 717, 638],
+  normal10: [0, 0, 471, 582],
+  normal12: [1, 1, 559, 575],
+  ranged10: [0, 1, 648, 554],
+  ranged12: [1, 0, 737, 575],
+  ranged14: [0, 0, 706, 632],
+  swift10: [1, 0, 496, 603],
+  swift12: [1, 0, 569, 617],
+};
 const warrensBounds = {
   boss20: [34,3,479,369],
   cloner10: [22,63,434,454],
@@ -96,16 +113,15 @@ export function actor(ctx,s,p,kind,base,{label,selected,active,roomId}) {
   const c=s.cell,pt=s.at(p.x,p.y),boss=p.variant==='boss';
   const w=image.naturalWidth,h=image.naturalHeight;
   let left,top,dw,dh;
-  if(isWorks(roomId)){
-    const scale=c*(boss?1:.9)*(p.clone?.82:1)/Math.max(w,h);
-    dw=w*scale; dh=h*scale;
-    left=pt.x-dw/2; top=pt.y+c*.28-dh;
-  }else if(!enemy){
+  if(!enemy){
     // Use the same player image, dimensions and resting anchor as Q5.
     dw=dh=c*1.28;
     left=pt.x-dw/2; top=pt.y-dh*.65;
   }else{
-    const [x,y,right,bottom]=(isWarrens(roomId) && warrensBounds[warrensEnemy(p)]) || [0,0,w,h];
+    let bounds;
+    if(isWorks(roomId)) bounds=diceworksBounds[diceworksEnemy(p)];
+    if(isWarrens(roomId)) bounds=warrensBounds[warrensEnemy(p)];
+    const [x,y,right,bottom]=bounds || [0,0,w,h];
     const span=c*(boss?1.34:1.10)*(p.clone?.82:1);
     const scale=span/Math.max(right-x,bottom-y);
     dw=w*scale; dh=h*scale;

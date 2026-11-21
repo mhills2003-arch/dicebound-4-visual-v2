@@ -30,6 +30,8 @@ function env(old=false,missing=null){
  for(const path of ["/v2-premium-monastery.mjs", "/v2-monastery-plan.mjs", "/assets/premium-monastery/terrain/7-8.webp"])files[path]='art';
  for(const path of ["/v2-diceworks-plan.mjs", "/assets/premium-diceworks/floors/8-1.webp", "/assets/premium-diceworks/enemies/boss20.webp"])files[path]='art';
  for(const path of ['/v2-warrens-plan.mjs','/assets/premium-warrens/floors/9-1.webp','/assets/premium-warrens/enemies/boss20.webp'])files[path]='art';
+ files['/v2-chaos-plan.mjs']='plan';
+ for(let i=1;i<=10;i++)files['/assets/premium-chaos/floors/10-'+i+'.webp']='art';
  if(missing)delete files[missing];
  return {ASSETS:{fetch:async req=>{
    const value=files[new URL(req.url).pathname];
@@ -44,7 +46,7 @@ test('V2 public version endpoint confirms the matching Worker and cinematic asse
  assert.equal(body.worker,'dicebound-4-visual-v2');
  assert.equal(body.build,'v2-q8-diceworks-r1');
  assert.equal(body.cinematicAssetsReady,true);
- assert.deepEqual(Object.values(body.checks),Array(50).fill(200));
+ assert.deepEqual(Object.values(body.checks),Array(61).fill(200));
 });
 test('V2 deployment probe detects accidental 1 November old UI files',async()=>{
  const worker=makeWorker();

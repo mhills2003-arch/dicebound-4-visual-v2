@@ -1,6 +1,7 @@
+import {sunkenNames} from '../public/v2-sunken-plan.mjs';
 import {ensureMineTrialPlayer} from './mine-trial.mjs';
 import {ensureCaravanTrialPlayer} from './caravan-trial.mjs';
-import {ensureCryptTrialPlayer,ensureMonasteryTrialPlayer,ensureDiceworksTrialPlayer,ensureWarrensTrialPlayer,ensureChaosTrialPlayer} from './crypt-trial.mjs';
+import {ensureCryptTrialPlayer,ensureMonasteryTrialPlayer,ensureDiceworksTrialPlayer,ensureWarrensTrialPlayer,ensureChaosTrialPlayer,ensureSunkenTrialPlayer} from './crypt-trial.mjs';
 import { DurableObject } from 'cloudflare:workers';
 import {createMaze,joinMaze,leaveMaze,mazeTravel,mazeSearch,mazeClaim,mazeBonus,mazeAction,mazeRetreat,mazeReward,mazeVoteAbandon,mazeTick,nextMazeDeadline,mazePublic,resumeMazeClock} from './maze-play.mjs';
 import {ensureChat,chatForViewer,postChat,togglePersonalMute,reportChat,toggleAdminMute} from './chat.mjs';
@@ -9,6 +10,7 @@ import {ensureWorld,freshState,ensurePlayer,markDisconnected,move,submitAction,c
 const ROOT='/dicebound-v2';
 const COOKIE='db4_v2_session';
 const trialWorlds = new Map([
+  ...Array.from({length:10},(_,i)=>['sunken-q11-r'+(i+1),'quest-v2-sunken-q11-r'+(i+1)]),
   ...Array.from({length:10},(_,i)=>['chaos-q10-r'+(i+1),'quest-v2-chaos-q10-r'+(i+1)]),
   ...[1,2,3,4,5,6,7,8].map(n=>['monastery-q7-r'+n,'quest-v2-monastery-q7-r'+n]),
   ...[1,2,3,4,5,6,7,8].map(n=>['warrens-q9-r'+n,'quest-v2-warrens-q9-r'+n]),
@@ -81,6 +83,17 @@ export default {
     // Unauthenticated, non-sensitive deployment fingerprint. Verifies that the
     // Worker and its bound static files belong to the same cinematic V2 build.
     if(req.method==='GET'&&u.pathname===ROOT+'/version'){
+      if(u.searchParams.get('quest')==='11'){
+        const paths=['/v2-sunken-plan.mjs','/v2-sunken-crops.mjs',
+          ...Array.from({length:10},(_,i)=>'/assets/premium-sunken/floors/11-'+(i+1)+'.webp'),
+          ...Object.keys(sunkenNames).map(key=>'/assets/premium-sunken/enemies/'+key+'.webp')];
+        const checks=await Promise.all(paths.map(async path=>{
+          const response=await env.ASSETS.fetch(new Request(u.origin+path,{method:'HEAD'}));
+          return [path,response.status];
+        }));
+        return Response.json({quest:11,artRevision:'q11-sunken-r1',ready:checks.every(([,status])=>status===200),checks:Object.fromEntries(checks)},
+          {headers:{'cache-control':'no-store'}});
+      }
       const assets = [
         ['html','/index.html'], ['js','/app.js'], ['css','/styles.css'],
         ['woodlandArt','/assets/premium-woodland/training-clearing-ground.jpg'],
@@ -123,7 +136,7 @@ export default {
         && checks[1].body.includes('v2-premium-giantwood.mjs?build=v2-q3-walls-20261114-r1')
         && checks[1].body.includes('initPremiumDesert') && checks[2].body.includes('.cin-room');
       return new Response(JSON.stringify({worker:'dicebound-4-visual-v2', build:'v2-q8-diceworks-r1',
-        artRevision:'q10-chaos-r1', cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
+        artRevision:'q11-sunken-r1', cinematicAssetsReady: ready, checks: Object.fromEntries(checks.map(check => [check.name, check.status]))}),
         {status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}});
     }
     if(req.method==='POST'&&u.pathname===ROOT+'/api/login')return doLogin(req,env);
@@ -185,6 +198,7 @@ export class GameRoom extends DurableObject {
       ensureCaravanTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),startRoom);
     }
     else if(/^monastery-q7-r[1-8]$/.test(trial||''))ensureMonasteryTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q7r'+trial.slice(-1));
+    else if(/^sunken-q11-r(?:10|[1-9])$/.test(trial||''))ensureSunkenTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),trial.replace('sunken-q11-','q11'));
     else if(/^chaos-q10-r(?:10|[1-9])$/.test(trial||''))ensureChaosTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),trial.replace('chaos-q10-','q10'));
     else if(/^warrens-q9-r[1-8]$/.test(trial||''))ensureWarrensTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q9r'+trial.slice(-1));
     else if(/^diceworks-q8-r[1-8]$/.test(trial||''))ensureDiceworksTrialPlayer(this.game,id,req.headers.get('x-dicebound-name'),'q8r'+trial.slice(-1));
@@ -283,6 +297,7 @@ export class GameRoom extends DurableObject {
         if(id!=='one')throw new Error('Only Player One can reset this technical test adventure');
         const monasteryStart=this.game.monasteryTrialRoom;
         const chaosStart=this.game.chaosTrialRoom;
+        const sunkenStart=this.game.sunkenTrialRoom;
         const warrensStart=this.game.warrensTrialRoom;
         const diceworksStart=this.game.diceworksTrialRoom;
         const cryptTrial=this.game.cryptTrial,cryptStart=this.game.cryptTrialRoom||'q6r3';
@@ -298,6 +313,10 @@ export class GameRoom extends DurableObject {
         if(diceworksStart){
           this.game.diceworksTrialRoom=diceworksStart;
           for(const player of Object.values(this.game.players))if(player.connected)ensureDiceworksTrialPlayer(this.game,player.id,player.name,diceworksStart);
+        }
+        if(sunkenStart){
+          this.game.sunkenTrialRoom=sunkenStart;
+          for(const player of Object.values(this.game.players))if(player.connected)ensureSunkenTrialPlayer(this.game,player.id,player.name,sunkenStart);
         }
         if(chaosStart){
           this.game.chaosTrialRoom=chaosStart;

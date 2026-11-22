@@ -37,6 +37,12 @@ export function ensureSunkenTrialPlayer(game,id,name,startRoom){
   return startTrial(game,id,name,startRoom,11,'sunkenTrialStarter',24);
 }
 
+export function ensureCityTrialPlayer(game,id,name,startRoom){
+  if(!/^q12r(?:10|[1-9])$/.test(startRoom))throw new Error('Unknown Quest 12 test room');
+  game.cityTrialRoom=startRoom;
+  return startTrial(game,id,name,startRoom,12,'cityTrialStarter',26);
+}
+
 function startTrial(game,id,name,startRoom,quest,starter,level=8){
   game.unlockedQuest=Math.max(quest,game.unlockedQuest||1);
   const player = ensurePlayer(game, id, name, null);

@@ -1,3 +1,4 @@
+import {city, cityArt, citySprite} from '../public/v2-city-plan.mjs';
 import {sunken, sunkenSprite, sunkenNames} from '../public/v2-sunken-plan.mjs';
 import {chaos} from '../public/v2-chaos-plan.mjs';
 import {warrens} from '../public/v2-warrens-plan.mjs';
@@ -421,7 +422,7 @@ for(const [room,plan] of Object.entries({...ROOM_CHALLENGES,...MEDIUM_BRIDGE_CHA
 // Authored Q6 start positions preserve the existing encounter roster.
 for(const [id,plan] of Object.entries(Q6_LAYOUTS))ROOM_DATA[id].spawnPositions=plan.spawnPositions;
 for(const [id,room] of Object.entries({...diceworks,...warrens})) ROOM_DATA[id].spawnPositions=room.spawns;
-const authoredHardRooms = {...chaos, ...sunken};
+const authoredHardRooms = {...chaos, ...sunken, ...city};
 for(const [id,plan] of Object.entries(authoredHardRooms)){
   const room=ROOM_DATA[id];
   room.foes=plan.foes;
@@ -949,7 +950,7 @@ export function freshState(now=nowMs()){
   for(const [id,def] of Object.entries(ROOM_DATA)){
     rooms[id]={id,discovered:id==='woodland',battle:{status:def.encounter.length?'dormant':'none',round:0,deadline:null,actions:{},eligibleRound:{},enemies:[]}};
   }
-  return {sunkenLayoutVersion:1,chaosLayoutVersion:1,turn:{round:1,ended:{},eligibleRound:{},deadline:now+ROUND_MS},version:8,epoch:now,revision:0,unlockedQuest:1,completedQuests:[],questRewardOffers:{},questRewardClaimed:{},legendaryMerchantOffer:null,mythicMerchantOffer:null,exoticMerchantOffer:null,events:[],nextEventId:1,players:{},rooms,log:[{at:now,text:'A Roll in the Woods begins. Find your friends and explore.'}]};
+  return {cityLayoutVersion:1,sunkenLayoutVersion:1,chaosLayoutVersion:1,turn:{round:1,ended:{},eligibleRound:{},deadline:now+ROUND_MS},version:8,epoch:now,revision:0,unlockedQuest:1,completedQuests:[],questRewardOffers:{},questRewardClaimed:{},legendaryMerchantOffer:null,mythicMerchantOffer:null,exoticMerchantOffer:null,events:[],nextEventId:1,players:{},rooms,log:[{at:now,text:'A Roll in the Woods begins. Find your friends and explore.'}]};
 }
 function addLog(s,text,now){s.log.push({at:now,text});if(s.log.length>35)s.log=s.log.slice(-35)}
 function emitEvent(s,type,payload,at){s.events??=[];s.nextEventId??=1;s.events.push({id:s.nextEventId++,type,...payload,at});s.events=s.events.slice(-40)}
@@ -971,6 +972,10 @@ export function ensureWorld(s){
   for(const [id,def] of Object.entries(ROOM_DATA)){
     if(!s.rooms[id])s.rooms[id]={id,discovered:id==='woodland',battle:{status:def.encounter.length?'dormant':'none',round:0,deadline:null,actions:{},eligibleRound:{},enemies:[]}};
     else {const b=s.rooms[id].battle;b.wave??=0;b.participated??={};b.damageBy??={};b.turnEnded??={};}
+  }
+  if (!s.cityLayoutVersion) {
+    reconcilePositions(s, Object.keys(city));
+    s.cityLayoutVersion = 1;
   }
   if (!s.sunkenLayoutVersion) {
     reconcilePositions(s, Object.keys(sunken));
@@ -1019,7 +1024,7 @@ export function enterQuest(s,id,quest,now=nowMs()){
   if(p.room!=='camp'&&ROOM_DATA[p.room]?.quest!==quest)saveQuestBookmark(p);
   const bookmark=activeBookmark(s,p,quest);
   const start=bookmark?.room||Object.keys(ROOM_DATA).find(r=>ROOM_DATA[r].quest===quest);
-  const entry=nearestVacant(s,start,bookmark?.x??(sunken[start]?0:1),bookmark?.y??(sunken[start]?doorRow(start):3),p.id);
+  const entry=nearestVacant(s,start,bookmark?.x??((sunken[start] || city[start])?0:1),bookmark?.y??((sunken[start] || city[start])?doorRow(start):3),p.id);
   if(!entry)throw new Error('No free square in the saved quest room');
   p.room=start;p.x=entry.x;p.y=entry.y;p.moveRemaining=0;p.moveRound=null;p.movementRolled=false;
   p.lastCampQuest=quest;
@@ -1183,6 +1188,7 @@ function spawnFoes(s,roomId,foes,now){
     const armourBase=variant==='boss'||variant==='large-shiny'?8:variant==='large'?6:4;
     const enemy={id:`${roomId}-w${b.wave||0}-${i}`,name:`${variant==='boss'?'Boss ':variant==='normal'?'':variant==='large-shiny'?'Large Shiny ':variant==='shiny'?'Shiny ':'Large '}${role!=='normal'?(role[0].toUpperCase()+role.slice(1)+' '):''}D${foe.faces}`,faces:foe.faces,variant,role,hp:Math.round(baseHp),maxHp:Math.round(baseHp),atk:medium?Math.round((15+(ROOM_DATA[roomId].quest-5)*4+foe.faces*.45+(variant==='boss'?10:0)+(role==='ninja'||role==='ranged'?3:0)))*(size===2?2:1):Math.max(2,Math.round(foe.faces*2/3))*(size===2?2:1),armourDie:medium?Math.round(13+(ROOM_DATA[roomId].quest-5)*3+foe.faces*.20+(variant==='boss'?8:0)+(role==='armoured'?7:0)):armourBase+(role==='armoured'?3:0),x:5,y:3,revived:false,awaitRevival:0,clone:false,teleportPhase:0,clonePhase:0};
     if (sunken[roomId]) enemy.name = sunkenNames[sunkenSprite(enemy)] + ' · D' + enemy.faces;
+    if (city[roomId]) enemy.name = cityArt[citySprite(enemy)].name + ' · D' + enemy.faces;
     let placed=false;
     const reachableLarge=size===2?largeTerrainReachableFromEntrance(roomId):null;
     // A room's formation changes its approach angles. Every candidate remains

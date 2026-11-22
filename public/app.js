@@ -1,4 +1,4 @@
-import * as monastery from './v2-premium-monastery.mjs?build=v2-q8-diceworks-r1&assembly=4&warrens=1&actors=3&chaos=1&sunken=1';
+import * as monastery from './v2-premium-monastery.mjs?build=v2-q8-diceworks-r1&assembly=4&warrens=1&actors=3&chaos=1&sunken=1&city=1';
 import {initPremiumCrypt,isPremiumCryptRoom,premiumCryptReady,paintPremiumCryptFloor,paintPremiumCryptWalls,paintPremiumCryptSurround,paintPremiumCryptAtmosphere,paintPremiumCryptActor,paintPremiumCryptRemains} from './v2-premium-crypt.mjs?build=v2-q6-obstacles-20261120-r3';
 import {initPremiumDesert,isPremiumDesertRoom,premiumDesertReady,paintPremiumDesertFloor,paintPremiumDesertWalls,paintPremiumDesertSurround,paintPremiumDesertAtmosphere,paintPremiumDesertActor} from './v2-premium-desert.mjs?build=v2-q2-polish-20261113-r2';
 import {initPremiumWoodland,premiumWoodlandReady,paintPremiumWoodlandFloor,paintPremiumWoodlandGroundLighting,paintPremiumWoodlandWall,paintPremiumWoodlandWalls,paintPremiumWoodlandAtmosphere,paintPremiumWoodlandContactShadow,paintPremiumWoodlandUnderbrush,paintPremiumWoodlandForeground,paintPremiumWoodlandForestLife,paintPremiumWoodlandActor,isPremiumWoodlandRoom} from './v2-premium-woodland.mjs?build=v2-quest1-soft-edges-q5-caravan-r1';
@@ -258,7 +258,7 @@ let campaign=null,selectedQuest=1,selectedEnemyId=null,lastSeenEvent=null;
 let chatData={messages:[],muted:[],reports:[],adminMuted:false,playersMuted:[]},chatOpen=false,chatSeen=0;
 const trial=new URLSearchParams(location.search).get('trial')==='balance-v9';
 const requestedTrial = new URLSearchParams(location.search).get('trial');
-const desertTrials = new Set([...Array.from({length:10},(_,i)=>'sunken-q11-r'+(i+1)),...Array.from({length:10},(_,i)=>'chaos-q10-r'+(i+1)),...Array.from({length:8},(_,i)=>'warrens-q9-r'+(i+1)),...Array.from({length:8},(_,i)=>'diceworks-q8-r'+(i+1)),...Array.from({length:8},(_,i)=>'monastery-q7-r'+(i+1)),...Array.from({length:8},(_,i)=>'crypt-q6-r'+(i+1)), 'mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
+const desertTrials = new Set([...Array.from({length:10},(_,i)=>'city-q12-r'+(i+1)),...Array.from({length:10},(_,i)=>'sunken-q11-r'+(i+1)),...Array.from({length:10},(_,i)=>'chaos-q10-r'+(i+1)),...Array.from({length:8},(_,i)=>'warrens-q9-r'+(i+1)),...Array.from({length:8},(_,i)=>'diceworks-q8-r'+(i+1)),...Array.from({length:8},(_,i)=>'monastery-q7-r'+(i+1)),...Array.from({length:8},(_,i)=>'crypt-q6-r'+(i+1)), 'mine-q2-r1','mine-q2-r2','mine-q2-r3','mine-q2-r4','mine-q2-r5','caravan-q5-r1', 'rushing-dunes-q5-r2',
   'quest5-room3', 'quest5-room4', 'quest5-room5', 'quest5-room6', 'quest5-room7', 'quest5-room8']);
 const desertTrial = desertTrials.has(requestedTrial) ? requestedTrial : null;
 if (desertTrial) $('cinematicQ5Room').value = desertTrial;
@@ -962,7 +962,7 @@ function render(){if(!state||!me)return;
     if(v2ArtToggle.textContent!==label)v2ArtToggle.textContent=label;
   }
   if(monastery.has(me.room)&&v2ArtToggle){
-    const theme=me.room.startsWith('q11r')?'Sunken Kingdom':me.room.startsWith('q10r')?'Chaos Dimension':me.room.startsWith('q9')?'Warrens':me.room.startsWith('q8')?'Diceworks':'Monastery';
+    const theme=me.room.startsWith('q12r')?'The Dice Are Cast':me.room.startsWith('q11r')?'Sunken Kingdom':me.room.startsWith('q10r')?'Chaos Dimension':me.room.startsWith('q9')?'Warrens':me.room.startsWith('q8')?'Diceworks':'Monastery';
     v2ArtToggle.textContent=v2ArtEnabled?(monastery.ready(me.room,state?.roomWalls?.[me.room]||[])?theme+' art: ON':'Loading '+theme+' art…'):theme+' art: OFF';
   }
   if(isPremiumCryptRoom(me.room)){

@@ -24,7 +24,7 @@ test('tablet portal arrows use normal movement, never bypassing global turns',()
  assert.match(js,/me\.moveRemaining>0/);
  assert.match(js,/turn\.activePlayer===me\.id/);
  // Doorways scale with 9×7 Beginner/Easy, 13×9 Medium, and 15×11 Hard and staged Extreme arenas, and the 16×12 sky quest.
- assert.match(js,/const roomSize=id=>roomDef\(id\)\.quest===13\?\{width:16,height:12\}:roomDef\(id\)\.quest>=10\?\{width:15,height:11\}:roomDef\(id\)\.quest>=5\?\{width:13,height:9\}:\{width:9,height:7\}/);
+ assert.match(js,/const roomSize=id=>\[13,14\]\.includes\(roomDef\(id\)\.quest\)\?\{width:16,height:12\}:roomDef\(id\)\.quest>=10\?\{width:15,height:11\}:roomDef\(id\)\.quest>=5\?\{width:13,height:9\}:\{width:9,height:7\}/);
  assert.match(js,/const doorRow=id=>Math\.floor\(roomSize\(id\)\.height\/2\)/);
  assert.match(js,/btn\.disabled=!canMove\|\|me\.y!==doorRow\(me\.room\)\|\|me\.x!==\(west\?0:roomSize\(me\.room\)\.width-1\)/);
  assert.match(css,/\.portal-arrow\{/);

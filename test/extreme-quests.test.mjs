@@ -33,7 +33,7 @@ test('15 original quests, 133 rooms and 45 distinct reachable Extreme maps',()=>
   for(let r=1;r<=15;r++){
    const id=`q${q}r${r}`,def=ROOM_DATA[id],rows=EXTREME_BLUEPRINTS[id];
    const {width,height}=roomSize(id);
-   assert.deepEqual({width,height},q===13?{width:16,height:12}:{width:15,height:11});
+   assert.deepEqual({width,height},q!==15?{width:16,height:12}:{width:15,height:11});
    const door=doorRow(id);assert.equal(door,Math.floor(height/2));
    assert.equal(rows.length,height);assert(rows.every(row=>row.length===width));
    assert(!isWall(id,0,door));assert(!isWall(id,width-1,door));
@@ -42,7 +42,7 @@ test('15 original quests, 133 rooms and 45 distinct reachable Extreme maps',()=>
    assert(reachable.has([width-1,door].join(',')),id+' exit unreachable');
    assert(ROOM_WALLS[id].length>=12,id+' lacks meaningful walls');
    assert(def.challenge.length>35,id+' challenge missing');
-   assert(q===13 ? def.foes.length>=18&&def.foes.length<=21 : def.foes.length>=8&&def.foes.length<=12,id+' encounter size');
+   assert(q!==15 ? def.foes.length>=18&&def.foes.length<=21 : def.foes.length>=8&&def.foes.length<=12,id+' encounter size');
    assert.equal(def.final,r===15);assert.equal(def.left,r===1?null:`q${q}r${r-1}`);
    assert.equal(def.right,r===15?null:`q${q}r${r+1}`);
   }

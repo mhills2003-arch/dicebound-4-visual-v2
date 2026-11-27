@@ -43,17 +43,23 @@ export function ensureCityTrialPlayer(game,id,name,startRoom){
   return startTrial(game,id,name,startRoom,12,'cityTrialStarter',26);
 }
 
+export function ensureSkyTrialPlayer(game,id,name,startRoom){
+  if(!/^q13r(?:1[0-5]|[1-9])$/.test(startRoom))throw new Error('Unknown Quest 13 test room');
+  game.skyTrialRoom=startRoom;
+  return startTrial(game,id,name,startRoom,13,'skyTrialStarter',28);
+}
+
 function startTrial(game,id,name,startRoom,quest,starter,level=8){
   game.unlockedQuest=Math.max(quest,game.unlockedQuest||1);
   const player = ensurePlayer(game, id, name, null);
   if (player[starter]) return player;
   player.room = 'camp';player.level = level;player.xp = 0;player.gold = 1000;
   selectClass(game, id, 'knight');player.maxHp = effectiveStats(player).maxHp;player.hp = player.maxHp;
-  for (const sku of (quest>=10?['sword-rare','armour-rare']:['sword-uncommon', 'armour-uncommon'])) {
+  for (const sku of (quest===13?['sword-legendary','armour-legendary']:quest>=10?['sword-rare','armour-rare']:['sword-uncommon', 'armour-uncommon'])) {
     buyFromShop(game, id, sku);const item = player.inventory.equipment.at(-1);
     equipItem(game, id, item.id, item.category === 'Armour' ? 'armour' : 'weapon');
   }
   for (let i = 0; i < 3; i++) buyFromShop(game, id, 'potion');
-  player.questBookmarks ??= {};player.questBookmarks[quest] = {room: startRoom, x: 0, y: quest>=10?5:4};
+  player.questBookmarks ??= {};player.questBookmarks[quest] = {room: startRoom, x: 0, y: quest===13?6:quest>=10?5:4};
   enterQuest(game, id, quest);player[starter] = true;return player;
 }

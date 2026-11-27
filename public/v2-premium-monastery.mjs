@@ -1,3 +1,4 @@
+import {sky, skyArt, skySprite} from './v2-sky-plan.mjs';
 import {city, cityArt, citySprite} from './v2-city-plan.mjs';
 import {sunken, sunkenSprite} from './v2-sunken-plan.mjs';
 import {sunkenBounds} from './v2-sunken-crops.mjs';
@@ -8,14 +9,14 @@ import {rooms as monastery} from './v2-monastery-plan.mjs';
 
 const isWarrens = id => Object.hasOwn(warrens,id);
 const isChaos=id=>Object.hasOwn(chaos,id);
-const paintedPlans={...warrens,...chaos,...sunken,...city};
+const paintedPlans={...warrens,...chaos,...sunken,...city,...sky};
 const rooms = {...monastery,...Object.fromEntries(Object.keys(paintedPlans).map(id=>[id,[]])),...Object.fromEntries(Object.entries(diceworks).map(([id,r])=>[id,r.machinery]))};
 const isWorks = id => Object.hasOwn(diceworks,id);
 const prefix = id => isWorks(id)?'diceworks/':'monastery/';
 const obstacleKey = (id,name) => prefix(id)+(isWorks(id)?'machinery/':'obstacles/')+name;
 const integratedBoard = id => id === 'q8r1' ? 'diceworks/floors/8-1-engine-pit-r3' : floorKey(id)+'-integrated-r4';
 const images = new Map();
-const floorKey = id => city[id] ? 'city/floors/12-'+id.slice(4) : sunken[id] ? 'sunken/floors/11-'+id.slice(4) : isChaos(id) ? 'chaos/floors/10-'+id.slice(4) : isWarrens(id) ? 'warrens/floors/9-'+id.slice(-1) : prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
+const floorKey = id => sky[id] ? 'sky/floors/13-'+id.slice(4) : city[id] ? 'city/floors/12-'+id.slice(4) : sunken[id] ? 'sunken/floors/11-'+id.slice(4) : isChaos(id) ? 'chaos/floors/10-'+id.slice(4) : isWarrens(id) ? 'warrens/floors/9-'+id.slice(-1) : prefix(id)+(isWorks(id)?'floors/8-':'terrain/7-')+id.slice(-1);
 function warrensEnemy(p) {
   if (p.variant==='boss' || (p.clone && p.faces===20)) return 'boss20';
   const role=p.clone && p.parentId!=='nest' ? 'cloner' : p.role;
@@ -28,7 +29,7 @@ const chaosSprites={
   ninja:'monastery/enemies/ninja-d20',armoured:'diceworks/enemies/armoured14',healer:'monastery/enemies/healer-d12'
 };
 const chaosSprite=p=>p.variant==='boss'?'warrens/enemies/boss20':chaosSprites[p.role]||chaosSprites.normal;
-const enemyKey = (id,p) => city[id] ? 'city/enemies/'+citySprite(p) : sunken[id] ? 'sunken/enemies/'+sunkenSprite(p) : isChaos(id)?chaosSprite(p): isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+diceworksEnemy(p):'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
+const enemyKey = (id,p) => sky[id] ? 'sky/enemies/'+skySprite(p) : city[id] ? 'city/enemies/'+citySprite(p) : sunken[id] ? 'sunken/enemies/'+sunkenSprite(p) : isChaos(id)?chaosSprite(p): isWarrens(id) ? 'warrens/enemies/'+warrensEnemy(p) : isWorks(id)?'diceworks/enemies/'+diceworksEnemy(p):'monastery/enemies/' + (p.clone ? 'cloner' : p.role === 'normal' ? 'ordinary' : p.role) + '-d' + p.faces;
 export const has = id => Object.hasOwn(rooms,id);
 function request(key) {
   if (images.has(key)) return;
@@ -194,6 +195,7 @@ export function actor(ctx,s,p,kind,base,{label,selected,active,roomId}) {
     left=pt.x-dw/2; top=pt.y-dh*.65;
   }else{
     let bounds = sunken[roomId] ? sunkenBounds[sunkenSprite(p)] : undefined;
+    if(sky[roomId]) bounds=skyArt[skySprite(p)].bounds;
     if(city[roomId]) bounds=cityArt[citySprite(p)].bounds;
     if(isWorks(roomId)) bounds=diceworksBounds[diceworksEnemy(p)];
     if(isChaos(roomId)) bounds=chaosBounds[chaosSprite(p)];

@@ -6,7 +6,7 @@ import {ROOM_DATA,ROOM_WALLS,freshState,ensurePlayer,resetTestAdventure,enterQue
 import {ensureCryptTrialPlayer} from '../src/crypt-trial.mjs';
 import {CRYPT_FILES,cryptSprite,cryptWallEdges,cryptObstaclePlan,isPremiumCryptRoom,initPremiumCrypt,premiumCryptReady,paintPremiumCryptActor} from '../public/v2-premium-crypt.mjs';
 import {CRYPT_SPRITE_CROPS} from '../public/v2-crypt-sprite-crops.mjs';
-const approved=JSON.parse(readFileSync(new URL('../design/quest6/layouts-r1.json',import.meta.url),'utf8'));
+const approved=JSON.parse(readFileSync(new URL('../design/quest5/quest6/layouts-r1.json',import.meta.url),'utf8'));
 
 test('all Q6 approved layouts and existing rosters reach the shipping engine',()=>{
   assert.equal(Object.keys(Q6_LAYOUTS).length,8);

@@ -43,6 +43,12 @@ export function ensureCityTrialPlayer(game,id,name,startRoom){
   return startTrial(game,id,name,startRoom,12,'cityTrialStarter',26);
 }
 
+export function ensureCitadelTrialPlayer(game,id,name,startRoom){
+  if(!/^q15r(?:1[0-5]|[1-9])$/.test(startRoom))throw new Error('Unknown Quest 15 test room');
+  game.citadelTrialRoom=startRoom;
+  return startTrial(game,id,name,startRoom,15,'citadelTrialStarter',32);
+}
+
 export function ensureAbyssTrialPlayer(game,id,name,startRoom){
   if(!/^q14r(?:1[0-5]|[1-9])$/.test(startRoom))throw new Error('Unknown Quest 14 test room');
   game.abyssTrialRoom=startRoom;

@@ -33,7 +33,7 @@ test('15 original quests, 133 rooms and 45 distinct reachable Extreme maps',()=>
   for(let r=1;r<=15;r++){
    const id=`q${q}r${r}`,def=ROOM_DATA[id],rows=EXTREME_BLUEPRINTS[id];
    const {width,height}=roomSize(id);
-   assert.deepEqual({width,height},q!==15?{width:16,height:12}:{width:15,height:11});
+   assert.deepEqual({width,height},{width:16,height:12});
    const door=doorRow(id);assert.equal(door,Math.floor(height/2));
    assert.equal(rows.length,height);assert(rows.every(row=>row.length===width));
    assert(!isWall(id,0,door));assert(!isWall(id,width-1,door));
@@ -42,7 +42,7 @@ test('15 original quests, 133 rooms and 45 distinct reachable Extreme maps',()=>
    assert(reachable.has([width-1,door].join(',')),id+' exit unreachable');
    assert(ROOM_WALLS[id].length>=12,id+' lacks meaningful walls');
    assert(def.challenge.length>35,id+' challenge missing');
-   assert(q!==15 ? def.foes.length>=18&&def.foes.length<=21 : def.foes.length>=8&&def.foes.length<=12,id+' encounter size');
+   assert(def.foes.length>=18&&def.foes.length<=21,id+' encounter size');
    assert.equal(def.final,r===15);assert.equal(def.left,r===1?null:`q${q}r${r-1}`);
    assert.equal(def.right,r===15?null:`q${q}r${r+1}`);
   }
@@ -133,7 +133,7 @@ test('Dice King turns through three faces on one persistent HP bar',()=>{
  const p=s.players.one;p.room=id;p.x=0;p.y=5;
  const b=s.rooms[id].battle;b.status='dormant';b.enemies=[];
  // Trigger real first room transition from previous chamber.
- const previous='q15r14';p.room=previous;p.x=14;p.y=5;p.moveRemaining=1;p.movementRolled=true;p.moveRound='global:1';s.rooms[previous].battle.status='cleared';move(s,'one','E',T);
+ const previous='q15r14';p.room=previous;p.x=roomSize(previous).width-1;p.y=doorRow(previous);p.moveRemaining=1;p.movementRolled=true;p.moveRound='global:1';s.rooms[previous].battle.status='cleared';move(s,'one','E',T);
  const king=b.enemies.find(e=>e.variant==='boss');assert(king);
  const hp=king.maxHp;
  b.eligibleRound={one:1};b.participated={one:true};b.damageBy={one:0};
